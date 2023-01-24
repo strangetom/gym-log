@@ -1,0 +1,104 @@
+:root {
+  color-scheme: dark;
+  --bg: #1d2021;
+  --bg-s: #32302f;
+  --bg-1: #3c3836;
+  --bg-2: #504945;
+  --bg-3: #665c54;
+  --bg-4: #7c6f64;
+  --fg: #fbf1c7;
+  --fg-1: #ebdbb2;
+  --fg-2: #d5c4a1;
+  --gray: #a89984;
+  --red: #cc241d;
+  --red-alt: #fb4934;
+  --green: #98971a;
+  --green-alt: #b8bb26;
+  --yellow: #d79921;
+  --yellow-alt: #fabd2f;
+  --blue: #458588;
+  --blue-alt: #83a598;
+  --purple: #b16286;
+  --purple-alt: #d3869b;
+  --orange: #d65d0e;
+  --orange-alt: #fe8019;
+  --aqua: #689d6a;
+  --aqua-alt: #8ec07c;
+  --brown: #B17744;
+}
+
+body {
+  font-family: sans-serif;
+  color: var(--fg);
+  background-color: var(--bg); 
+  margin: 0 auto;
+  max-width: 80ch;
+  -webkit-font-smoothing: antialiased;
+}
+
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-s);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  font-size: 1.3rem;
+}
+h1 {
+  margin: .7rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+#fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 3.8rem;
+  height: 3.8rem;
+  border: none;
+  border-radius: 3rem;
+  background-color: var(--fg);
+  color: var(--bg-1);
+  font-size: 3rem;
+  font-weight: 100;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
+}
+
+#exercises {
+  margin-top: calc(2rem + .7rem + 1rem);
+}
+.exercise-card {
+  display: block;
+  padding: 1rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gray);
+  color: var(--fg);
+}
+.exercise-card h2 {
+  margin: 0 0 1rem 0;
+  font-weight: normal;
+}
+.exercise-card .exercise-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+dialog::backdrop {
+  /* Backdrop does not inherit from any element so cannot use CSS variables.
+  https://fullscreen.spec.whatwg.org/#::backdrop-pseudo-element
+  */
+  background-color: #32302f66;
+  backdrop-filter: blur(2px);
+}
+
+dialog[open] {
+  animation: show .1s ease-out normal;
+}
+@keyframes show {
+  from {transform: translateY(-100%);}
+  to {transform: translateY(0%);}
+}
