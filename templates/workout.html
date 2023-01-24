@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="Description" content="Gym Log">
+        <meta name="viewport" content="width=device-width">
+        <title>Shopping List</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/workout.css">
+        <script type="module" src="./static/js/index.js"></script>
+        <!-- icons and manifest for PWA -->
+        <link rel="manifest" href="/static/manifest.json">
+        <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+        <meta name="theme-color" content="#3c3836"/>
+    </head>
+    <body>
+
+        <section id="header">
+            <h1>Upper Body</h1>
+        </section>
+
+        <section id="exercises">
+             {%- for e in exercises -%}
+            <a href="" class="exercise-card">
+                <h2>{{e.name}}</h2>
+                <div class="exercise-details">
+                    <span>{{e.last_update}}</span>
+                    <span>{{e.last_set}}</span>
+                </div>
+            </a>
+            {%- endfor -%}
+        </section>
+
+        <button id="fab">
+            +
+        </button>
+
+        <dialog id="new-workout-dialog">
+            <form method="dialog">
+                <div>
+                    <input type="text" id="name" name="name" autocomplete="off" value="">
+                    <button type="submit" value="submit">+</button>
+                </div>
+                <ul id="suggestions"></ul>
+            </form>
+        </dialog>
+
+    </body>
+</html>
