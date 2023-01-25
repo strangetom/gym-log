@@ -13,7 +13,6 @@ from flask import (
     request,
     url_for,
 )
-
 from tools.WorkoutData import WorkoutData
 
 app = Flask(__name__)
@@ -49,9 +48,42 @@ def home():
 
 
 @app.route("/workout/<string:slug>")
-def workout(slug):
+def workout(slug: str):
+    """Return page for workout given by slug
 
+    Parameters
+    ----------
+    slug : str
+        Slug for workout
+
+    Returns
+    -------
+    str
+        Rendered HTML template
+    """
     w = get_workout_data()
     exercises = w.list_exercises(slug)
+    name = w.get_workout_name(slug)
 
-    return render_template("workout.html", exercises=exercises)
+    return render_template("workout.html", exercises=exercises, name=name)
+
+
+@app.route("/exercise/<int:exerciseID>")
+def exercise(exerciseID: int):
+    """Return page for exercise given by ID
+
+    Parameters
+    ----------
+    exerciseID : int
+        Exercise ID
+
+    Returns
+    -------
+    str
+        Rendered HTML template
+    """
+    w = get_workout_data()
+    sets = w.list_sets(exerciseID)
+    name = w.get_exercise_name(exerciseID)
+
+    return render_template("exercise.html", sets=sets, name=name)

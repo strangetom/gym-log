@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="Description" content="Gym Log">
+        <meta name="viewport" content="width=device-width">
+        <title>Shopping List</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/exercise.css">
+        <script type="module" src="./static/js/index.js"></script>
+        <!-- icons and manifest for PWA -->
+        <link rel="manifest" href="/static/manifest.json">
+        <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+        <meta name="theme-color" content="#3c3836"/>
+    </head>
+    <body>
+
+        <section id="header">
+            <h1>{{name}}</h1>
+        </section>
+
+        <section id="sets">
+            {%- for group in sets -%}
+            <div class="set-group">
+                {%- for s in group -%}
+                <div class="set-card">
+                    <h3>{{s.set_detail}}</h3>
+                    <small>{{s.timestamp}}</small>
+                </div>
+                {%- endfor -%}
+            </div>
+            {%- endfor -%}
+        </section>
+
+    </body>
+</html>
