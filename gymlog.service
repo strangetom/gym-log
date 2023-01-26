@@ -1,0 +1,12 @@
+[Unit]
+Description=Recipe Manager
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/GymLog
+Environment="PATH=/home/pi/GymLog/venv/bin"
+ExecStart=/home/pi/GymLog/venv/bin/gunicorn --chdir /home/pi/GymLog/ GymLog:app
+
+[Install]
+WantedBy=multi-user.target
