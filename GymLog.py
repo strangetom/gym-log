@@ -33,6 +33,19 @@ def get_workout_data():
     return data
 
 
+@app.route("/service-worker.js", methods=["GET"])
+def serviceworker():
+    """Make servicer work available at /service-worker.js path instead of from
+    within /static path
+
+    Returns
+    -------
+    Response
+        Response object pointing to service-worker.js
+    """
+    return app.send_static_file("service-worker.js")
+
+
 @app.route("/")
 def home():
     """Return homepage
