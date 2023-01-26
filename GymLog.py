@@ -1,3 +1,4 @@
+import json
 import sys
 
 sys.path.append(".")
@@ -62,10 +63,9 @@ def workout(slug: str):
         Rendered HTML template
     """
     w = get_workout_data()
-    exercises = w.list_exercises(slug)
-    name = w.get_workout_name(slug)
-
-    return render_template("workout.html", exercises=exercises, name=name)
+    return render_template(
+        "workout.html", exercises=w.list_exercises(slug), name=w.get_workout_name(slug)
+    )
 
 
 @app.route("/exercise/<int:exerciseID>")
@@ -83,7 +83,24 @@ def exercise(exerciseID: int):
         Rendered HTML template
     """
     w = get_workout_data()
-    sets = w.list_sets(exerciseID)
-    name = w.get_exercise_name(exerciseID)
+    return render_template(
+        "exercise.html",
+        sets=w.list_sets(exerciseID),
+        name=w.get_exercise_name(exerciseID),
+        type=w.get_exercise_type(exerciseID),
+        exerciseID=exerciseID,
+    )
 
-    return render_template("exercise.html", sets=sets, name=name)
+
+@app.route("/add-set", methods=["POST"])
+def add_set():
+
+    if request.method == "POST":
+        post_data = request.form
+        set_data = json.loads(post_data["set"])
+
+        w = get_workout_data()
+        w.save_set(set_data)
+        exerciseID = set_data["exerciseID"]
+
+        return redirect(url_for("exercise", exerciseID=exerciseID))

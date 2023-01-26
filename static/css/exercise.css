@@ -47,13 +47,42 @@ body {
   font-size: 1.3rem;
 }
 h1 {
-  margin: .7rem;
+  padding: .7rem;
+  margin: 0;
   font-weight: 400;
   text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 }
 
-#sets {
+#new-set {
+  position: relative;
+  height: 9rem;
+  background-color: var(--bg-3);
+  box-shadow: 0 -5px 50px rgba(0, 0, 0, 0.4);
+  padding-top: .3rem;
+}
+#new-set .new-input {
+  display: block;
+  padding: 1rem 0 0 4rem;
+  font-size: 1.6rem;
+}
+#new-set input {
+  font-size: 2rem;
+  width: 6ch;
+  color: var(--bg);
+  background-color: var(--fg);
+  border: none;
+  border-radius: .2rem;
+}
+#new-set .time-input {
+  width: 3ch;
+}
+
+
+#historical-sets {
   margin-top: calc(2rem + .7rem + 1rem);
+  max-height: calc(100vh - 2rem - .7rem - 1rem - 9rem);
+  overflow: auto;
 }
 .set-group {
   border-bottom: 3px solid var(--gray);
@@ -73,18 +102,25 @@ h1 {
   color: var(--fg-2);
 }
 
-dialog::backdrop {
-  /* Backdrop does not inherit from any element so cannot use CSS variables.
-  https://fullscreen.spec.whatwg.org/#::backdrop-pseudo-element
-  */
-  background-color: #32302f66;
-  backdrop-filter: blur(2px);
+#fab {
+  position: absolute;
+  top: -1.9rem;
+  right: 1rem;
+  width: 3.8rem;
+  height: 3.8rem;
+  border: none;
+  border-radius: 3rem;
+  background-color: var(--fg);
+  color: var(--bg-1);
+  font-size: 3rem;
+  font-weight: 100;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
+  transition: rotate .2s;
 }
-
-dialog[open] {
-  animation: show .1s ease-out normal;
+.save-success {
+  background-color: var(--green-alt) !important;
 }
-@keyframes show {
-  from {transform: translateY(-100%);}
-  to {transform: translateY(0%);}
+.save-error {
+  background-color: var(--red) !important;
+  rotate: 45deg;
 }

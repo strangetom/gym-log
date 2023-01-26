@@ -13,7 +13,7 @@ class WorkoutData:
         self.db = db
 
     def get_workout_name(self, slug: str) -> str:
-        """Return work name from slug
+        """Return workout name from slug
 
         Parameters
         ----------
@@ -34,11 +34,11 @@ class WorkoutData:
         return name[0]
 
     def get_exercise_name(self, exerciseID: int) -> str:
-        """Return work name from slug
+        """Return exercise name from exercise ID
 
         Parameters
         ----------
-        exerciseID : ing
+        exerciseID : int
             Exercise ID
 
         Returns
@@ -53,6 +53,27 @@ class WorkoutData:
 
         conn.close()
         return name[0]
+
+    def get_exercise_type(self, exerciseID: int) -> str:
+        """Return work name from slug
+
+        Parameters
+        ----------
+        exerciseID : int
+            Exercise ID
+
+        Returns
+        -------
+        str
+            Exercise name
+        """
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT type FROM exercise WHERE exerciseID = ?", (exerciseID,))
+            type_ = cur.fetchone()
+
+        conn.close()
+        return type_[0]
 
     def list_workouts(self) -> List[Dict[str, Any]]:
         """List all workouts in log
@@ -183,6 +204,27 @@ class WorkoutData:
         ]
 
         return grouped_sets
+
+    def save_set(self, set_data: Dict[str, str]) -> None:
+
+        # Replace empty strings in keys with None
+        data = {key: None if value == "" else value for key, value in set_data.items()}
+
+        # Insert into database
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO sets (exerciseID, datetime, distance_m, weight_kg, time_s, repetitions) VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    data["exerciseID"],
+                    data["datetime"],
+                    data["distance_m"],
+                    data["weight_kg"],
+                    data["time_s"],
+                    data["repetitions"],
+                ),
+            )
+        conn.close()
 
     def _get_workout_last_update(self, workoutID: int) -> str:
         """Return human readable string for when timestamp of last set

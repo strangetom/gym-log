@@ -4,9 +4,9 @@
         <meta charset="utf-8">
         <meta name="Description" content="Gym Log">
         <meta name="viewport" content="width=device-width">
-        <title>Shopping List</title>
+        <title>{{name}} | Gym Log</title>
         <link rel="stylesheet" type="text/css" href="/static/css/exercise.css">
-        <script type="module" src="./static/js/index.js"></script>
+        <script type="module" src="/static/js/exercise.js"></script>
         <!-- icons and manifest for PWA -->
         <link rel="manifest" href="/static/manifest.json">
         <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
@@ -18,7 +18,7 @@
             <h1>{{name}}</h1>
         </section>
 
-        <section id="sets">
+        <section id="historical-sets">
             {%- for group in sets -%}
             <div class="set-group">
                 {%- for s in group -%}
@@ -31,5 +31,37 @@
             {%- endfor -%}
         </section>
 
+        <section id=new-set>
+            <input type="hidden" name="exerciseID" id="exerciseID" value="{{exerciseID}}">
+            {%- if type == "weight-repetitions" -%}
+            <div class="new-input">
+                <input type="text" inputmode="numeric" id="reps" name="reps" autocomplete="off" value="">
+                Reps
+            </div>
+            <div class="new-input">
+                <input type="text" inputmode="numeric" id="weight" name="weight" autocomplete="off" value="">
+                kg
+            </div>
+            {%- elif type == "distance-time" -%}
+            <div class="new-input">
+                <input type="text" inputmode="numeric" id="distance" name="distance" autocomplete="off" value="">
+                m
+            </div>
+            <div class="new-input">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="" placeholder="ss">
+            </div>
+            {%- elif type == "time" -%}
+            <div class="new-input">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="" placeholder="ss">
+            </div>
+            {%- endif -%}
+            <button id="fab">
+                +
+            </button>
+        </section>
     </body>
 </html>
