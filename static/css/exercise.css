@@ -55,7 +55,10 @@ h1 {
 }
 
 #new-set {
-  position: relative;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   height: 9rem;
   background-color: var(--bg-3);
   box-shadow: 0 -5px 50px rgba(0, 0, 0, 0.4);
@@ -80,8 +83,11 @@ h1 {
 
 
 #historical-sets {
-  margin-top: calc(2rem + .7rem + 1rem);
-  max-height: calc(100vh - 2rem - .7rem - 1rem - 9rem);
+  position: fixed;
+  top: calc(2rem + .7rem + 1rem);
+  bottom: 9rem;
+  left: 0;
+  right: 0;
   overflow: auto;
 }
 .set-group {
