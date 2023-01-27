@@ -1,6 +1,6 @@
 {
   "name": "Gym Log",
-  "short_name": "GymLog",
+  "short_name": "Gym Log",
   "icons": [{
       "src": "/static/icons/icon-512.png",
       "sizes": "512x512",
