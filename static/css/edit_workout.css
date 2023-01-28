@@ -183,10 +183,14 @@ dialog[open] {
   margin-top: 2vh;
   border-radius: .2rem;
 }
+h2 {
+  font-size: 1rem;
+  margin: 0 0 .5rem 0;
+}
 .new-exercise-input {
   width: 100%;
 }
-.new-exercise-inputlabel {
+.new-exercise-input label {
   margin-top: .5rem;
   display: block;
   font-size: .8rem;
