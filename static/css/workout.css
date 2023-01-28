@@ -51,6 +51,15 @@ h1 {
   font-weight: 400;
   text-align: center;
 }
+#header img {
+  position: absolute;
+  top: .7rem;
+  left: .7rem;
+  height: 2rem;
+  margin: 5px;
+  background-color: var(--fg);
+  border-radius: .5rem;
+}
 
 #fab {
   position: fixed;

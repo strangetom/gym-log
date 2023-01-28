@@ -53,6 +53,15 @@ h1 {
   text-align: center;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 }
+#header img {
+  position: absolute;
+  top: .7rem;
+  left: .7rem;
+  height: 2rem;
+  margin: 5px;
+  background-color: var(--fg);
+  border-radius: .5rem;
+}
 
 #new-set {
   position: fixed;
