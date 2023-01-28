@@ -51,6 +51,15 @@ h1 {
   font-weight: 400;
   text-align: center;
 }
+#header input {
+  box-sizing: border-box;
+  padding: .1rem .5rem;
+  border: none;
+  color: var(--fg);
+  background-color: var(--bg-3);
+  font-size: 2rem;
+  width: 15ch;
+}
 
 .fab {
   position: fixed;

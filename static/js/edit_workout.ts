@@ -80,6 +80,10 @@ function saveWorkout(e: Event) {
     workoutID = Number(workoutIDEl.value);
   }
 
+  let workoutName: string = (
+    document.querySelector("#workout-name") as HTMLInputElement
+  ).value;
+
   let selectedExerciseIDs: number[] = [];
   let exerciseOptions: NodeListOf<HTMLInputElement> = document.querySelectorAll(
     "input[type='checkbox']"
@@ -89,7 +93,11 @@ function saveWorkout(e: Event) {
       selectedExerciseIDs.push(Number(opt.dataset.exerciseid));
     }
   });
-  let workoutData = { workoutID: workoutID, exerciseIDs: selectedExerciseIDs };
+  let workoutData = {
+    workoutID: workoutID,
+    exerciseIDs: selectedExerciseIDs,
+    name: workoutName,
+  };
 
   let postData = new FormData();
   postData.append("workout", JSON.stringify(workoutData));
@@ -99,8 +107,11 @@ function saveWorkout(e: Event) {
     body: postData,
   }).then((res) => {
     if (res.ok) {
-      saveSuccess("#fab-edit");
-      window.history.back();
+      if (res.redirected) {
+        window.location.href = res.url;
+      } else {
+        saveSuccess("#fab-edit");
+      }
     } else {
       saveError("#fab-edit");
     }

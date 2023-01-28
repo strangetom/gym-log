@@ -79,7 +79,7 @@ def workout(slug: str):
     return render_template(
         "workout.html",
         exercises=w.list_workout_exercises(slug),
-        name=w.get_workout_name(slug),
+        name=w.get_workout_name_from_slug(slug),
         slug=slug,
     )
 
@@ -102,8 +102,8 @@ def exercise(exerciseID: int):
     return render_template(
         "exercise.html",
         sets=w.list_exercise_sets(exerciseID),
-        name=w.get_exercise_name(exerciseID),
-        type=w.get_exercise_type(exerciseID),
+        name=w.get_exercise_name_from_id(exerciseID),
+        type=w.get_exercise_type_from_id(exerciseID),
         exerciseID=exerciseID,
     )
 
@@ -116,10 +116,10 @@ def edit_workout(slug: str):
 
     return render_template(
         "edit_workout.html",
-        name=w.get_workout_name(slug),
+        name=w.get_workout_name_from_slug(slug),
         all_exercises=all_exercises,
         workout_exercises=workout_exercises,
-        workoutID=w.get_workout_id(slug),
+        workoutID=w.get_workout_id_from_slug(slug),
     )
 
 
@@ -143,11 +143,12 @@ def save_workout():
     if request.method == "POST":
         post_data = request.form
         workout_data = json.loads(post_data["workout"])
+        workoutID = workout_data["workoutID"]
 
         w = get_workout_data()
         w.save_workout(workout_data)
 
-        return Response(status=200)
+        return redirect(url_for("workout", slug=w.get_workout_slug_from_id(workoutID)))
 
 
 @app.route("/new-exercise", methods=["POST"])

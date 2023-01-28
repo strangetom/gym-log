@@ -12,7 +12,7 @@ class WorkoutData:
     def __init__(self, db):
         self.db = db
 
-    def get_workout_name(self, slug: str) -> str:
+    def get_workout_name_from_slug(self, slug: str) -> str:
         """Return workout name from slug
 
         Parameters
@@ -33,7 +33,7 @@ class WorkoutData:
         conn.close()
         return name[0]
 
-    def get_workout_id(self, slug: str) -> int:
+    def get_workout_id_from_slug(self, slug: str) -> int:
         """Return workout ID from slug
 
         Parameters
@@ -54,7 +54,7 @@ class WorkoutData:
         conn.close()
         return workoutID[0]
 
-    def get_workout_slug(self, workoutID: int) -> str:
+    def get_workout_slug_from_id(self, workoutID: int) -> str:
         """Return workout ID from slug
 
         Parameters
@@ -75,7 +75,7 @@ class WorkoutData:
         conn.close()
         return slug[0]
 
-    def get_exercise_name(self, exerciseID: int) -> str:
+    def get_exercise_name_from_id(self, exerciseID: int) -> str:
         """Return exercise name from exercise ID
 
         Parameters
@@ -96,7 +96,7 @@ class WorkoutData:
         conn.close()
         return name[0]
 
-    def get_exercise_type(self, exerciseID: int) -> str:
+    def get_exercise_type_from_id(self, exerciseID: int) -> str:
         """Return work name from slug
 
         Parameters
@@ -175,6 +175,23 @@ class WorkoutData:
                 all_exercises.append({"name": name, "exerciseID": exerciseID})
 
         return sorted(all_exercises, key=lambda x: x["name"])
+
+    def list_workout_exercises_by_id(self, workoutID: int) -> List[Dict[str, str]]:
+        """Return exercises for workout given by workoutID
+
+        Parameters
+        ----------
+        workoutID : int
+            workoutID
+
+        Returns
+        -------
+        List[Dict[str, str]]
+            ist of dicts containing name, exerciseID, last update
+            and last set details
+        """
+        slug = self.get_workout_slug_from_id(workoutID)
+        return self.list_workout_exercises(slug)
 
     def list_workout_exercises(self, slug: str) -> List[Dict[str, str]]:
         """Return exercises for workout given by slug
@@ -302,10 +319,21 @@ class WorkoutData:
     def save_workout(self, workout_data: Dict[str, Any]) -> None:
 
         workoutID = workout_data["workoutID"]
-        slug = self.get_workout_slug(workoutID)
+
+        # Update name and slug
+        workout_name = workout_data["name"]
+        workout_slug = slugify(workout_name)
+
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "UPDATE workout SET name = ?, slug = ? WHERE workoutID = ?",
+                (workout_name, workout_slug, workoutID),
+            )
+        conn.close()
 
         # Get set of current exercise IDs
-        current_exercises = self.list_workout_exercises(slug)
+        current_exercises = self.list_workout_exercises_by_id(workoutID)
         current_exercise_IDs = {ex["exerciseID"] for ex in current_exercises}
 
         new_exercises = set(workout_data["exerciseIDs"]) - current_exercise_IDs
