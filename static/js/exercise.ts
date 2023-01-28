@@ -1,4 +1,4 @@
-"use strict";
+import { saveError, saveSuccess } from "./saveFunctions.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   let fab: HTMLButtonElement = document.querySelector(
@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function saveSet(e: Event) {
-  let set_data = {
+  let setData = {
     exerciseID: "",
     datetime: isoDateTime(),
     distance_m: "",
@@ -17,34 +17,34 @@ function saveSet(e: Event) {
     repetitions: "",
   };
 
-  let exerciseID: HTMLInputElement = document.querySelector(
+  let exerciseIDEl: HTMLInputElement = document.querySelector(
     "#exerciseID"
   ) as HTMLInputElement;
-  if (exerciseID == null) {
+  if (exerciseIDEl == null) {
     //error
   } else {
-    set_data.exerciseID = exerciseID.value;
+    setData.exerciseID = exerciseIDEl.value;
   }
 
   let distance_m: HTMLInputElement = document.querySelector(
     "#distance"
   ) as HTMLInputElement;
   if (distance_m != null) {
-    set_data.distance_m = distance_m.value;
+    setData.distance_m = distance_m.value;
   }
 
   let weight_kg: HTMLInputElement = document.querySelector(
     "#weight"
   ) as HTMLInputElement;
   if (weight_kg != null) {
-    set_data.weight_kg = weight_kg.value;
+    setData.weight_kg = weight_kg.value;
   }
 
   let reps: HTMLInputElement = document.querySelector(
     "#reps"
   ) as HTMLInputElement;
   if (reps != null) {
-    set_data.repetitions = reps.value;
+    setData.repetitions = reps.value;
   }
 
   let hours: HTMLInputElement = document.querySelector(
@@ -59,18 +59,23 @@ function saveSet(e: Event) {
   if (hours != null && mins != null && secs != null) {
     let time_s =
       Number(secs.value) + Number(mins.value) * 60 + Number(hours.value) * 3600;
-    set_data.time_s = time_s.toString();
+    setData.time_s = time_s.toString();
   }
 
   let postData = new FormData();
-  postData.append("set", JSON.stringify(set_data));
+  postData.append("set", JSON.stringify(setData));
 
-  fetch("/add-set", {
+  fetch("/save-set", {
     method: "POST",
     body: postData,
   }).then((res) => {
     if (res.ok) {
-      saveSuccess();
+      if (res.redirected) {
+        // Redirect if instructed
+        window.location.href = res.url;
+      } else {
+        saveSuccess();
+      }
     } else {
       saveError();
     }
@@ -82,24 +87,4 @@ function saveSet(e: Event) {
  */
 function isoDateTime() {
   return new Date().toISOString().split(".")[0] + "Z";
-}
-
-function saveSuccess() {
-  let fab: HTMLButtonElement = document.querySelector(
-    "#fab"
-  ) as HTMLButtonElement;
-  fab.classList.add("save-success");
-  setTimeout(() => {
-    fab.classList.remove("save-success");
-  }, 2500);
-}
-
-function saveError() {
-  let fab: HTMLButtonElement = document.querySelector(
-    "#fab"
-  ) as HTMLButtonElement;
-  fab.classList.add("save-error");
-  setTimeout(() => {
-    fab.classList.remove("save-error");
-  }, 2500);
 }

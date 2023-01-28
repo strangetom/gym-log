@@ -67,24 +67,76 @@ h1 {
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
 }
 #fab img {
-  scale: 0.6;
+  scale: 0.7;
+  padding-top: 5px;
+}
+.save-success {
+  background-color: var(--green-alt) !important;
+}
+.save-error {
+  background-color: var(--red) !important;
 }
 
 #exercises {
   margin-top: calc(2rem + .7rem + 1rem);
 }
-.exercise-card {
-  display: block;
+
+/* Checkbox specific styles */
+.checkbox {  
+  display: block; 
   padding: 1rem;
   text-decoration: none;
   border-bottom: 1px solid var(--gray);
   color: var(--fg);
+  left: 0; 
+  right: 0;
+  position: relative;
 }
-.exercise-card h2 {
-  margin: 0 0 1rem 0;
-  font-weight: normal;
+.checkbox input[type="checkbox"] {
+  width: auto;
+  opacity: 0.00000001;
+  position: absolute;
+  left: 0;
+  margin-left: -20px;
 }
-.exercise-card .exercise-details {
-  display: flex;
-  justify-content: space-between;
+.checkbox label {
+  font-family: sans-serif;
+  font-size: 1rem;
+  position: relative;
+  display: block;
+  padding-left: 40px;
+  cursor: pointer;
+}
+.checkbox label:before {
+  /* Checkbox outline */
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -3px;
+  margin: 4px;
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.28s ease;
+  border-radius: 3px;
+  border: 2px solid var(--yellow);
+}
+.checkbox label:after {
+  /* Check icon */
+  content: '';
+  border-bottom: 2px solid var(--bg);
+  border-left: 2px solid var(--bg);
+  transform: rotate(-45deg) scale(0);
+  transition: transform ease 0.25s;
+  position: absolute;
+  width: 8px;
+  height: 4px;
+  top: 7px;
+  left: 9px;
+}
+.checkbox input[type="checkbox"]:checked ~ label::after {
+  /* Check icon animtation */
+  transform: rotate(-45deg) scale(1);
+}
+.checkbox input[type="checkbox"]:checked ~ label::before {
+  background-color: var(--yellow);
 }

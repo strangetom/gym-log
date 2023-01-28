@@ -33,6 +33,48 @@ class WorkoutData:
         conn.close()
         return name[0]
 
+    def get_workout_id(self, slug: str) -> int:
+        """Return workout ID from slug
+
+        Parameters
+        ----------
+        slug : str
+            Workout slug
+
+        Returns
+        -------
+        int
+            Workout ID
+        """
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT workoutID FROM workout WHERE slug = ?", (slug,))
+            workoutID = cur.fetchone()
+
+        conn.close()
+        return workoutID[0]
+
+    def get_workout_slug(self, workoutID: int) -> str:
+        """Return workout ID from slug
+
+        Parameters
+        ----------
+        workoutID : int
+            Workout ID
+
+        Returns
+        -------
+        str
+            Workout slug
+        """
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT slug FROM workout WHERE workoutID = ?", (workoutID,))
+            slug = cur.fetchone()
+
+        conn.close()
+        return slug[0]
+
     def get_exercise_name(self, exerciseID: int) -> str:
         """Return exercise name from exercise ID
 
@@ -115,8 +157,39 @@ class WorkoutData:
 
         return workout_data
 
-    def list_exercises(self, slug: str) -> List[Dict[str, Any]]:
+    def list_all_exercises(self) -> List[Dict[str, str]]:
+        """Return all exercises in database
 
+        Returns
+        -------
+        List[Dict[str, str]]
+            List of dicts containing name and exercise ID for all exercises
+        """
+        all_exercises = []
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT name, exerciseID FROM exercise")
+            exercises = cur.fetchall()
+
+            for name, exerciseID in exercises:
+                all_exercises.append({"name": name, "exerciseID": exerciseID})
+
+        return sorted(all_exercises, key=lambda x: x["name"])
+
+    def list_workout_exercises(self, slug: str) -> List[Dict[str, str]]:
+        """Return exercises for workout given by slug
+
+        Parameters
+        ----------
+        slug : str
+            Workout slug
+
+        Returns
+        -------
+        List[Dict[str, str]]
+            List of dicts containing name, exerciseID, last update
+            and last set details
+        """
         exercise_data = []
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
@@ -151,7 +224,7 @@ class WorkoutData:
         # Sort alpabetically by name and return
         return sorted(exercise_data, key=lambda x: x["name"])
 
-    def list_sets(
+    def list_exercise_sets(
         self, exerciseID: int, number: int = 12
     ) -> List[List[Dict[str, Any]]]:
         """Get list of most recent sets limited by <number> for exercise.
@@ -225,6 +298,36 @@ class WorkoutData:
                 ),
             )
         conn.close()
+
+    def save_workout(self, workout_data: Dict[str, Any]) -> None:
+
+        workoutID = workout_data["workoutID"]
+        slug = self.get_workout_slug(workoutID)
+
+        # Get set of current exercise IDs
+        current_exercises = self.list_workout_exercises(slug)
+        current_exercise_IDs = {ex["exerciseID"] for ex in current_exercises}
+
+        new_exercises = set(workout_data["exerciseIDs"]) - current_exercise_IDs
+        deleted_exercises = current_exercise_IDs - set(workout_data["exerciseIDs"])
+
+        for exerciseID in new_exercises:
+            with sqlite3.connect(self.db) as conn:
+                cur = conn.cursor()
+                cur.execute(
+                    "INSERT INTO workout_exercise (workoutID, exerciseID) VALUES (?, ?)",
+                    (workoutID, exerciseID),
+                )
+            conn.close()
+
+        for exerciseID in deleted_exercises:
+            with sqlite3.connect(self.db) as conn:
+                cur = conn.cursor()
+                cur.execute(
+                    "DELETE FROM workout_exercise WHERE (workoutID = ? AND exerciseID = ?)",
+                    (workoutID, exerciseID),
+                )
+            conn.close()
 
     def _get_workout_last_update(self, workoutID: int) -> str:
         """Return human readable string for when timestamp of last set
