@@ -81,6 +81,7 @@ def workout(slug: str):
         exercises=w.list_workout_exercises(slug),
         name=w.get_workout_name_from_slug(slug),
         slug=slug,
+        colour=w.get_workout_colour_from_slug(slug),
     )
 
 

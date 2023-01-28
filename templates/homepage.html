@@ -21,7 +21,7 @@
 
         <section id="workouts">
             {%- for w in workouts -%}
-            <a href="/workout/{{w.slug}}" class="workout-card">
+            <a href="/workout/{{w.slug}}" class="workout-card" style="background-color:{{w.colour}};">
                 <h2>{{w.name}}</h2>
                 <div class="workout-details">
                     <span>{{w.last_update}}</span>

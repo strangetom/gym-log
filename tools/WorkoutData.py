@@ -55,7 +55,7 @@ class WorkoutData:
         return workoutID[0]
 
     def get_workout_slug_from_id(self, workoutID: int) -> str:
-        """Return workout ID from slug
+        """Return workout slug from ID
 
         Parameters
         ----------
@@ -74,6 +74,27 @@ class WorkoutData:
 
         conn.close()
         return slug[0]
+
+    def get_workout_colour_from_slug(self, slug: str) -> str:
+        """Return hex colour for workout from slug
+
+        Parameters
+        ----------
+        slug : str
+            Workout slug
+
+        Returns
+        -------
+        str
+            Workout colour
+        """
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT colour FROM workout WHERE slug = ?", (slug,))
+            colour = cur.fetchone()
+
+        conn.close()
+        return colour[0]
 
     def get_exercise_name_from_id(self, exerciseID: int) -> str:
         """Return exercise name from exercise ID
@@ -133,11 +154,11 @@ class WorkoutData:
         # Get list of workouts
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
-            cur.execute("SELECT workoutID, name, slug FROM workout")
+            cur.execute("SELECT workoutID, name, slug, colour FROM workout")
             workout_names = cur.fetchall()
 
             # For each workout, count number of exercises
-            for workoutID, name, slug in workout_names:
+            for workoutID, name, slug, colour in workout_names:
                 cur.execute(
                     "SELECT COUNT(*) FROM workout_exercise WHERE workoutID = ?",
                     (workoutID,),
@@ -149,6 +170,7 @@ class WorkoutData:
                         "name": name,
                         "exercise_count": count[0],
                         "slug": slug,
+                        "colour": colour,
                         "last_update": self._get_workout_last_update(workoutID),
                     }
                 )
