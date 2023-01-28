@@ -48,11 +48,11 @@ function saveSet(e) {
                 window.location.href = res.url;
             }
             else {
-                saveSuccess();
+                saveSuccess("#fab");
             }
         }
         else {
-            saveError();
+            saveError("#fab");
         }
     });
 }

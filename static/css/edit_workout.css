@@ -52,23 +52,32 @@ h1 {
   text-align: center;
 }
 
-#fab {
+.fab {
   position: fixed;
+  border: none;
+  background-color: var(--fg);
+  color: var(--bg-1);
+  font-weight: 100;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
+}
+.fab img {
+  scale: 0.7;
+  padding-top: 5px;
+}
+#fab-edit {
   bottom: 2rem;
   right: 2rem;
   width: 3.8rem;
   height: 3.8rem;
-  border: none;
   border-radius: 3rem;
-  background-color: var(--fg);
-  color: var(--bg-1);
-  font-size: 3rem;
-  font-weight: 100;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
 }
-#fab img {
-  scale: 0.7;
-  padding-top: 5px;
+#fab-new-exercise {
+  font-size: 2rem;
+  bottom: 2.65rem;
+  right: 6.2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 2rem;
 }
 .save-success {
   background-color: var(--green-alt) !important;
@@ -139,4 +148,67 @@ h1 {
 }
 .checkbox input[type="checkbox"]:checked ~ label::before {
   background-color: var(--yellow);
+}
+
+/* Dialog specific styles */
+dialog::backdrop {
+  /* Backdrop does not inherit from any element so cannot use CSS variables.
+  https://fullscreen.spec.whatwg.org/#::backdrop-pseudo-element
+  */
+  background-color: #32302f66;
+  backdrop-filter: blur(2px);
+}
+dialog[open] {
+  animation: show .1s ease-out normal;
+}
+@keyframes show {
+  from {transform: translateY(-100%);}
+  to {transform: translateY(0%);}
+}
+#new-exercise-dialog {
+  width: 85vw;
+  max-width: 70ch;
+  color: var(--bg);
+  background-color: var(--fg);
+  border: none;
+  margin-top: 2vh;
+  border-radius: .2rem;
+}
+.new-exercise-input {
+  width: 100%;
+}
+.new-exercise-inputlabel {
+  margin-top: .5rem;
+  display: block;
+  font-size: .8rem;
+  color: var(--bg);
+}
+.new-exercise-input input,
+.new-exercise-input select {
+  box-sizing: border-box;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: .2rem;
+  padding: .5rem;
+  background-color: var(--blue-alt);
+  color: var(--bg);
+  width: 100%;
+  word-break: break-word;
+}
+
+#new-exercise-dialog .buttons {
+  margin-top: 1rem;
+  text-align: right;
+  display: flex;
+  flex-direction: row-reverse;
+}
+#new-exercise-dialog button {
+  font-family: sans-serif;
+  font-size: 1rem;
+  text-align: center;
+  border: 1px solid var(--purple-alt);
+  border-radius: .25rem;
+  padding: .5rem .8rem;
+  margin: 0 .2rem;
+  background-color: var(--purple);
 }

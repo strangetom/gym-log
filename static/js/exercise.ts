@@ -74,10 +74,10 @@ function saveSet(e: Event) {
         // Redirect if instructed
         window.location.href = res.url;
       } else {
-        saveSuccess();
+        saveSuccess("#fab");
       }
     } else {
-      saveError();
+      saveError("#fab");
     }
   });
 }

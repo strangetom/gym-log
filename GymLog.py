@@ -147,5 +147,16 @@ def save_workout():
         w = get_workout_data()
         w.save_workout(workout_data)
 
-        slug = w.get_workout_slug(workout_data["workoutID"])
-        return redirect(url_for("workout", slug=slug))
+        return Response(status=200)
+
+
+@app.route("/new-exercise", methods=["POST"])
+def new_exercise():
+
+    if request.method == "POST":
+        post_data = request.form
+
+        w = get_workout_data()
+        w.new_exercise(post_data["name"], post_data["type"])
+
+        return Response(status=200)

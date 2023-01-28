@@ -28,8 +28,32 @@
             {%- endfor -%}
         </section>
 
-        <button id="fab">
+        <button id="fab-edit" class="fab">
             <img src="/static/img/save.svg" alt="Save workout">
         </button>
+        <button id="fab-new-exercise" class="fab">
+            +
+        </button>
     </body>
+
+    <dialog id="new-exercise-dialog">
+        <form method="dialog">
+            <div class="new-exercise-input">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" autocomplete="off" value="">
+            </div>
+            <div class="new-exercise-input">
+                <label for="type">Type</label>
+                <select id="type" name="type">
+                    <option value="weight-repetitions">weight-repetitions</option>
+                    <option value="distance-time">distance-time</option>
+                    <option value="time">time</option>
+                </select>
+            </div>
+            <div class="buttons">
+                <button type="submit" value="submit">Add</button>
+                <button type="submit" value="cancel">Cancel</button>
+            </div>
+        </form>
+    </dialog>
 </html>
