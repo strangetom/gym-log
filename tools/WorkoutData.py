@@ -150,6 +150,7 @@ class WorkoutData:
                 exercise_count
                 slug
                 last_update
+                last_exercise
         """
         workout_data = []
         # Get list of workouts
@@ -166,13 +167,15 @@ class WorkoutData:
                 )
                 count = cur.fetchone()
 
+                exercise, update = self._get_workout_last_update(workoutID)
                 workout_data.append(
                     {
                         "name": name,
                         "exercise_count": count[0],
                         "slug": slug,
                         "colour": colour,
-                        "last_update": self._get_workout_last_update(workoutID),
+                        "last_update": update,
+                        "last_exercise": exercise,
                     }
                 )
 
@@ -478,7 +481,7 @@ class WorkoutData:
             )
         conn.close()
 
-    def _get_workout_last_update(self, workoutID: int) -> str:
+    def _get_workout_last_update(self, workoutID: int) -> Tuple[str, str]:
         """Return human readable string for when timestamp of last set
         for exercise in workout.
 
@@ -489,23 +492,26 @@ class WorkoutData:
 
         Returns
         -------
-        str
-            Human readable relative string
+        Tuple[str, str]
+            Last exercise
+            Human readable relative datetime string
         """
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
             cur.execute(
-                "SELECT MAX(datetime) FROM sets WHERE exerciseID in (SELECT exerciseID FROM workout_exercise WHERE workoutID = ?)",
+                "SELECT MAX(datetime), exerciseID FROM sets WHERE exerciseID in (SELECT exerciseID FROM workout_exercise WHERE workoutID = ?)",
                 (workoutID,),
             )
-            timestamp = cur.fetchone()
+            timestamp, exerciseID = cur.fetchone()
 
         conn.close()
 
         if timestamp[0] is None:
-            return "Never"
+            datetime_string = "Never"
+        else:
+            datetime_string = self._readable_datetime(timestamp)
 
-        return self._readable_datetime(timestamp[0])
+        return self.get_exercise_name_from_id(exerciseID), datetime_string
 
     def _get_exercise_last_set(self, exerciseID: int) -> Tuple[str, str]:
         """Return human readable string for when timestamp of last set
