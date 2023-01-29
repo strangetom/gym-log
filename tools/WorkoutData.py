@@ -306,9 +306,9 @@ class WorkoutData:
 
                 # Convert time (seconds) to hours, minutes and seconds
                 if time is not None:
-                    hours = math.floor(float(time) / 3600)
-                    mins = math.floor((float(time) % 3600) / 60)
-                    seconds = math.floor(float(time) % 60)
+                    hours = math.floor(float(time) / 3600) or None
+                    mins = math.floor((float(time) % 3600) / 60) or None
+                    seconds = math.floor(float(time) % 60) or None
                 else:
                     hours = None
                     mins = None

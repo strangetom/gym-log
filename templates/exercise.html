@@ -42,28 +42,28 @@
             <input type="hidden" name="exerciseID" id="exerciseID" value="{{exerciseID}}">
             {%- if type == "weight-repetitions" -%}
             <div class="new-input">
-                <input type="text" inputmode="numeric" id="reps" name="reps" autocomplete="off" value="{{sets[0][0].repetitions}}">
+                <input type="text" inputmode="numeric" id="reps" name="reps" autocomplete="off" value="{{sets[0][0].repetitions if sets[0][0].repetitions is not none}}">
                 Reps
             </div>
             <div class="new-input">
-                <input type="text" inputmode="numeric" id="weight" name="weight" autocomplete="off" value="{{sets[0][0].weight}}">
+                <input type="text" inputmode="numeric" id="weight" name="weight" autocomplete="off" value="{{sets[0][0].weight if sets[0][0].weight is not none}}">
                 kg
             </div>
             {%- elif type == "distance-time" -%}
             <div class="new-input">
-                <input type="text" inputmode="numeric" id="distance" name="distance" autocomplete="off" value="{{sets[0][0].distance}}">
+                <input type="text" inputmode="numeric" id="distance" name="distance" autocomplete="off" value="{{sets[0][0].distance if sets[0][0].distance is not none}}">
                 m
             </div>
             <div class="new-input">
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{sets[0][0].hours}}" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{sets[0][0].mins}}" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{sets[0][0].seconds}}" placeholder="ss">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{sets[0][0].hours if sets[0][0].hours is not none}}" placeholder="hh">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{sets[0][0].mins if sets[0][0].mins is not none}}" placeholder="mm">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{sets[0][0].seconds if sets[0][0].seconds is not none}}" placeholder="ss">
             </div>
             {%- elif type == "time" -%}
             <div class="new-input">
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{sets[0][0].hours}}" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{sets[0][0].mins}}" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{sets[0][0].seconds}}" placeholder="ss">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{sets[0][0].hours if sets[0][0].hours is not none}}" placeholder="hh">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{sets[0][0].mins if sets[0][0].mins is not none}}" placeholder="mm">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{sets[0][0].seconds if sets[0][0].seconds is not none}}" placeholder="ss">
             </div>
             {%- endif -%}
             <button id="fab">
@@ -71,4 +71,24 @@
             </button>
         </section>
     </body>
+
+    <dialog id="edit-set-dialog">
+        <form method="dialog">
+            <h2>Edit set</h2>
+            {%- if type == "weight-repetitions" -%}
+            <div class="edit-set-input">
+                <label for="reps">Reps</label>
+                <input type="text" id="reps" name="reps" autocomplete="off" value="">
+            </div>
+            <div class="edit-set-input">
+                <label for="weight">Weight (kg)</label>
+                <input type="text" id="weight" name="weight" autocomplete="off" value="">
+            </div>
+            {%- endif -%}
+            <div class="buttons">
+                <button type="submit" value="submit">Save</button>
+                <button type="submit" value="cancel">Cancel</button>
+            </div>
+        </form>
+    </dialog>
 </html>
