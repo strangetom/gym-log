@@ -42,28 +42,28 @@
             <input type="hidden" name="exerciseID" id="exerciseID" value="{{exerciseID}}">
             {%- if type == "weight-repetitions" -%}
             <div class="new-input">
-                <input type="text" inputmode="numeric" id="reps" name="reps" autocomplete="off" value="">
+                <input type="text" inputmode="numeric" id="reps" name="reps" autocomplete="off" value="{{sets[0][0].repetitions}}">
                 Reps
             </div>
             <div class="new-input">
-                <input type="text" inputmode="numeric" id="weight" name="weight" autocomplete="off" value="">
+                <input type="text" inputmode="numeric" id="weight" name="weight" autocomplete="off" value="{{sets[0][0].weight}}">
                 kg
             </div>
             {%- elif type == "distance-time" -%}
             <div class="new-input">
-                <input type="text" inputmode="numeric" id="distance" name="distance" autocomplete="off" value="">
+                <input type="text" inputmode="numeric" id="distance" name="distance" autocomplete="off" value="{{sets[0][0].distance}}">
                 m
             </div>
             <div class="new-input">
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="" placeholder="ss">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{sets[0][0].hours}}" placeholder="hh">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{sets[0][0].mins}}" placeholder="mm">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{sets[0][0].seconds}}" placeholder="ss">
             </div>
             {%- elif type == "time" -%}
             <div class="new-input">
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="" placeholder="ss">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{sets[0][0].hours}}" placeholder="hh">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{sets[0][0].mins}}" placeholder="mm">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{sets[0][0].seconds}}" placeholder="ss">
             </div>
             {%- endif -%}
             <button id="fab">

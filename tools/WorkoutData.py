@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import datetime
+import math
 import sqlite3
 from itertools import groupby
 from typing import Any, Dict, List, Tuple
@@ -303,10 +304,26 @@ class WorkoutData:
                 else:
                     set_string = ""
 
+                # Convert time (seconds) to hours, minutes and seconds
+                if time is not None:
+                    hours = math.floor(float(time) / 3600)
+                    mins = math.floor((float(time) % 3600) / 60)
+                    seconds = math.floor(float(time) % 60)
+                else:
+                    hours = None
+                    mins = None
+                    seconds = None
+
                 set_data.append(
                     {
                         "timestamp": self._readable_datetime(timestamp),
                         "set_detail": set_string,
+                        "distance": distance,
+                        "weight": weight,
+                        "hours": hours,
+                        "mins": mins,
+                        "seconds": seconds,
+                        "repetitions": repetitions,
                     }
                 )
 
