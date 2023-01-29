@@ -310,9 +310,12 @@ class WorkoutData:
                     }
                 )
 
-        # Group sets by timestamp
+        # Group sets by date (i.e. the bit before 'T' in the timestamp)
         grouped_sets = [
-            list(group) for _, group in groupby(set_data, key=lambda x: x["timestamp"])
+            list(group)
+            for _, group in groupby(
+                set_data, key=lambda x: x["timestamp"].split("T")[0]
+            )
         ]
 
         return grouped_sets
