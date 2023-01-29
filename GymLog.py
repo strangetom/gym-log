@@ -111,6 +111,18 @@ def exercise(exerciseID: int):
 
 @app.route("/edit-workout/<string:slug>")
 def edit_workout(slug: str):
+    """Page for editing workout name and exercise list.
+
+    Parameters
+    ----------
+    slug : str
+        Slug for workout
+
+    Returns
+    -------
+    str
+        Rendered HTML template
+    """
     w = get_workout_data()
     all_exercises = w.list_all_exercises()
     workout_exercises = [ex["name"] for ex in w.list_workout_exercises(slug)]
@@ -124,23 +136,50 @@ def edit_workout(slug: str):
     )
 
 
-@app.route("/save-set", methods=["POST"])
+@app.route("/save-set", methods=["POST", "DELETE", "PUT"])
 def save_set():
+    """Save set.
+    If the method is POST, create new set.
+    If the method is DELETE, delete indicated set
+    If the method is PUT, update indicated set.
 
+    Returns
+    -------
+    Response
+        Response object
+    """
+    w = get_workout_data()
     if request.method == "POST":
         post_data = request.form
         set_data = json.loads(post_data["set"])
 
-        w = get_workout_data()
         w.save_set(set_data)
         exerciseID = set_data["exerciseID"]
 
-        return redirect(url_for("exercise", exerciseID=exerciseID))
+        return Response(status=200)
+
+    elif request.method == "DELETE":
+        post_data = request.form
+        set_data = json.loads(post_data)
+        w.delete_set(int(post_data["setID"]))
+        return Response(status=200)
+
+    elif request.method == "PUT":
+        post_data = request.form
+        print(post_data)
+        w.update_set(int(post_data["setID"]), post_data)
+        return Response(status=200)
 
 
 @app.route("/save-workout", methods=["POST"])
 def save_workout():
+    """Save modifications to workout
 
+    Returns
+    -------
+    Response
+        Redirection to workout page for modified workout
+    """
     if request.method == "POST":
         post_data = request.form
         workout_data = json.loads(post_data["workout"])
@@ -154,7 +193,13 @@ def save_workout():
 
 @app.route("/new-exercise", methods=["POST"])
 def new_exercise():
+    """Create new exercise
 
+    Returns
+    -------
+    Response
+        Response object
+    """
     if request.method == "POST":
         post_data = request.form
 

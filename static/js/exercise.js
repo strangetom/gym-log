@@ -1,13 +1,53 @@
-import { saveError, saveSuccess } from "./saveFunctions.js";
+import { saveError } from "./saveFunctions.js";
+const hideDialogAnimation = [{ transform: "translateY(-100%" }];
+const hideDialogTiming = {
+    duration: 100,
+    easing: "ease-out",
+};
 document.addEventListener("DOMContentLoaded", () => {
     let fab = document.querySelector("#fab");
     fab.addEventListener("click", saveSet);
     let sets = document.querySelectorAll(".set-card");
-    sets.forEach(el => {
+    sets.forEach((el) => {
         el.addEventListener("click", showEditSetDialog);
     });
+    let editDialog = document.querySelector("#edit-set-dialog");
+    editDialog.addEventListener("click", (event) => {
+        if (event.target.nodeName === "DIALOG") {
+            let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
+            animation.addEventListener("finish", () => {
+                editDialog.close("cancel");
+            });
+        }
+    });
+    let editBtn = editDialog.querySelector("button[value='edit']");
+    editBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
+        animation.addEventListener("finish", () => {
+            editDialog.close("edit");
+            modifySet();
+        });
+    });
+    let deleteBtn = editDialog.querySelector("button[value='delete']");
+    deleteBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
+        animation.addEventListener("finish", () => {
+            editDialog.close("delete");
+            modifySet();
+        });
+    });
+    let cancelBtn = editDialog.querySelector("button[value='cancel']");
+    cancelBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
+        animation.addEventListener("finish", () => {
+            editDialog.close("cancel");
+        });
+    });
 });
-function saveSet(e) {
+function saveSet() {
     let setData = {
         exerciseID: "",
         datetime: isoDateTime(),
@@ -48,12 +88,7 @@ function saveSet(e) {
         body: postData,
     }).then((res) => {
         if (res.ok) {
-            if (res.redirected) {
-                window.location.href = res.url;
-            }
-            else {
-                saveSuccess("#fab");
-            }
+            window.location.reload();
         }
         else {
             saveError("#fab");
@@ -66,14 +101,16 @@ function isoDateTime() {
 function showEditSetDialog(e) {
     let set = e.target.closest(".set-card");
     let editDialog = document.querySelector("#edit-set-dialog");
+    editDialog.querySelector("#setID").value =
+        set.dataset.uid;
     if (set.dataset.type == "weight-repetitions") {
-        let repDialogInput = editDialog.querySelector("#reps");
+        let repDialogInput = editDialog.querySelector("#repetitions");
         repDialogInput.value = set.dataset.repetitions || "";
-        let weightDialogInput = editDialog.querySelector("#weight");
+        let weightDialogInput = editDialog.querySelector("#weight_kg");
         weightDialogInput.value = set.dataset.weight || "";
     }
     else if (set.dataset.type == "distance-time") {
-        let distanceDialogInput = editDialog.querySelector("#distance");
+        let distanceDialogInput = editDialog.querySelector("#distance_m");
         distanceDialogInput.value = set.dataset.distance || "";
         let hoursDialogInput = editDialog.querySelector("#hours");
         hoursDialogInput.value = set.dataset.hours || "";
@@ -91,4 +128,29 @@ function showEditSetDialog(e) {
         secondsDialogInput.value = set.dataset.seconds || "";
     }
     editDialog.showModal();
+}
+function modifySet() {
+    let editDialog = document.querySelector("#edit-set-dialog");
+    let formEl = editDialog.querySelector("form");
+    let post_data = new FormData(formEl);
+    if (editDialog.returnValue == "edit") {
+        fetch("/save-set", {
+            method: "PUT",
+            body: post_data,
+        }).then((res) => {
+            if (res.ok) {
+                window.location.reload();
+            }
+        });
+    }
+    else if (editDialog.returnValue == "delete") {
+        fetch("/save-set", {
+            method: "DELETE",
+            body: post_data,
+        }).then((res) => {
+            if (res.ok) {
+                window.location.reload();
+            }
+        });
+    }
 }

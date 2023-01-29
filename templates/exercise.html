@@ -29,7 +29,7 @@
             {%- for group in sets -%}
             <div class="set-group">
                 {%- for s in group -%}
-                <div class="set-card" data-type="{{type}}" data-distance="{{s.distance if s.distance if not none}}" data-repetitions="{{s.repetitions if s.repetitions if not none}}" data-weight="{{s.weight if s.weight if not none}}" data-hours="{{s.hours if s.hours if not none}}" data-mins="{{s.mins if s.mins if not none}}" data-seconds="{{s.seconds if s.seconds if not none}}">
+                <div class="set-card" data-uid="{{s.uid}}" data-type="{{type}}" data-distance="{{s.distance if s.distance if not none}}" data-repetitions="{{s.repetitions if s.repetitions if not none}}" data-weight="{{s.weight if s.weight if not none}}" data-hours="{{s.hours if s.hours if not none}}" data-mins="{{s.mins if s.mins if not none}}" data-seconds="{{s.seconds if s.seconds if not none}}">
                     <h3>{{s.set_detail}}</h3>
                     <small>{{s.timestamp}}</small>
                 </div>
@@ -75,19 +75,20 @@
     <dialog id="edit-set-dialog">
         <form method="dialog">
             <h2>Edit set</h2>
+            <input type="hidden" name="setID" id="setID" value="">
             {%- if type == "weight-repetitions" -%}
             <div class="edit-set-input">
-                <label for="reps">Reps</label>
-                <input type="text" id="reps" name="reps" autocomplete="off" value="">
+                <label for="repetitions">Reps</label>
+                <input type="text" id="repetitions" name="repetitions" autocomplete="off" value="">
             </div>
             <div class="edit-set-input">
-                <label for="weight">Weight (kg)</label>
-                <input type="text" id="weight" name="weight" autocomplete="off" value="">
+                <label for="weight_kg">Weight (kg)</label>
+                <input type="text" id="weight_kg" name="weight_kg" autocomplete="off" value="">
             </div>
             {%- elif type == "distance-time" -%}
             <div class="edit-set-input">
-                <label for="distance">Distance (m)</label>
-                <input type="text" id="distance" name="distance" autocomplete="off" value="">
+                <label for="distance_m">Distance (m)</label>
+                <input type="text" id="distance_m" name="distance_m" autocomplete="off" value="">
             </div>
             <div class="edit-set-input">
                 <label for="hours">Time</label>
@@ -104,7 +105,8 @@
             </div>
             {%- endif -%}
             <div class="buttons">
-                <button type="submit" value="submit">Save</button>
+                <button type="submit" value="edit">Edit</button>
+                <button type="submit" value="delete">Delete</button>
                 <button type="submit" value="cancel">Cancel</button>
             </div>
         </form>

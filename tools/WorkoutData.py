@@ -292,7 +292,7 @@ class WorkoutData:
             sets = cur.fetchall()
 
             for info in sets:
-                _, _, timestamp, distance, weight, time, repetitions = info
+                uid, _, timestamp, distance, weight, time, repetitions = info
 
                 if repetitions is not None and weight is not None:
                     set_string = f"{repetitions} x {weight} kg"
@@ -316,6 +316,7 @@ class WorkoutData:
 
                 set_data.append(
                     {
+                        "uid": uid,
                         "timestamp": self._readable_datetime(timestamp),
                         "set_detail": set_string,
                         "distance": distance,
@@ -358,8 +359,69 @@ class WorkoutData:
             )
         conn.close()
 
-    def save_workout(self, workout_data: Dict[str, Any]) -> None:
+    def delete_set(self, uid: int) -> None:
+        """Delete set given by set uid
 
+        Parameters
+        ----------
+        uid : int
+            Set unique ID
+        """
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM sets WHERE uid = ?", (uid,))
+        conn.close()
+
+    def update_set(self, uid: int, data: Dict[str, str]) -> None:
+        """Update set with new data.
+        The timestamp and uid remain unchanged.
+
+        Parameters
+        ----------
+        uid : int
+            Set unique ID
+        data : Dict[str, str]
+            Dict containing updated values. Only the values relevant to the
+            exercise type are in the dict.
+        """
+        time_updated = False
+        # Iterate through items in dict and update field in table
+        for key, value in data.items():
+            if key == "setID":
+                # Skip set ID
+                continue
+            elif key in ["hours", "mins", "seconds"]:
+                if not time_updated:
+                    # Calculate time in seconds
+                    seconds = (
+                        int(data["hours"] or 0) * 3600
+                        + int(data["mins"] or 0) * 60
+                        + int(data["seconds"] or 0)
+                    )
+                    with sqlite3.connect(self.db) as conn:
+                        cur = conn.cursor()
+                        cur.execute(
+                            f"UPDATE sets SET time_s = ?  WHERE uid = ?", (seconds, uid)
+                        )
+                    conn.close()
+                    # Mark time update as done so we don't do it 3 times
+                    time_updated = True
+            else:
+                with sqlite3.connect(self.db) as conn:
+                    cur = conn.cursor()
+                    cur.execute(
+                        f"UPDATE sets SET {key} = ?  WHERE uid = ?", (value, uid)
+                    )
+                conn.close()
+
+    def save_workout(self, workout_data: Dict[str, Any]) -> None:
+        """Save changes to workout
+
+        Parameters
+        ----------
+        workout_data : Dict[str, Any]
+            Dict containing latest workout name and exercise list
+        """
         workoutID = workout_data["workoutID"]
 
         # Update name and slug

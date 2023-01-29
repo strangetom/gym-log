@@ -1,18 +1,66 @@
 import { saveError, saveSuccess } from "./saveFunctions.js";
 
+const hideDialogAnimation = [{ transform: "translateY(-100%" }];
+const hideDialogTiming = {
+  duration: 100,
+  easing: "ease-out",
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   let fab: HTMLButtonElement = document.querySelector(
     "#fab"
   ) as HTMLButtonElement;
   fab.addEventListener("click", saveSet);
 
-  let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card")
-  sets.forEach( el => {
-    el.addEventListener("click", showEditSetDialog)
-  })
-});
+  let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card");
+  sets.forEach((el) => {
+    el.addEventListener("click", showEditSetDialog);
+  });
 
-function saveSet(e: Event) {
+  let editDialog: HTMLDialogElement =
+    document.querySelector("#edit-set-dialog");
+  editDialog.addEventListener("click", (event) => {
+    if ((event.target as HTMLElement).nodeName === "DIALOG") {
+      let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
+      animation.addEventListener("finish", () => {
+        editDialog.close("cancel");
+      });
+    }
+  });
+
+  let editBtn = editDialog.querySelector("button[value='edit']");
+  editBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
+    animation.addEventListener("finish", () => {
+      editDialog.close("edit");
+      modifySet();
+    });
+  });
+
+  let deleteBtn = editDialog.querySelector("button[value='delete']");
+  deleteBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
+    animation.addEventListener("finish", () => {
+      editDialog.close("delete");
+      modifySet();
+    });
+  });
+
+  let cancelBtn = editDialog.querySelector("button[value='cancel']");
+  cancelBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
+    animation.addEventListener("finish", () => {
+      editDialog.close("cancel");
+    });
+  });
+});
+/**
+ * Save new set to database
+ */
+function saveSet() {
   let setData = {
     exerciseID: "",
     datetime: isoDateTime(),
@@ -75,12 +123,7 @@ function saveSet(e: Event) {
     body: postData,
   }).then((res) => {
     if (res.ok) {
-      if (res.redirected) {
-        // Redirect if instructed
-        window.location.href = res.url;
-      } else {
-        saveSuccess("#fab");
-      }
+      window.location.reload();
     } else {
       saveError("#fab");
     }
@@ -88,39 +131,81 @@ function saveSet(e: Event) {
 }
 
 /**
- * Return ISO8601 datetime without milliseconds
+ * Return current ISO8601 datetime without milliseconds.
  */
 function isoDateTime() {
   return new Date().toISOString().split(".")[0] + "Z";
 }
 
-function showEditSetDialog(e: Event){
+/**
+ * Show dialog for editing a set
+ * @param {Event} e Click event for set to be edited.
+ */
+function showEditSetDialog(e: Event) {
   let set: HTMLDivElement = (e.target as HTMLDivElement).closest(".set-card");
-  let editDialog: HTMLDialogElement = document.querySelector("#edit-set-dialog");
+  let editDialog: HTMLDialogElement =
+    document.querySelector("#edit-set-dialog");
+
+  (editDialog.querySelector("#setID") as HTMLInputElement).value =
+    set.dataset.uid;
 
   if (set.dataset.type == "weight-repetitions") {
-    let repDialogInput: HTMLInputElement = editDialog.querySelector("#reps");
+    let repDialogInput: HTMLInputElement =
+      editDialog.querySelector("#repetitions");
     repDialogInput.value = set.dataset.repetitions || "";
-    let weightDialogInput: HTMLInputElement = editDialog.querySelector("#weight")
+    let weightDialogInput: HTMLInputElement =
+      editDialog.querySelector("#weight_kg");
     weightDialogInput.value = set.dataset.weight || "";
   } else if (set.dataset.type == "distance-time") {
-    let distanceDialogInput: HTMLInputElement = editDialog.querySelector("#distance")
+    let distanceDialogInput: HTMLInputElement =
+      editDialog.querySelector("#distance_m");
     distanceDialogInput.value = set.dataset.distance || "";
-    let hoursDialogInput: HTMLInputElement = editDialog.querySelector("#hours")
+    let hoursDialogInput: HTMLInputElement = editDialog.querySelector("#hours");
     hoursDialogInput.value = set.dataset.hours || "";
-    let minsDialogInput: HTMLInputElement = editDialog.querySelector("#mins")
+    let minsDialogInput: HTMLInputElement = editDialog.querySelector("#mins");
     minsDialogInput.value = set.dataset.mins || "";
-    let secondsDialogInput: HTMLInputElement = editDialog.querySelector("#seconds")
+    let secondsDialogInput: HTMLInputElement =
+      editDialog.querySelector("#seconds");
     secondsDialogInput.value = set.dataset.seconds || "";
   } else if (set.dataset.type == "time") {
-    let hoursDialogInput: HTMLInputElement = editDialog.querySelector("#hours")
+    let hoursDialogInput: HTMLInputElement = editDialog.querySelector("#hours");
     hoursDialogInput.value = set.dataset.hours || "";
-    let minsDialogInput: HTMLInputElement = editDialog.querySelector("#mins")
+    let minsDialogInput: HTMLInputElement = editDialog.querySelector("#mins");
     minsDialogInput.value = set.dataset.mins || "";
-    let secondsDialogInput: HTMLInputElement = editDialog.querySelector("#seconds")
+    let secondsDialogInput: HTMLInputElement =
+      editDialog.querySelector("#seconds");
     secondsDialogInput.value = set.dataset.seconds || "";
   }
 
-  
-  editDialog.showModal()
+  editDialog.showModal();
+}
+/**
+ * Modify set from dialog box.
+ * Modification includes changing values or deleting the set.
+ */
+function modifySet() {
+  let editDialog: HTMLDialogElement =
+    document.querySelector("#edit-set-dialog");
+  let formEl: HTMLFormElement = editDialog.querySelector("form");
+  let post_data = new FormData(formEl);
+
+  if (editDialog.returnValue == "edit") {
+    fetch("/save-set", {
+      method: "PUT",
+      body: post_data,
+    }).then((res) => {
+      if (res.ok) {
+        window.location.reload();
+      }
+    });
+  } else if (editDialog.returnValue == "delete") {
+    fetch("/save-set", {
+      method: "DELETE",
+      body: post_data,
+    }).then((res) => {
+      if (res.ok) {
+        window.location.reload();
+      }
+    });
+  }
 }
