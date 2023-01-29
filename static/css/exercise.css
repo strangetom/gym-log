@@ -140,3 +140,73 @@ h1 {
   background-color: var(--red) !important;
   rotate: 45deg;
 }
+
+/* Dialog specific styles */
+dialog::backdrop {
+  /* Backdrop does not inherit from any element so cannot use CSS variables.
+  https://fullscreen.spec.whatwg.org/#::backdrop-pseudo-element
+  */
+  background-color: #32302f66;
+  backdrop-filter: blur(2px);
+}
+dialog[open] {
+  animation: show .1s ease-out normal;
+}
+@keyframes show {
+  from {transform: translateY(-100%);}
+  to {transform: translateY(0%);}
+}
+#edit-set-dialog {
+  width: 85vw;
+  max-width: 70ch;
+  color: var(--bg);
+  background-color: var(--fg);
+  border: none;
+  margin-top: 2vh;
+  border-radius: .2rem;
+}
+h2 {
+  font-size: 1rem;
+  margin: 0 0 .5rem 0;
+}
+.edit-set-input {
+  width: 100%;
+}
+.edit-set-input label {
+  margin-top: .5rem;
+  display: block;
+  font-size: .8rem;
+  color: var(--bg);
+}
+.edit-set-input input,
+.edit-set-input select {
+  box-sizing: border-box;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: .2rem;
+  padding: .5rem;
+  background-color: var(--blue-alt);
+  color: var(--bg);
+  width: 100%;
+  word-break: break-word;
+}
+.edit-set-input .time-input {
+  width: 5ch;
+}
+
+#edit-set-dialog .buttons {
+  margin-top: 1rem;
+  text-align: right;
+  display: flex;
+  flex-direction: row-reverse;
+}
+#edit-set-dialog button {
+  font-family: sans-serif;
+  font-size: 1rem;
+  text-align: center;
+  border: 1px solid var(--purple-alt);
+  border-radius: .25rem;
+  padding: .5rem .8rem;
+  margin: 0 .2rem;
+  background-color: var(--purple);
+}

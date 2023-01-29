@@ -2,6 +2,10 @@ import { saveError, saveSuccess } from "./saveFunctions.js";
 document.addEventListener("DOMContentLoaded", () => {
     let fab = document.querySelector("#fab");
     fab.addEventListener("click", saveSet);
+    let sets = document.querySelectorAll(".set-card");
+    sets.forEach(el => {
+        el.addEventListener("click", showEditSetDialog);
+    });
 });
 function saveSet(e) {
     let setData = {
@@ -58,4 +62,33 @@ function saveSet(e) {
 }
 function isoDateTime() {
     return new Date().toISOString().split(".")[0] + "Z";
+}
+function showEditSetDialog(e) {
+    let set = e.target.closest(".set-card");
+    let editDialog = document.querySelector("#edit-set-dialog");
+    if (set.dataset.type == "weight-repetitions") {
+        let repDialogInput = editDialog.querySelector("#reps");
+        repDialogInput.value = set.dataset.repetitions || "";
+        let weightDialogInput = editDialog.querySelector("#weight");
+        weightDialogInput.value = set.dataset.weight || "";
+    }
+    else if (set.dataset.type == "distance-time") {
+        let distanceDialogInput = editDialog.querySelector("#distance");
+        distanceDialogInput.value = set.dataset.distance || "";
+        let hoursDialogInput = editDialog.querySelector("#hours");
+        hoursDialogInput.value = set.dataset.hours || "";
+        let minsDialogInput = editDialog.querySelector("#mins");
+        minsDialogInput.value = set.dataset.mins || "";
+        let secondsDialogInput = editDialog.querySelector("#seconds");
+        secondsDialogInput.value = set.dataset.seconds || "";
+    }
+    else if (set.dataset.type == "time") {
+        let hoursDialogInput = editDialog.querySelector("#hours");
+        hoursDialogInput.value = set.dataset.hours || "";
+        let minsDialogInput = editDialog.querySelector("#mins");
+        minsDialogInput.value = set.dataset.mins || "";
+        let secondsDialogInput = editDialog.querySelector("#seconds");
+        secondsDialogInput.value = set.dataset.seconds || "";
+    }
+    editDialog.showModal();
 }

@@ -5,6 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
     "#fab"
   ) as HTMLButtonElement;
   fab.addEventListener("click", saveSet);
+
+  let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card")
+  sets.forEach( el => {
+    el.addEventListener("click", showEditSetDialog)
+  })
 });
 
 function saveSet(e: Event) {
@@ -87,4 +92,35 @@ function saveSet(e: Event) {
  */
 function isoDateTime() {
   return new Date().toISOString().split(".")[0] + "Z";
+}
+
+function showEditSetDialog(e: Event){
+  let set: HTMLDivElement = (e.target as HTMLDivElement).closest(".set-card");
+  let editDialog: HTMLDialogElement = document.querySelector("#edit-set-dialog");
+
+  if (set.dataset.type == "weight-repetitions") {
+    let repDialogInput: HTMLInputElement = editDialog.querySelector("#reps");
+    repDialogInput.value = set.dataset.repetitions || "";
+    let weightDialogInput: HTMLInputElement = editDialog.querySelector("#weight")
+    weightDialogInput.value = set.dataset.weight || "";
+  } else if (set.dataset.type == "distance-time") {
+    let distanceDialogInput: HTMLInputElement = editDialog.querySelector("#distance")
+    distanceDialogInput.value = set.dataset.distance || "";
+    let hoursDialogInput: HTMLInputElement = editDialog.querySelector("#hours")
+    hoursDialogInput.value = set.dataset.hours || "";
+    let minsDialogInput: HTMLInputElement = editDialog.querySelector("#mins")
+    minsDialogInput.value = set.dataset.mins || "";
+    let secondsDialogInput: HTMLInputElement = editDialog.querySelector("#seconds")
+    secondsDialogInput.value = set.dataset.seconds || "";
+  } else if (set.dataset.type == "time") {
+    let hoursDialogInput: HTMLInputElement = editDialog.querySelector("#hours")
+    hoursDialogInput.value = set.dataset.hours || "";
+    let minsDialogInput: HTMLInputElement = editDialog.querySelector("#mins")
+    minsDialogInput.value = set.dataset.mins || "";
+    let secondsDialogInput: HTMLInputElement = editDialog.querySelector("#seconds")
+    secondsDialogInput.value = set.dataset.seconds || "";
+  }
+
+  
+  editDialog.showModal()
 }

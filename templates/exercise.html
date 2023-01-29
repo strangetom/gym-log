@@ -29,7 +29,7 @@
             {%- for group in sets -%}
             <div class="set-group">
                 {%- for s in group -%}
-                <div class="set-card">
+                <div class="set-card" data-type="{{type}}" data-distance="{{s.distance if s.distance if not none}}" data-repetitions="{{s.repetitions if s.repetitions if not none}}" data-weight="{{s.weight if s.weight if not none}}" data-hours="{{s.hours if s.hours if not none}}" data-mins="{{s.mins if s.mins if not none}}" data-seconds="{{s.seconds if s.seconds if not none}}">
                     <h3>{{s.set_detail}}</h3>
                     <small>{{s.timestamp}}</small>
                 </div>
@@ -83,6 +83,24 @@
             <div class="edit-set-input">
                 <label for="weight">Weight (kg)</label>
                 <input type="text" id="weight" name="weight" autocomplete="off" value="">
+            </div>
+            {%- elif type == "distance-time" -%}
+            <div class="edit-set-input">
+                <label for="distance">Distance (m)</label>
+                <input type="text" id="distance" name="distance" autocomplete="off" value="">
+            </div>
+            <div class="edit-set-input">
+                <label for="hours">Time</label>
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss">
+            </div>
+            {%- elif type == "time" -%}
+            <div class="edit-set-input">
+                <label for="hours">Time</label>
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss">
             </div>
             {%- endif -%}
             <div class="buttons">
