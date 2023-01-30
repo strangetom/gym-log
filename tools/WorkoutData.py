@@ -506,12 +506,12 @@ class WorkoutData:
 
         conn.close()
 
-        if timestamp[0] is None:
-            datetime_string = "Never"
+        if timestamp is None:
+            return "", "Never"
         else:
-            datetime_string = self._readable_datetime(timestamp)
-
-        return self.get_exercise_name_from_id(exerciseID), datetime_string
+            return self.get_exercise_name_from_id(exerciseID), self._readable_datetime(
+                timestamp
+            )
 
     def _get_exercise_last_set(self, exerciseID: int) -> Tuple[str, str]:
         """Return human readable string for when timestamp of last set
