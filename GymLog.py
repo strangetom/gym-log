@@ -207,3 +207,21 @@ def new_exercise():
         w.new_exercise(post_data["name"], post_data["type"])
 
         return Response(status=200)
+
+
+@app.route("/new-workout", methods=["POST"])
+def new_workout():
+    """Crea new workout
+
+    Returns
+    -------
+    Response
+        Response object
+    """
+    if request.method == "POST":
+        post_data = request.form
+
+        w = get_workout_data()
+        w.new_workout(post_data["name"], post_data["colour"])
+
+        return Response(status=200)

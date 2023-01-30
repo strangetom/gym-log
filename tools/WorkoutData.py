@@ -481,6 +481,24 @@ class WorkoutData:
             )
         conn.close()
 
+    def new_workout(self, name: str, colour: str) -> None:
+        """Add new workout to database
+
+        Parameters
+        ----------
+        name : str
+            Name of workout
+        colour : str
+            Workout colour
+        """
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO workout (name, slug, colour) VALUES (?, ?, ?)",
+                (name, slugify(name), colour),
+            )
+        conn.close()
+
     def _get_workout_last_update(self, workoutID: int) -> Tuple[str, str]:
         """Return human readable string for when timestamp of last set
         for exercise in workout.

@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width">
         <title>Gym Log</title>
         <link rel="stylesheet" type="text/css" href="/static/css/index.css">
-        <script type="module" src="./static/js/index.js"></script>
+        <script type="module" src="./static/js/homepage.js"></script>
         <!-- icons and manifest for PWA -->
         <link rel="manifest" href="/static/manifest.json">
         <link rel="icon" href="/static/favicon.svg" type="image/svg+xml"/>
@@ -39,13 +39,29 @@
         </button>
 
         <dialog id="new-workout-dialog">
-            <form method="dialog">
-                <div>
-                    <input type="text" id="name" name="name" autocomplete="off" value="">
-                    <button type="submit" value="submit">+</button>
+        <form method="dialog">
+            <h2>New workout</h2>
+            <div class="new-workout-input">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" autocomplete="off" value="">
+            </div>
+            <div class="new-workout-input">
+                <label for="colour">Colour</label>
+                <div class="colours">
+                    <input class="radio" type="radio" name="colour" value="#8e1914" style="--colour:#8e1914;">
+                    <input class="radio" type="radio" name="colour" value="#6a6912" style="--colour:#6a6912;">
+                    <input class="radio" type="radio" name="colour" value="#966b17" style="--colour:#966b17;">
+                    <input class="radio" type="radio" name="colour" value="#305d5f" style="--colour:#305d5f;">
+                    <input class="radio" type="radio" name="colour" value="#7b445d" style="--colour:#7b445d;">
+                    <input class="radio" type="radio" name="colour" value="#954109" style="--colour:#954109;">
+                    <input class="radio" type="radio" name="colour" value="#486d4a" style="--colour:#486d4a;">
                 </div>
-                <ul id="suggestions"></ul>
-            </form>
+            </div>
+            <div class="buttons">
+                <button type="submit" value="submit">Add</button>
+                <button type="submit" value="cancel">Cancel</button>
+            </div>
+        </form>
         </dialog>
 
     </body>
