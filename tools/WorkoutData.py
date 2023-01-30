@@ -571,8 +571,6 @@ class WorkoutData:
         delta = datetime.datetime.now() - dt
         delta_seconds = int(delta.total_seconds())
 
-        print(dt.date())
-
         if dt.date() == datetime.date.today():
             if delta_seconds < 60:
                 return "Just now"
