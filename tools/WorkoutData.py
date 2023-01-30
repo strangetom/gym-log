@@ -571,22 +571,26 @@ class WorkoutData:
         delta = datetime.datetime.now() - dt
         delta_seconds = int(delta.total_seconds())
 
-        if delta_seconds < 60:
-            return "Just now"
-        elif delta_seconds < 3600:
-            mins = int(delta_seconds / 60)
-            unit = "mins" if mins > 1 else "min"
-            return f"{mins} {unit} ago"
-        elif delta_seconds < 3600 * 12:
-            hours = int(delta_seconds / 60 / 60)
-            unit = "hours" if hours > 1 else "hour"
-            return f"{hours} {unit} ago"
-        elif delta_seconds < 3600 * 24:
-            return "Earlier today"
-        elif delta_seconds < 3600 * 24 * 2:
-            return "Yesterday"
-        elif delta_seconds < 3600 * 24 * 7:
-            days = int(delta_seconds / (3600 * 24))
-            return f"{days} days ago"
+        print(dt.date())
+
+        if dt.date() == datetime.date.today():
+            if delta_seconds < 60:
+                return "Just now"
+            elif delta_seconds < 3600:
+                mins = int(delta_seconds / 60)
+                unit = "mins" if mins > 1 else "min"
+                return f"{mins} {unit} ago"
+            elif delta_seconds < 3600 * 12:
+                hours = int(delta_seconds / 60 / 60)
+                unit = "hours" if hours > 1 else "hour"
+                return f"{hours} {unit} ago"
+            else:
+                return "Earlier today"
         else:
-            return dt.strftime("%b %d %Y")
+            if delta_seconds < 3600 * 24 * 2:
+                return "Yesterday"
+            elif delta_seconds < 3600 * 24 * 7:
+                days = int(delta_seconds / (3600 * 24))
+                return f"{days} days ago"
+            else:
+                return dt.strftime("%b %d %Y")
