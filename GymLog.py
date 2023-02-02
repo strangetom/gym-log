@@ -160,13 +160,11 @@ def save_set():
 
     elif request.method == "DELETE":
         post_data = request.form
-        set_data = json.loads(post_data)
         w.delete_set(int(post_data["setID"]))
         return Response(status=200)
 
     elif request.method == "PUT":
         post_data = request.form
-        print(post_data)
         w.update_set(int(post_data["setID"]), post_data)
         return Response(status=200)
 
