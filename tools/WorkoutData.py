@@ -268,7 +268,7 @@ class WorkoutData:
         return sorted(exercise_data, key=lambda x: x["name"])
 
     def list_exercise_sets(
-        self, exerciseID: int, number: int = 12
+        self, exerciseID: int, number: int = 36
     ) -> List[List[Dict[str, Any]]]:
         """Get list of most recent sets limited by <number> for exercise.
         Sets are grouped by date.
