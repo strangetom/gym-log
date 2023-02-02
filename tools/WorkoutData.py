@@ -320,7 +320,8 @@ class WorkoutData:
                 set_data.append(
                     {
                         "uid": uid,
-                        "timestamp": self._readable_datetime(timestamp),
+                        "timestamp": timestamp,
+                        "readable_time": self._readable_datetime(timestamp),
                         "set_detail": set_string,
                         "distance": distance,
                         "weight": weight,
