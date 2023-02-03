@@ -80,6 +80,7 @@ def workout(slug: str):
         "workout.html",
         exercises=w.list_workout_exercises(slug),
         name=w.get_workout_name_from_slug(slug),
+        workoutID=w.get_workout_id_from_slug(slug),
         slug=slug,
         colour=w.get_workout_colour_from_slug(slug),
     )
@@ -169,7 +170,7 @@ def save_set():
         return Response(status=200)
 
 
-@app.route("/save-workout", methods=["POST"])
+@app.route("/save-workout", methods=["POST", "DELETE"])
 def save_workout():
     """Save modifications to workout
 
@@ -178,15 +179,19 @@ def save_workout():
     Response
         Redirection to workout page for modified workout
     """
+    w = get_workout_data()
     if request.method == "POST":
         post_data = request.form
         workout_data = json.loads(post_data["workout"])
         workoutID = workout_data["workoutID"]
-
-        w = get_workout_data()
         w.save_workout(workout_data)
 
         return redirect(url_for("workout", slug=w.get_workout_slug_from_id(workoutID)))
+
+    elif request.method == "DELETE":
+        post_data = request.form
+        w.delete_workout(int(post_data["workoutID"]))
+        return Response(status=200)
 
 
 @app.route("/new-exercise", methods=["POST"])

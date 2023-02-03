@@ -500,6 +500,24 @@ class WorkoutData:
             )
         conn.close()
 
+    def delete_workout(self, workoutID: int) -> None:
+        """Delete workout given by set workoutID.
+        Delete association between workout and exercises.
+
+        Parameters
+        ----------
+        workoutID : int
+            Workout ID
+        """
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM workout WHERE workoutID = ?", (workoutID,))
+            cur.execute(
+                "DELETE FROM workout_exercise WHERE workoutID = ?", (workoutID,)
+            )
+
+        conn.close()
+
     def _get_workout_last_update(self, workoutID: int) -> Tuple[str, str]:
         """Return human readable string for when timestamp of last set
         for exercise in workout.
