@@ -88,6 +88,13 @@ h1 {
   height: 2.5rem;
   border-radius: 2rem;
 }
+#fab-delete {
+  bottom: 6.3rem;
+  right: 2.65rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 3rem;
+}
 .save-success {
   background-color: var(--green-alt) !important;
 }

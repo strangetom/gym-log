@@ -6,7 +6,6 @@
         <meta name="viewport" content="width=device-width">
         <title>{{name}} | Gym Log</title>
         <link rel="stylesheet" type="text/css" href="/static/css/workout.css">
-        <script type="module" src="/static/js/workout.js"></script>
         <!-- icons and manifest for PWA -->
         <link rel="manifest" href="/static/manifest.json">
         <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
@@ -43,9 +42,5 @@
         <a href="/edit-workout/{{slug}}" id="fab-edit">
             <img src="/static/img/edit.svg" alt="Edit workout">
         </a>
-        <div id="fab-delete">
-            <input type="hidden" name="workoutID" id="workoutID" value="{{workoutID}}">
-            <img src="/static/img/delete.svg" alt="Delete workout">
-        </div>
     </body>
 </html>

@@ -67,6 +67,11 @@ document.addEventListener("DOMContentLoaded", () => {
       saveExercise();
     });
   });
+
+  let fab_delete: HTMLButtonElement = document.querySelector(
+    "#fab-delete"
+  ) as HTMLButtonElement;
+  fab_delete.addEventListener("click", deleteWorkout);
 });
 
 function saveWorkout(e: Event) {
@@ -134,6 +139,24 @@ function saveExercise() {
         window.location.reload();
       } else {
         saveError("#fab-new-exercise");
+      }
+    });
+  }
+}
+
+function deleteWorkout() {
+  let workoutID: string = (
+    document.querySelector("#workoutID") as HTMLInputElement
+  ).value;
+  if (confirm("Are you sure you want to delete this workout?")) {
+    let postData = new FormData();
+    postData.append("workoutID", workoutID);
+    fetch("/save-workout", {
+      method: "DELETE",
+      body: postData,
+    }).then((res) => {
+      if (res.ok) {
+        window.location.href = "/";
       }
     });
   }
