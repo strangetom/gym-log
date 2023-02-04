@@ -694,7 +694,7 @@ class WorkoutData:
             time_string = str(datetime.timedelta(seconds=int(details.time_s)))[2:]
             set_string = f"{int(details.distance_m)} m - {time_string}"
 
-        elif details.time is not None:
+        elif details.time_s is not None:
             set_string = f"{details.time_s} s"
         else:
             set_string = ""
