@@ -66,6 +66,8 @@ h1 {
 
 #new-set {
   position: fixed;
+  max-width: 80ch;
+  margin: 0 auto;
   bottom: 0;
   left: 0;
   right: 0;
@@ -94,6 +96,8 @@ h1 {
 
 #historical-sets {
   position: fixed;
+  max-width: 80ch;
+  margin: 0 auto;
   top: calc(2rem + .7rem + 1rem);
   bottom: 9rem;
   left: 0;
