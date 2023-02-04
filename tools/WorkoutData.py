@@ -3,10 +3,21 @@
 import datetime
 import math
 import sqlite3
+from dataclasses import dataclass
 from itertools import groupby
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from slugify import slugify
+
+
+@dataclass
+class ExerciseSet:
+    uid: int
+    datetime: str
+    distance_m: Optional[float]
+    weight_kg: Optional[float]
+    time_s: Optional[int]
+    repetitions: Optional[int]
 
 
 class WorkoutData:
@@ -289,23 +300,20 @@ class WorkoutData:
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
             cur.execute(
-                "SELECT * FROM sets WHERE exerciseID = ? ORDER BY datetime DESC LIMIT ?",
+                "SELECT * FROM sets WHERE exerciseID = ? ORDER BY uid DESC LIMIT ?",
                 (exerciseID, number),
             )
             sets = cur.fetchall()
 
             for info in sets:
                 uid, _, timestamp, distance, weight, time, repetitions = info
+                current_set = ExerciseSet(
+                    uid, timestamp, distance, weight, time, repetitions
+                )
+                previous_set = self._get_previous_set(exerciseID, uid)
 
-                if repetitions is not None and weight is not None:
-                    set_string = f"{repetitions} x {weight} kg"
-                elif distance is not None and time is not None:
-                    time_string = str(datetime.timedelta(seconds=int(time)))[2:]
-                    set_string = f"{int(distance)} m - {time_string}"
-                elif time is not None:
-                    set_string = f"{time} s"
-                else:
-                    set_string = ""
+                set_string = self._create_set_summary(current_set)
+                delta = self._calculate_set_delta(current_set, previous_set)
 
                 # Convert time (seconds) to hours, minutes and seconds
                 if time is not None:
@@ -329,6 +337,7 @@ class WorkoutData:
                         "mins": mins,
                         "seconds": seconds,
                         "repetitions": repetitions,
+                        "delta": delta,
                     }
                 )
 
@@ -550,6 +559,37 @@ class WorkoutData:
                 timestamp
             )
 
+    def _get_previous_set(self, exerciseID: int, uid: int):
+        """Return last set for exercise given by exerciseID prior to set given by uid
+
+        Parameters
+        ----------
+        exerciseID : int
+            exerciseID
+        uid : int
+            uid of set to find previous set for
+        """
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT MAX(uid), * FROM sets WHERE exerciseID = ? and uid < ?",
+                (exerciseID, uid),
+            )
+            (
+                prev_uid,
+                _,
+                _,
+                timestamp,
+                distance,
+                weight,
+                time,
+                repetitions,
+            ) = cur.fetchone()
+
+        conn.close()
+
+        return ExerciseSet(prev_uid, timestamp, distance, weight, time, repetitions)
+
     def _get_exercise_last_set(self, exerciseID: int) -> Tuple[str, str]:
         """Return human readable string for when timestamp of last set
         for exercise.
@@ -629,3 +669,91 @@ class WorkoutData:
                 return f"{days} days ago"
             else:
                 return dt.strftime("%b %d %Y")
+
+    def _create_set_summary(self, details: ExerciseSet) -> str:
+        """Generate string that summarises a set
+        For example:
+        10 x 39.0 kg for weight-repetition exercises
+        2000 m - 17:00 for distance-time exercises
+        45 s for time exercises
+
+        Parameters
+        ----------
+        details : ExerciseSet
+            ExerciseSet dataclass containing details of set.
+
+        Returns
+        -------
+        str
+            String summarising set
+        """
+        if details.repetitions is not None and details.weight_kg is not None:
+            set_string = f"{details.repetitions} x {details.weight_kg} kg"
+
+        elif details.distance_m is not None and details.time_s is not None:
+            time_string = str(datetime.timedelta(seconds=int(details.time_s)))[2:]
+            set_string = f"{int(details.distance_m)} m - {time_string}"
+
+        elif details.time is not None:
+            set_string = f"{details.time_s} s"
+        else:
+            set_string = ""
+
+        return set_string
+
+    def _calculate_set_delta(
+        self, current_set: ExerciseSet, previous_set: ExerciseSet
+    ) -> Optional[float]:
+        """Calculate the percentage change from previous set.
+        If the exercise type is weight-repetitions, the delta is calculated
+        from the weight (repetitions ignored)
+        If the exercise type is distance-time, the delta is calculated from
+        the change in rate (i.e. distance/time)
+        If the exercise type is time, the delta is calculated from the change
+        is time.
+
+        Parameters
+        ----------
+        current_set : ExerciseSet
+            Current set details
+        previous_set : ExerciseSet
+            Previous set details
+
+        Returns
+        -------
+        Optional[float]
+            Percentage change is non-zero, else None
+        """
+        change_from_previous = 0
+
+        if current_set.repetitions is not None and current_set.weight_kg is not None:
+            if previous_set.weight_kg != 0 and previous_set.weight_kg is not None:
+                change_from_previous = (
+                    (current_set.weight_kg - previous_set.weight_kg)
+                    / previous_set.weight_kg
+                    * 100
+                )
+
+        elif current_set.distance_m is not None and current_set.time_s is not None:
+            rate = current_set.distance_m / current_set.time_s
+            previous_rate = previous_set.distance_m / previous_set.time_s
+            if previous_rate != 0 and previous_rate is not None:
+                change_from_previous = (rate - previous_rate) / previous_rate * 100
+
+        elif current_set.time_s is not None:
+            if previous_set.time_s != 0 and previous_set.time_s is not None:
+                change_from_previous = (
+                    (current_set.time_s - previous_set.time_s)
+                    / previous_set.time_s
+                    * 100
+                )
+        else:
+            set_string = ""
+
+        # Convert change from previous set to sensible string
+        if change_from_previous == 0:
+            delta = None
+        else:
+            delta = change_from_previous
+
+        return delta

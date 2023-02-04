@@ -114,7 +114,23 @@ h1 {
   margin: 0;
   font-weight: bold;
 }
-.set-card small {
+.set-top-row {
+  display: flex;
+  justify-content: space-between;
+}
+.set-top-row .increase {
+  color: var(--green);
+  font-weight: bold;
+}
+.set-top-row .decrease {
+  color: var(--red);
+  font-weight: bold;
+}
+.set-top-row .equal {
+  color: var(--aqua-alt);
+  font-weight: bold;
+}
+.set-card {
   color: var(--fg-2);
 }
 

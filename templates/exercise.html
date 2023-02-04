@@ -30,7 +30,18 @@
             <div class="set-group">
                 {%- for s in group -%}
                 <div class="set-card" data-uid="{{s.uid}}" data-type="{{type}}" data-distance="{{s.distance if s.distance if not none}}" data-repetitions="{{s.repetitions if s.repetitions if not none}}" data-weight="{{s.weight if s.weight if not none}}" data-hours="{{s.hours if s.hours if not none}}" data-mins="{{s.mins if s.mins if not none}}" data-seconds="{{s.seconds if s.seconds if not none}}">
-                    <h3>{{s.set_detail}}</h3>
+                    <div class="set-top-row">
+                        <h3>{{s.set_detail}}</h3>
+                        {% if s.delta is not none %}
+                            {%- if s.delta > 0 %}
+                            <span class="increase">{{"+%.1f"|format(s.delta)}}%</span>
+                            {%- else -%}
+                            <span class="decrease">{{"%.1f"|format(s.delta)}}%</span>
+                            {%- endif -%}
+                        {% else %}
+                        <span class="equal">=</span>
+                        {% endif %}
+                    </div>
                     <small>{{s.readable_time}}</small>
                 </div>
                 {%- endfor -%}
