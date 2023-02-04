@@ -1,5 +1,5 @@
 [Unit]
-Description=Recipe Manager
+Description=Gym Log
 After=network.target
 
 [Service]
