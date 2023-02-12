@@ -77,15 +77,14 @@ def edit_workout(workoutID: int):
     """
     w = get_workout_data()
     all_exercises = w.list_all_exercises()
-    slug = w.get_workout_slug_from_id(workoutID)
-    workout_exercises = [ex["name"] for ex in w.list_workout_exercises(slug)]
+    workout_exercises = [ex["name"] for ex in w.list_workout_exercises(workoutID)]
 
     return render_template(
         "edit_workout.html",
-        name=w.get_workout_name_from_slug(slug),
+        name=w.get_workout_name(workoutID),
         all_exercises=all_exercises,
         workout_exercises=workout_exercises,
-        workoutID=w.get_workout_id_from_slug(slug),
+        workoutID=workoutID,
     )
 
 
@@ -110,13 +109,12 @@ def workout_endpoint(workoutID: int):
     """
     w = get_workout_data()
     if request.method == "GET":
-        slug = w.get_workout_slug_from_id(workoutID)
         return render_template(
             "workout.html",
-            exercises=w.list_workout_exercises(slug),
-            name=w.get_workout_name_from_slug(slug),
+            exercises=w.list_workout_exercises(workoutID),
+            name=w.get_workout_name(workoutID),
             workoutID=workoutID,
-            colour=w.get_workout_colour_from_slug(slug),
+            colour=w.get_workout_colour(workoutID),
         )
 
     elif request.method == "POST":

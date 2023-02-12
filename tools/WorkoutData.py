@@ -7,8 +7,6 @@ from dataclasses import dataclass
 from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple
 
-from slugify import slugify
-
 
 @dataclass
 class ExerciseSet:
@@ -24,50 +22,8 @@ class WorkoutData:
     def __init__(self, db):
         self.db = db
 
-    def get_workout_name_from_slug(self, slug: str) -> str:
-        """Return workout name from slug
-
-        Parameters
-        ----------
-        slug : str
-            Workout slug
-
-        Returns
-        -------
-        str
-            Workout name
-        """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT name FROM workout WHERE slug = ?", (slug,))
-            name = cur.fetchone()
-
-        conn.close()
-        return name[0]
-
-    def get_workout_id_from_slug(self, slug: str) -> int:
-        """Return workout ID from slug
-
-        Parameters
-        ----------
-        slug : str
-            Workout slug
-
-        Returns
-        -------
-        int
-            Workout ID
-        """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT workoutID FROM workout WHERE slug = ?", (slug,))
-            workoutID = cur.fetchone()
-
-        conn.close()
-        return workoutID[0]
-
-    def get_workout_slug_from_id(self, workoutID: int) -> str:
-        """Return workout slug from ID
+    def get_workout_name(self, workoutID: int) -> str:
+        """Return workout name from workoutID
 
         Parameters
         ----------
@@ -77,32 +33,32 @@ class WorkoutData:
         Returns
         -------
         str
-            Workout slug
+            Workout name
         """
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
-            cur.execute("SELECT slug FROM workout WHERE workoutID = ?", (workoutID,))
-            slug = cur.fetchone()
+            cur.execute("SELECT name FROM workout WHERE workoutID = ?", (workoutID,))
+            name = cur.fetchone()
 
         conn.close()
-        return slug[0]
+        return name[0]
 
-    def get_workout_colour_from_slug(self, slug: str) -> str:
-        """Return hex colour for workout from slug
+    def get_workout_colour(self, workoutID: int) -> str:
+        """Return hex colour for workout from workoutID
 
         Parameters
         ----------
-        slug : str
-            Workout slug
+        workoutID : int
+            Workout ID
 
         Returns
         -------
         str
-            Workout colour
+            Colour associated with workout
         """
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
-            cur.execute("SELECT colour FROM workout WHERE slug = ?", (slug,))
+            cur.execute("SELECT colour FROM workout WHERE workoutID = ?", (workoutID,))
             colour = cur.fetchone()
 
         conn.close()
@@ -130,7 +86,7 @@ class WorkoutData:
         return name[0]
 
     def get_exercise_type_from_id(self, exerciseID: int) -> str:
-        """Return work name from slug
+        """Return exercise type from exercise ID
 
         Parameters
         ----------
@@ -159,7 +115,8 @@ class WorkoutData:
             List of dictionaries with the following keys
                 name
                 exercise_count
-                slug
+                workoutID
+                colour
                 last_update
                 last_exercise
         """
@@ -213,30 +170,13 @@ class WorkoutData:
 
         return sorted(all_exercises, key=lambda x: x["name"])
 
-    def list_workout_exercises_by_id(self, workoutID: int) -> List[Dict[str, str]]:
+    def list_workout_exercises(self, workoutID: int) -> List[Dict[str, str]]:
         """Return exercises for workout given by workoutID
 
         Parameters
         ----------
         workoutID : int
-            workoutID
-
-        Returns
-        -------
-        List[Dict[str, str]]
-            ist of dicts containing name, exerciseID, last update
-            and last set details
-        """
-        slug = self.get_workout_slug_from_id(workoutID)
-        return self.list_workout_exercises(slug)
-
-    def list_workout_exercises(self, slug: str) -> List[Dict[str, str]]:
-        """Return exercises for workout given by slug
-
-        Parameters
-        ----------
-        slug : str
-            Workout slug
+            Workout ID
 
         Returns
         -------
@@ -247,9 +187,6 @@ class WorkoutData:
         exercise_data = []
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
-            cur.execute("SELECT workoutID from workout WHERE slug = ?", (slug,))
-            workoutID = cur.fetchone()[0]
-
             cur.execute(
                 "SELECT exerciseID FROM workout_exercise WHERE workoutID = ?",
                 (workoutID,),
@@ -437,20 +374,19 @@ class WorkoutData:
         workout_data : Dict[str, Any]
             Dict containing latest workout name and exercise list
         """
-        # Update name and slug
+        # Update name
         workout_name = workout_data["name"]
-        workout_slug = slugify(workout_name)
 
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
             cur.execute(
-                "UPDATE workout SET name = ?, slug = ? WHERE workoutID = ?",
-                (workout_name, workout_slug, workoutID),
+                "UPDATE workout SET name = ? WHERE workoutID = ?",
+                (workout_name, workoutID),
             )
         conn.close()
 
         # Get set of current exercise IDs
-        current_exercises = self.list_workout_exercises_by_id(workoutID)
+        current_exercises = self.list_workout_exercises(workoutID)
         current_exercise_IDs = {ex["exerciseID"] for ex in current_exercises}
 
         new_exercises = set(workout_data["exerciseIDs"]) - current_exercise_IDs
@@ -524,8 +460,8 @@ class WorkoutData:
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
             cur.execute(
-                "INSERT INTO workout (name, slug, colour) VALUES (?, ?, ?)",
-                (name, slugify(name), colour),
+                "INSERT INTO workout (name, colour) VALUES (?, ?)",
+                (name, colour),
             )
         conn.close()
 
