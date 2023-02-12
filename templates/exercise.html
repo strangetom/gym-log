@@ -90,29 +90,29 @@
             {%- if type == "weight-repetitions" -%}
             <div class="edit-set-input">
                 <label for="repetitions">Reps</label>
-                <input type="text" id="repetitions" name="repetitions" autocomplete="off" value="">
+                <input type="text" inputmode="numeric" id="repetitions" name="repetitions" autocomplete="off" value="">
             </div>
             <div class="edit-set-input">
                 <label for="weight_kg">Weight (kg)</label>
-                <input type="text" id="weight_kg" name="weight_kg" autocomplete="off" value="">
+                <input type="text" inputmode="numeric" id="weight_kg" name="weight_kg" autocomplete="off" value="">
             </div>
             {%- elif type == "distance-time" -%}
             <div class="edit-set-input">
                 <label for="distance_m">Distance (m)</label>
-                <input type="text" id="distance_m" name="distance_m" autocomplete="off" value="">
+                <input type="text" inputmode="numeric" id="distance_m" name="distance_m" autocomplete="off" value="">
             </div>
             <div class="edit-set-input">
                 <label for="hours">Time</label>
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss">
+                <input class="time-input" inputmode="numeric" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
+                <input class="time-input" inputmode="numeric" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
+                <input class="time-input" inputmode="numeric" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss">
             </div>
             {%- elif type == "time" -%}
             <div class="edit-set-input">
                 <label for="hours">Time</label>
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss">
+                <input class="time-input" inputmode="numeric" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
+                <input class="time-input" inputmode="numeric" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
+                <input class="time-input" inputmode="numeric" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss">
             </div>
             {%- endif -%}
             <div class="buttons">
