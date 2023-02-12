@@ -493,7 +493,8 @@ class WorkoutData:
 
     def delete_exercise(self, exerciseID: int) -> None:
         """Delete exercise given by set exerciseID.
-        Delete association between eercise and any workouts.
+        Delete association between exercise and any workouts.
+        Delete any sets associated with exercise.
 
         Parameters
         ----------
@@ -506,6 +507,7 @@ class WorkoutData:
             cur.execute(
                 "DELETE FROM workout_exercise WHERE exerciseID = ?", (exerciseID,)
             )
+            cur.execute("DELETE FROM sets WHERE exerciseID = ?", (exerciseID,))
 
         conn.close()
 
