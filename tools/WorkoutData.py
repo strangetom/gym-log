@@ -167,11 +167,11 @@ class WorkoutData:
         # Get list of workouts
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
-            cur.execute("SELECT workoutID, name, slug, colour FROM workout")
+            cur.execute("SELECT workoutID, name, colour FROM workout")
             workout_names = cur.fetchall()
 
             # For each workout, count number of exercises
-            for workoutID, name, slug, colour in workout_names:
+            for workoutID, name, colour in workout_names:
                 cur.execute(
                     "SELECT COUNT(*) FROM workout_exercise WHERE workoutID = ?",
                     (workoutID,),
@@ -183,7 +183,7 @@ class WorkoutData:
                     {
                         "name": name,
                         "exercise_count": count[0],
-                        "slug": slug,
+                        "workoutID": workoutID,
                         "colour": colour,
                         "last_update": update,
                         "last_exercise": exercise,
@@ -427,16 +427,16 @@ class WorkoutData:
                     )
                 conn.close()
 
-    def save_workout(self, workout_data: Dict[str, Any]) -> None:
+    def save_workout(self, workoutID: int, workout_data: Dict[str, Any]) -> None:
         """Save changes to workout
 
         Parameters
         ----------
+        workoutID : int
+            Workout ID
         workout_data : Dict[str, Any]
             Dict containing latest workout name and exercise list
         """
-        workoutID = workout_data["workoutID"]
-
         # Update name and slug
         workout_name = workout_data["name"]
         workout_slug = slugify(workout_name)

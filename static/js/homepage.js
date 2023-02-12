@@ -40,7 +40,7 @@ function addWorkout() {
     let formEl = addWorkoutDialog.querySelector("form");
     let post_data = new FormData(formEl);
     if (addWorkoutDialog.returnValue == "submit") {
-        fetch("/new-workout", {
+        fetch("/workout/", {
             method: "POST",
             body: post_data,
         }).then((res) => {
