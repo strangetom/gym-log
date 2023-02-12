@@ -83,7 +83,7 @@ function saveSet() {
     }
     let postData = new FormData();
     postData.append("set", JSON.stringify(setData));
-    fetch("/save-set", {
+    fetch("/set/", {
         method: "POST",
         body: postData,
     }).then((res) => {
@@ -133,8 +133,10 @@ function modifySet() {
     let editDialog = document.querySelector("#edit-set-dialog");
     let formEl = editDialog.querySelector("form");
     let post_data = new FormData(formEl);
+    let setID = post_data.get("setID");
+    let url = `/set/${setID}`;
     if (editDialog.returnValue == "edit") {
-        fetch("/save-set", {
+        fetch(url, {
             method: "PUT",
             body: post_data,
         }).then((res) => {
@@ -144,9 +146,8 @@ function modifySet() {
         });
     }
     else if (editDialog.returnValue == "delete") {
-        fetch("/save-set", {
+        fetch(url, {
             method: "DELETE",
-            body: post_data,
         }).then((res) => {
             if (res.ok) {
                 window.location.reload();

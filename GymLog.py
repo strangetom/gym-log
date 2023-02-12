@@ -61,63 +61,14 @@ def home():
     return render_template("homepage.html", workouts=workouts)
 
 
-@app.route("/workout/<string:slug>")
-def workout(slug: str):
-    """Return page for workout given by slug
-
-    Parameters
-    ----------
-    slug : str
-        Slug for workout
-
-    Returns
-    -------
-    str
-        Rendered HTML template
-    """
-    w = get_workout_data()
-    return render_template(
-        "workout.html",
-        exercises=w.list_workout_exercises(slug),
-        name=w.get_workout_name_from_slug(slug),
-        workoutID=w.get_workout_id_from_slug(slug),
-        slug=slug,
-        colour=w.get_workout_colour_from_slug(slug),
-    )
-
-
-@app.route("/exercise/<int:exerciseID>")
-def exercise(exerciseID: int):
-    """Return page for exercise given by ID
-
-    Parameters
-    ----------
-    exerciseID : int
-        Exercise ID
-
-    Returns
-    -------
-    str
-        Rendered HTML template
-    """
-    w = get_workout_data()
-    return render_template(
-        "exercise.html",
-        sets=w.list_exercise_sets(exerciseID),
-        name=w.get_exercise_name_from_id(exerciseID),
-        type=w.get_exercise_type_from_id(exerciseID),
-        exerciseID=exerciseID,
-    )
-
-
-@app.route("/edit-workout/<string:slug>")
-def edit_workout(slug: str):
+@app.route("/edit-workout/<int:workoutID>")
+def edit_workout(workoutID: int):
     """Page for editing workout name and exercise list.
 
     Parameters
     ----------
-    slug : str
-        Slug for workout
+    workoutID : int
+        Workout ID
 
     Returns
     -------
@@ -126,108 +77,130 @@ def edit_workout(slug: str):
     """
     w = get_workout_data()
     all_exercises = w.list_all_exercises()
-    workout_exercises = [ex["name"] for ex in w.list_workout_exercises(slug)]
+    workout_exercises = [ex["name"] for ex in w.list_workout_exercises(workoutID)]
 
     return render_template(
         "edit_workout.html",
-        name=w.get_workout_name_from_slug(slug),
+        name=w.get_workout_name(workoutID),
         all_exercises=all_exercises,
         workout_exercises=workout_exercises,
-        workoutID=w.get_workout_id_from_slug(slug),
+        workoutID=workoutID,
     )
 
 
-@app.route("/save-set", methods=["POST", "DELETE", "PUT"])
-def save_set():
-    """Save set.
-    If the method is POST, create new set.
-    If the method is DELETE, delete indicated set
-    If the method is PUT, update indicated set.
-
-    Returns
-    -------
-    Response
-        Response object
-    """
-    w = get_workout_data()
-    if request.method == "POST":
-        post_data = request.form
-        set_data = json.loads(post_data["set"])
-
-        w.save_set(set_data)
-        exerciseID = set_data["exerciseID"]
-
-        return Response(status=200)
-
-    elif request.method == "DELETE":
-        post_data = request.form
-        w.delete_set(int(post_data["setID"]))
-        return Response(status=200)
-
-    elif request.method == "PUT":
-        post_data = request.form
-        w.update_set(int(post_data["setID"]), post_data)
-        return Response(status=200)
-
-
-@app.route("/save-workout", methods=["POST", "DELETE"])
-def save_workout():
-    """Save modifications to workout
+@app.route("/workout/", methods=["POST"], defaults={"workoutID": None})
+@app.route("/workout/<int:workoutID>", methods=["GET", "DELETE", "PUT"])
+def workout_endpoint(workoutID: int):
+    """Workout endpoint
+    If the method is GET, return workout page.
+    If the method is POST, create new workout.
+    If the method is PUT, update indicated workout.
+    If the method is DELETE, delete indicated workout.
 
     Returns
     -------
     Response
         Redirection to workout page for modified workout
+
+    Parameters
+    ----------
+    workoutID : int
+        Workout ID
     """
     w = get_workout_data()
-    if request.method == "POST":
+    if request.method == "GET":
+        return render_template(
+            "workout.html",
+            exercises=w.list_workout_exercises(workoutID),
+            name=w.get_workout_name(workoutID),
+            workoutID=workoutID,
+            colour=w.get_workout_colour(workoutID),
+        )
+
+    elif request.method == "POST":
+        post_data = request.form
+        w.new_workout(post_data["name"], post_data["colour"])
+        return Response(status=200)
+
+    elif request.method == "PUT":
         post_data = request.form
         workout_data = json.loads(post_data["workout"])
-        workoutID = workout_data["workoutID"]
-        w.save_workout(workout_data)
-
-        return redirect(url_for("workout", slug=w.get_workout_slug_from_id(workoutID)))
+        w.save_workout(workoutID, workout_data)
+        return Response(status=200)
 
     elif request.method == "DELETE":
-        post_data = request.form
-        w.delete_workout(int(post_data["workoutID"]))
+        w.delete_workout(workoutID)
         return Response(status=200)
 
 
-@app.route("/save-exercise", methods=["POST", "DELETE"])
-def save_exercise():
-    """Create new exercise
+@app.route("/exercise/", methods=["POST"], defaults={"exerciseID": None})
+@app.route("/exercise/<int:exerciseID>", methods=["GET", "DELETE"])
+def exercise_endpoint(exerciseID: int):
+    """Exercise endpoint.
+    If the method is GET, return exercise page.
+    If the method is POST, create new exercise.
+    If the method is DELETE, delete indicated exercise.
 
     Returns
     -------
     Response
         Response object
+
+    Parameters
+    ----------
+    exerciseID : int
+        Exercise ID
     """
     w = get_workout_data()
-    if request.method == "POST":
+    if request.method == "GET":
+        return render_template(
+            "exercise.html",
+            sets=w.list_exercise_sets(exerciseID),
+            name=w.get_exercise_name_from_id(exerciseID),
+            type=w.get_exercise_type_from_id(exerciseID),
+            exerciseID=exerciseID,
+        )
+
+    elif request.method == "POST":
         post_data = request.form
         w.new_exercise(post_data["name"], post_data["type"])
         return Response(status=200)
 
     elif request.method == "DELETE":
-        post_data = request.form
-        w.delete_exercise(int(post_data["exerciseID"]))
+        w.delete_exercise(exerciseID)
         return Response(status=200)
 
 
-@app.route("/new-workout", methods=["POST"])
-def new_workout():
-    """Crea new workout
+@app.route("/set/", methods=["POST"], defaults={"setID": None})
+@app.route("/set/<int:setID>", methods=["DELETE", "PUT"])
+def set_endpoint(setID: int):
+    """Exercise set endpoint.
+    If the method is POST, create new set.
+    If the method is PUT, update indicated set.
+    If the method is DELETE, delete indicated set.
 
     Returns
     -------
     Response
         Response object
+
+    Parameters
+    ----------
+    setID : int
+        Set ID
     """
+    w = get_workout_data()
     if request.method == "POST":
         post_data = request.form
+        set_data = json.loads(post_data["set"])
+        w.save_set(set_data)
+        return Response(status=200)
 
-        w = get_workout_data()
-        w.new_workout(post_data["name"], post_data["colour"])
+    elif request.method == "DELETE":
+        w.delete_set(setID)
+        return Response(status=200)
 
+    elif request.method == "PUT":
+        post_data = request.form
+        w.update_set(setID, post_data)
         return Response(status=200)

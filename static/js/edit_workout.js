@@ -1,4 +1,4 @@
-import { saveError, saveSuccess } from "./saveFunctions.js";
+import { saveError } from "./saveFunctions.js";
 const hideDialogAnimation = [{ transform: "translateY(-100%" }];
 const hideDialogTiming = {
     duration: 100,
@@ -61,35 +61,43 @@ function saveWorkout(e) {
         }
     });
     let workoutData = {
-        workoutID: workoutID,
         exerciseIDs: selectedExerciseIDs,
         name: workoutName,
     };
     let postData = new FormData();
     postData.append("workout", JSON.stringify(workoutData));
-    fetch("/save-workout", {
-        method: "POST",
+    let url = `/workout/${workoutID}`;
+    fetch(url, {
+        method: "PUT",
         body: postData,
     }).then((res) => {
         if (res.ok) {
-            if (res.redirected) {
-                window.location.href = res.url;
-            }
-            else {
-                saveSuccess("#fab-edit");
-            }
+            window.location.href = `/workout/${workoutID}`;
         }
         else {
             saveError("#fab-edit");
         }
     });
 }
+function deleteWorkout() {
+    let workoutID = document.querySelector("#workoutID").value;
+    if (confirm("Are you sure you want to delete this workout?")) {
+        let url = `/workout/${workoutID}`;
+        fetch(url, {
+            method: "DELETE",
+        }).then((res) => {
+            if (res.ok) {
+                window.location.href = "/";
+            }
+        });
+    }
+}
 function saveExercise() {
     let new_exercise_dialog = document.querySelector("#new-exercise-dialog");
     if (new_exercise_dialog.returnValue == "submit") {
         let formEl = new_exercise_dialog.querySelector("form");
         let post_data = new FormData(formEl);
-        fetch("/save-exercise", {
+        fetch("/exercise/", {
             method: "POST",
             body: post_data,
         }).then((res) => {
@@ -102,29 +110,12 @@ function saveExercise() {
         });
     }
 }
-function deleteWorkout() {
-    let workoutID = document.querySelector("#workoutID").value;
-    if (confirm("Are you sure you want to delete this workout?")) {
-        let postData = new FormData();
-        postData.append("workoutID", workoutID);
-        fetch("/save-workout", {
-            method: "DELETE",
-            body: postData,
-        }).then((res) => {
-            if (res.ok) {
-                window.location.href = "/";
-            }
-        });
-    }
-}
 function deleteExercise(e) {
     let exerciseID = e.target.dataset.exerciseid;
     if (confirm("Are you sure you want to delete this exercise?")) {
-        let postData = new FormData();
-        postData.append("exerciseID", exerciseID);
-        fetch("/save-exercise", {
+        let url = `/exercise/${exerciseID}`;
+        fetch(url, {
             method: "DELETE",
-            body: postData,
         }).then((res) => {
             if (res.ok) {
                 window.location.reload();

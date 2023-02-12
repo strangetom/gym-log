@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS "sets" (
 CREATE TABLE IF NOT EXISTS "workout" (
 	"workoutID"	INTEGER NOT NULL,
 	"name"		TEXT NOT NULL,
-	"slug"		TEXT NOT NULL,
 	"colour"	TEXT NOT NULL DEFAULT "#000",
 	PRIMARY KEY("workoutID")
 );
