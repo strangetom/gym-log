@@ -22,7 +22,7 @@
    
    with sqlite3.connect("gym-log.db") as conn:
        c = conn.cursor()
-       c.executescrpit(sql)
+       c.executescript(sql)
    conn.close()
    ```
 
