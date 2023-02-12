@@ -7,10 +7,10 @@ const hideDialogTiming = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  let fab_edit: HTMLButtonElement = document.querySelector(
-    "#fab-edit"
+  let fab_save: HTMLButtonElement = document.querySelector(
+    "#fab-save"
   ) as HTMLButtonElement;
-  fab_edit.addEventListener("click", saveWorkout);
+  fab_save.addEventListener("click", saveWorkout);
 
   let fab_new_exercise: HTMLButtonElement = document.querySelector(
     "#fab-new-exercise"
@@ -68,10 +68,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  let fab_delete: HTMLButtonElement = document.querySelector(
+  let fab_delete_workout: HTMLButtonElement = document.querySelector(
     "#fab-delete"
   ) as HTMLButtonElement;
-  fab_delete.addEventListener("click", deleteWorkout);
+  fab_delete_workout.addEventListener("click", deleteWorkout);
+
+  let delete_exercise_btns: NodeListOf<HTMLImageElement> =
+    document.querySelectorAll(".delete-exercise");
+  delete_exercise_btns.forEach((el) => {
+    el.addEventListener("click", deleteExercise);
+  });
 });
 
 function saveWorkout(e: Event) {
@@ -131,7 +137,7 @@ function saveExercise() {
     let formEl: HTMLFormElement = new_exercise_dialog.querySelector("form");
     let post_data = new FormData(formEl);
 
-    fetch("/new-exercise", {
+    fetch("/save-exercise", {
       method: "POST",
       body: post_data,
     }).then((res) => {
@@ -157,6 +163,22 @@ function deleteWorkout() {
     }).then((res) => {
       if (res.ok) {
         window.location.href = "/";
+      }
+    });
+  }
+}
+
+function deleteExercise(e: Event) {
+  let exerciseID: string = (e.target as HTMLImageElement).dataset.exerciseid;
+  if (confirm("Are you sure you want to delete this exercise?")) {
+    let postData = new FormData();
+    postData.append("exerciseID", exerciseID);
+    fetch("/save-exercise", {
+      method: "DELETE",
+      body: postData,
+    }).then((res) => {
+      if (res.ok) {
+        window.location.reload();
       }
     });
   }

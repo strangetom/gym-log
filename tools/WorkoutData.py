@@ -491,6 +491,24 @@ class WorkoutData:
             )
         conn.close()
 
+    def delete_exercise(self, exerciseID: int) -> None:
+        """Delete exercise given by set exerciseID.
+        Delete association between eercise and any workouts.
+
+        Parameters
+        ----------
+        exerciseID : int
+            Exercise ID
+        """
+        with sqlite3.connect(self.db) as conn:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM exercise WHERE exerciseID = ?", (exerciseID,))
+            cur.execute(
+                "DELETE FROM workout_exercise WHERE exerciseID = ?", (exerciseID,)
+            )
+
+        conn.close()
+
     def new_workout(self, name: str, colour: str) -> None:
         """Add new workout to database
 

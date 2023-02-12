@@ -194,8 +194,8 @@ def save_workout():
         return Response(status=200)
 
 
-@app.route("/new-exercise", methods=["POST"])
-def new_exercise():
+@app.route("/save-exercise", methods=["POST", "DELETE"])
+def save_exercise():
     """Create new exercise
 
     Returns
@@ -203,12 +203,15 @@ def new_exercise():
     Response
         Response object
     """
+    w = get_workout_data()
     if request.method == "POST":
         post_data = request.form
-
-        w = get_workout_data()
         w.new_exercise(post_data["name"], post_data["type"])
+        return Response(status=200)
 
+    elif request.method == "DELETE":
+        post_data = request.form
+        w.delete_exercise(int(post_data["exerciseID"]))
         return Response(status=200)
 
 

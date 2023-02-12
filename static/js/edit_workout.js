@@ -5,8 +5,8 @@ const hideDialogTiming = {
     easing: "ease-out",
 };
 document.addEventListener("DOMContentLoaded", () => {
-    let fab_edit = document.querySelector("#fab-edit");
-    fab_edit.addEventListener("click", saveWorkout);
+    let fab_save = document.querySelector("#fab-save");
+    fab_save.addEventListener("click", saveWorkout);
     let fab_new_exercise = document.querySelector("#fab-new-exercise");
     let new_exercise_dialog = document.querySelector("#new-exercise-dialog");
     fab_new_exercise.addEventListener("click", () => {
@@ -37,8 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
             saveExercise();
         });
     });
-    let fab_delete = document.querySelector("#fab-delete");
-    fab_delete.addEventListener("click", deleteWorkout);
+    let fab_delete_workout = document.querySelector("#fab-delete");
+    fab_delete_workout.addEventListener("click", deleteWorkout);
+    let delete_exercise_btns = document.querySelectorAll(".delete-exercise");
+    delete_exercise_btns.forEach((el) => {
+        el.addEventListener("click", deleteExercise);
+    });
 });
 function saveWorkout(e) {
     let workoutID;
@@ -85,7 +89,7 @@ function saveExercise() {
     if (new_exercise_dialog.returnValue == "submit") {
         let formEl = new_exercise_dialog.querySelector("form");
         let post_data = new FormData(formEl);
-        fetch("/new-exercise", {
+        fetch("/save-exercise", {
             method: "POST",
             body: post_data,
         }).then((res) => {
@@ -109,6 +113,21 @@ function deleteWorkout() {
         }).then((res) => {
             if (res.ok) {
                 window.location.href = "/";
+            }
+        });
+    }
+}
+function deleteExercise(e) {
+    let exerciseID = e.target.dataset.exerciseid;
+    if (confirm("Are you sure you want to delete this exercise?")) {
+        let postData = new FormData();
+        postData.append("exerciseID", exerciseID);
+        fetch("/save-exercise", {
+            method: "DELETE",
+            body: postData,
+        }).then((res) => {
+            if (res.ok) {
+                window.location.reload();
             }
         });
     }
