@@ -744,22 +744,27 @@ class WorkoutData:
         """
         change_from_previous = 0
 
-        if current_set.repetitions is not None and current_set.weight_kg is not None:
-            if previous_set.weight_kg != 0 and previous_set.weight_kg is not None:
+        if current_set.weight_kg is not None and previous_set.weight_kg is not None:
+            if previous_set.weight_kg != 0:
                 change_from_previous = (
                     (current_set.weight_kg - previous_set.weight_kg)
                     / previous_set.weight_kg
                     * 100
                 )
 
-        elif current_set.distance_m is not None and current_set.time_s is not None:
+        elif (
+            current_set.distance_m is not None
+            and current_set.time_s is not None
+            and previous_set.distance_m is not None
+            and previous_set.time_s is not None
+        ):
             rate = current_set.distance_m / current_set.time_s
             previous_rate = previous_set.distance_m / previous_set.time_s
-            if previous_rate != 0 and previous_rate is not None:
+            if previous_rate != 0:
                 change_from_previous = (rate - previous_rate) / previous_rate * 100
 
-        elif current_set.time_s is not None:
-            if previous_set.time_s != 0 and previous_set.time_s is not None:
+        elif current_set.time_s is not None and previous_set.time_s is not None:
+            if previous_set.time_s != 0:
                 change_from_previous = (
                     (current_set.time_s - previous_set.time_s)
                     / previous_set.time_s
