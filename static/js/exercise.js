@@ -7,6 +7,11 @@ const hideDialogTiming = {
 document.addEventListener("DOMContentLoaded", () => {
     let fab = document.querySelector("#fab");
     fab.addEventListener("click", saveSet);
+    let graphBtn = document.querySelector("#graph-button");
+    let graphSection = document.querySelector("#graph");
+    graphBtn.addEventListener("click", () => {
+        graphSection.classList.toggle("hidden");
+    });
     let sets = document.querySelectorAll(".set-card");
     sets.forEach((el) => {
         el.addEventListener("click", showEditSetDialog);

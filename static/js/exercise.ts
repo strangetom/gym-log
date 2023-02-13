@@ -12,6 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
   ) as HTMLButtonElement;
   fab.addEventListener("click", saveSet);
 
+  let graphBtn: HTMLDivElement = document.querySelector(
+    "#graph-button"
+  ) as HTMLDivElement;
+  let graphSection: HTMLElement = document.querySelector(
+    "#graph"
+  ) as HTMLElement;
+  graphBtn.addEventListener("click", () => {
+    graphSection.classList.toggle("hidden");
+  });
+
   let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card");
   sets.forEach((el) => {
     el.addEventListener("click", showEditSetDialog);

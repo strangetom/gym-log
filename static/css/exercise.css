@@ -53,12 +53,24 @@ h1 {
   text-align: center;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 }
-#header svg {
+#home-shortcut svg {
   position: absolute;
   top: .7rem;
   left: .7rem;
   height: 2rem;
   width: 2rem;
+  margin: 5px;
+  background-color: var(--fg);
+  border-radius: .5rem;
+}
+
+#graph-button svg {
+  position: absolute;
+  top: .7rem;
+  right: .7rem;
+  height: calc(2rem - 8px);
+  width: calc(2rem - 8px);
+  padding: 4px;
   margin: 5px;
   background-color: var(--fg);
   border-radius: .5rem;
@@ -75,6 +87,7 @@ h1 {
   background-color: var(--bg-3);
   box-shadow: 0 -5px 50px rgba(0, 0, 0, 0.4);
   padding-top: .3rem;
+  z-index: 1;
 }
 #new-set .new-input {
   display: block;
@@ -138,6 +151,20 @@ h1 {
   color: var(--fg-2);
 }
 
+#graph {
+  position: fixed;
+  top: calc(2rem + .7rem + 1rem);
+  bottom: 9rem;
+  left: 0;
+  right: 0;
+  background-color: var(--fg);
+  transform: translateY(0);
+  transition: transform .2s ease-out;
+}
+#graph.hidden {
+  transform: translateY(-100%);
+}
+
 #fab {
   position: absolute;
   top: -1.9rem;
@@ -152,6 +179,7 @@ h1 {
   font-weight: 100;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
   transition: rotate .2s;
+
 }
 .save-success {
   background-color: var(--green-alt) !important;
