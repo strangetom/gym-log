@@ -64,7 +64,7 @@ class WorkoutData:
         conn.close()
         return colour[0]
 
-    def get_exercise_name_from_id(self, exerciseID: int) -> str:
+    def get_exercise_name(self, exerciseID: int) -> str:
         """Return exercise name from exercise ID
 
         Parameters
@@ -85,7 +85,7 @@ class WorkoutData:
         conn.close()
         return name[0]
 
-    def get_exercise_type_from_id(self, exerciseID: int) -> str:
+    def get_exercise_type(self, exerciseID: int) -> str:
         """Return exercise type from exercise ID
 
         Parameters
@@ -511,7 +511,7 @@ class WorkoutData:
         if timestamp is None:
             return "", "Never"
         else:
-            return self.get_exercise_name_from_id(exerciseID), self._readable_datetime(
+            return self.get_exercise_name(exerciseID), self._readable_datetime(
                 timestamp
             )
 

@@ -156,8 +156,8 @@ def exercise_endpoint(exerciseID: int):
         return render_template(
             "exercise.html",
             sets=w.list_exercise_sets(exerciseID),
-            name=w.get_exercise_name_from_id(exerciseID),
-            type=w.get_exercise_type_from_id(exerciseID),
+            name=w.get_exercise_name(exerciseID),
+            type=w.get_exercise_type(exerciseID),
             exerciseID=exerciseID,
         )
 
