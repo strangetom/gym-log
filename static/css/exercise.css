@@ -155,14 +155,54 @@ h1 {
   position: fixed;
   top: calc(2rem + .7rem + 1rem);
   bottom: 9rem;
-  left: 0;
-  right: 0;
-  background-color: var(--fg);
+  left: calc(calc(100vw - 80ch) / 2);
+  right: calc(calc(100vw - 80ch) / 2);
+  max-width: 80ch;
+  background-color: var(--bg-s);
   transform: translateY(0);
-  transition: transform .2s ease-out;
+  transition: transform .15s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 #graph.hidden {
   transform: translateY(-100%);
+}
+#graph h4 {
+  font-weight: normal;
+  font-size: 1.4rem;
+  margin-bottom: 2rem;
+}
+#graph .table-wrapper {
+  overflow-x: scroll;
+  direction: rtl;
+  width: 100vw;
+  height: 50%;
+}
+#graph table {
+  width: 150vw;
+  margin: 0 20px;
+  --secondary-axes-color: var(--bg-2);
+  --color-1: var(--green);
+  --color-2: var(--orange);
+  --color-3: var(--blue);
+  --color-4: var(--red);
+  --color-5: var(--aqua);
+  --color-6: var(--purple);
+  --color-7: var(--yellow);
+}
+#graph td {
+  max-width: 20px;
+}
+#graph table .tooltip {
+  bottom: unset;
+  top: -2rem;
+  background-color: var(--fg);
+  color: var(--bg);
+}
+#graph table .tooltip::after {
+  border-top-color: var(--fg);
 }
 
 #fab {

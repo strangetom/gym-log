@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width">
         <title>{{name}} | Gym Log</title>
         <link rel="stylesheet" type="text/css" href="/static/css/exercise.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/vendor/chart.min.css">
         <script type="module" src="/static/js/exercise.js"></script>
         <!-- icons and manifest for PWA -->
         <link rel="manifest" href="/static/manifest.json">
@@ -88,6 +89,28 @@
         </section>
 
         <section id="graph" class="hidden">
+            <h4>Historical progress</h4>
+            <div class="table-wrapper">
+                <table class="charts-css column multiple show-4-secondary-axes data-spacing-4">
+                    <thead>
+                        <tr>
+                            <th scope="col"> Days ago </th>
+                            <th scope="col"> Value </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%- for age, values in graph.items() -%}
+                        <tr>
+                            <th> {{age}} </th>
+                            {%- for v in values -%}
+                            <td style="--size:calc({{v.scaled}});"><span class="tooltip"> {{v.value}} </span></td>
+                            {%- endfor -%}
+                        </tr>
+                        {%- endfor -%}
+                    </tbody>
+                </table>
+            </div>
+            <p>Most recent ⟶</p>
         </section>
     </body>
 

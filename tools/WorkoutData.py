@@ -5,7 +5,7 @@ import math
 import sqlite3
 from dataclasses import dataclass
 from itertools import groupby
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 @dataclass
@@ -287,6 +287,127 @@ class WorkoutData:
         ]
 
         return grouped_sets
+
+    def get_exercise_history(
+        self, exerciseID: int, num_sets: int = 12
+    ) -> Dict[int, List[Tuple[str, str]]]:
+        """Get historical sets for this exercise going back `period_days`.
+
+        Parameters
+        ----------
+        exerciseID : int
+            Exercise ID
+        num_sets : int, optional
+            Number of sets to include
+
+        Returns
+        -------
+        Dict[int, List[Tuple[str, str]]]
+            Dict.
+            The key is the number of days ago the set was logged.
+            The value is a list of tuple of (scaled value, value)
+                For weight-repetition exercises, the value is weight*repetition
+                For distance-time exercises, the value is distance/time
+                For time exercises, the value is time
+        """
+        exercise_type = self.get_exercise_type(exerciseID)
+
+        data = {}
+        max_value = 0
+        min_value = 1e6
+        if exercise_type == "weight-repetitions":
+            with sqlite3.connect(self.db) as conn:
+                cur = conn.cursor()
+                cur.execute(
+                    "SELECT datetime, weight_kg, repetitions FROM sets WHERE exerciseID = ? ORDER BY datetime DESC",
+                    (exerciseID,),
+                )
+                res = cur.fetchall()
+
+                for timestamp, weight_kg, repetitions in res:
+                    time_delta = (
+                        datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+                        - datetime.datetime.now()
+                    )
+
+                    if time_delta.days in data.keys():
+                        data[time_delta.days].append(weight_kg * repetitions)
+                    else:
+                        data[time_delta.days] = [weight_kg * repetitions]
+
+                    max_value = max(max_value, weight_kg * repetitions)
+                    min_value = min(min_value, weight_kg * repetitions)
+
+                    if len(data.keys()) == num_sets:
+                        break
+
+        elif exercise_type == "distance-time":
+            with sqlite3.connect(self.db) as conn:
+                cur = conn.cursor()
+                cur.execute(
+                    "SELECT datetime, distance_m, time_s FROM sets WHERE exerciseID = ? ORDER BY datetime DESC",
+                    (exerciseID,),
+                )
+                res = cur.fetchall()
+
+                for timestamp, distance_m, time_s in res:
+                    time_delta = (
+                        datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+                        - datetime.datetime.now()
+                    )
+
+                    if time_delta.days in data.keys():
+                        data[time_delta.days].append(distance_m / time_s)
+                    else:
+                        data[time_delta.days] = [distance_m / time_s]
+
+                    max_value = max(max_value, distance_m / time_s)
+                    min_value = min(min_value, distance_m / time_s)
+
+                    if len(data.keys()) == num_sets:
+                        break
+
+        elif exercise_type == "time":
+            with sqlite3.connect(self.db) as conn:
+                cur = conn.cursor()
+                cur.execute(
+                    "SELECT datetime, time_s FROM sets WHERE exerciseID = ? ORDER BY datetime DESC",
+                    (exerciseID,),
+                )
+                res = cur.fetchall()
+
+                for timestamp, time_s in res:
+                    time_delta = (
+                        datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+                        - datetime.datetime.now()
+                    )
+
+                    if time_delta.days in data.keys():
+                        data[time_delta.days].append(time_s)
+                    else:
+                        data[time_delta.days] = [time_s]
+
+                    max_value = max(max_value, time_s)
+                    min_value = min(min_value, time_s)
+
+                    if len(data.keys()) == num_sets:
+                        break
+
+        # Calculate a scaled value, offset so zero is at the 0.9*min_value, then normalise
+        # This is to better show the delta between sets
+        # Format the value to 3 significant figures for diplay purposes tooltips
+        max_value = max_value * 1.04
+        min_value = min_value * 0.9
+        for k, values in data.items():
+            data[k] = [
+                {
+                    "scaled": f"{(v - min_value) / (max_value - min_value):.2g}",
+                    "value": f"{v:.3g}",
+                }
+                for v in values
+            ]
+
+        return data
 
     def save_set(self, set_data: Dict[str, str]) -> None:
 
@@ -629,7 +750,7 @@ class WorkoutData:
     def _create_set_summary(self, details: ExerciseSet) -> str:
         """Generate string that summarises a set
         For example:
-        10 x 39.0 kg for weight-repetition exercises
+        10 x 39.0 kg for weight-repetitions exercises
         2000 m - 17:00 for distance-time exercises
         45 s for time exercises
 

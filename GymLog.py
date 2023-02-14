@@ -158,6 +158,7 @@ def exercise_endpoint(exerciseID: int):
             sets=w.list_exercise_sets(exerciseID),
             name=w.get_exercise_name(exerciseID),
             type=w.get_exercise_type(exerciseID),
+            graph=w.get_exercise_history(exerciseID),
             exerciseID=exerciseID,
         )
 
