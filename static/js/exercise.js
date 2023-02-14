@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     graphBtn.addEventListener("click", () => {
         graphSection.classList.toggle("hidden");
     });
+    graphSection.addEventListener("touchstart", swipeCloseGraph);
     let sets = document.querySelectorAll(".set-card");
     sets.forEach((el) => {
         el.addEventListener("click", showEditSetDialog);
@@ -159,4 +160,19 @@ function modifySet() {
             }
         });
     }
+}
+function swipeCloseGraph(e) {
+    if (e.changedTouches[0].target.closest("table") != null) {
+        return;
+    }
+    e.preventDefault();
+    let startY = e.changedTouches[0].pageY;
+    let graph = e.changedTouches[0].target.closest("#graph");
+    graph.addEventListener("touchend", function swipeEnd(e) {
+        let endY = e.changedTouches[0].pageY;
+        if (startY - endY > 30) {
+            graph.classList.add("hidden");
+        }
+        graph.removeEventListener("touchend", swipeEnd);
+    });
 }

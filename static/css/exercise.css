@@ -205,6 +205,12 @@ h1 {
 #graph table .tooltip::after {
   border-top-color: var(--fg);
 }
+#graph .swipe-arrow {
+  margin-top: 5rem;
+  color: var(--bg-2);
+  height: 3rem;
+  width: 15%;
+}
 
 #fab {
   position: absolute;

@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
   graphBtn.addEventListener("click", () => {
     graphSection.classList.toggle("hidden");
   });
+  // Add event listener for swiping up to close graph drop down
+  graphSection.addEventListener("touchstart", swipeCloseGraph);
 
   let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card");
   sets.forEach((el) => {
@@ -219,4 +221,37 @@ function modifySet() {
       }
     });
   }
+}
+
+/**
+ * Event handler for touch events to swipe up to close graph
+ * @param {TouchEvent} e Touchstart event
+ */
+function swipeCloseGraph(e: TouchEvent) {
+  if ((e.changedTouches[0].target as HTMLElement).closest("table") != null) {
+    // If the closest table element is not null, then it means we've touched the graph.
+    // Therefore, abort this event listener so we can scroll the graph horizontally without
+    // this event listener capturing the touch events
+    return;
+  }
+
+  e.preventDefault();
+
+  // e.changedTouches should only have a single item
+  // Get the y position on the page from that item
+  let startY = e.changedTouches[0].pageY;
+
+  // Add a touchend event to the graph element
+  let graph = (e.changedTouches[0].target as HTMLElement).closest("#graph");
+  graph.addEventListener("touchend", function swipeEnd(e: TouchEvent) {
+    let endY = e.changedTouches[0].pageY;
+    // If the delta between startY and endY is large enough, add the "hidden" class
+    // to trigger the close animation
+    if (startY - endY > 30) {
+      graph.classList.add("hidden");
+    }
+    // Remove this touchend event listener to avoid adding a new one everytime a touchstart
+    // event is fired.
+    graph.removeEventListener("touchend", swipeEnd);
+  });
 }
