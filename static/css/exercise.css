@@ -206,7 +206,8 @@ h1 {
   border-top-color: var(--fg);
 }
 #graph .swipe-arrow {
-  margin-top: 5rem;
+  position: absolute;
+  bottom: 1rem;
   color: var(--bg-2);
   height: 3rem;
   width: 15%;
