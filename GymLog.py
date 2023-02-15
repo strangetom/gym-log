@@ -3,17 +3,8 @@ import sys
 
 sys.path.append(".")
 
-from flask import (
-    Flask,
-    Response,
-    abort,
-    g,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from flask import Flask, Response, g, render_template, request
+
 from tools.WorkoutData import WorkoutData
 
 app = Flask(__name__)

@@ -5,7 +5,7 @@ import math
 import sqlite3
 from dataclasses import dataclass
 from itertools import groupby
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -472,7 +472,7 @@ class WorkoutData:
                     with sqlite3.connect(self.db) as conn:
                         cur = conn.cursor()
                         cur.execute(
-                            f"UPDATE sets SET time_s = ?  WHERE uid = ?", (seconds, uid)
+                            "UPDATE sets SET time_s = ?  WHERE uid = ?", (seconds, uid)
                         )
                     conn.close()
                     # Mark time update as done so we don't do it 3 times
@@ -829,8 +829,6 @@ class WorkoutData:
                     / previous_set.time_s
                     * 100
                 )
-        else:
-            set_string = ""
 
         # Convert change from previous set to sensible string
         if change_from_previous == 0:
