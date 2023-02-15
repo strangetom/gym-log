@@ -160,12 +160,14 @@ h1 {
   max-width: 80ch;
   background-color: var(--bg-s);
   transform: translateY(0);
-  transition: transform .15s ease-out;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
+}
+#graph.animate {
+  transition: transform .15s ease-out;
 }
 #graph.hidden {
   transform: translateY(-100%);

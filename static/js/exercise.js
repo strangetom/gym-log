@@ -175,6 +175,7 @@ function swipeCloseGraph(e) {
     let startY = e.changedTouches[0].pageY;
     let currentY = startY;
     let graph = e.changedTouches[0].target.closest("#graph");
+    graph.classList.remove("animate");
     this.swipeMove = function (e) {
         let endY = e.changedTouches[0].pageY;
         let translate = Math.min(0, -(startY - endY));
@@ -183,8 +184,9 @@ function swipeCloseGraph(e) {
     };
     this.swipeEnd = function (e) {
         let endY = e.changedTouches[0].pageY;
-        if (startY - endY > 30) {
-            graph.style.transform = "";
+        graph.style.transform = "";
+        graph.classList.add("animate");
+        if (startY - endY > 175) {
             graph.classList.add("hidden");
         }
         graph.removeEventListener("touchmove", this.swipeMove);

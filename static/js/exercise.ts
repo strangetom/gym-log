@@ -248,7 +248,12 @@ function swipeCloseGraph(e: TouchEvent) {
   let currentY = startY;
 
   // Add a touchmove and touchend events to the graph element
-  let graph: HTMLElement = (e.changedTouches[0].target as HTMLElement).closest("#graph");
+  let graph: HTMLElement = (e.changedTouches[0].target as HTMLElement).closest(
+    "#graph"
+  );
+  // Remove animation on touchstart event so it doesn't make the touch iteraction laggy.
+  // We'll restore it when closing the graph
+  graph.classList.remove("animate");
 
   this.swipeMove = function (e: TouchEvent) {
     let endY = e.changedTouches[0].pageY;
@@ -260,14 +265,18 @@ function swipeCloseGraph(e: TouchEvent) {
 
   this.swipeEnd = function (e: TouchEvent) {
     let endY = e.changedTouches[0].pageY;
+    // Remove any element style transform so that if we don't move far enough to close
+    // the graph, it returns to fully open
+    graph.style.transform = "";
+    // Restore animation
+    graph.classList.add("animate");
     // If the delta between startY and endY is large enough, add the "hidden" class
     // to trigger the close animation
-    if (startY - endY > 30) {
-      graph.style.transform = "";
+    if (startY - endY > 175) {
       graph.classList.add("hidden");
     }
-    // Remove this touchend event listener to avoid adding a new one everytime a touchstart
-    // event is fired.
+    // Remove the touchend and touchmove event listeners to avoid adding a new one
+    // everytime a touchstart event is fired.
     graph.removeEventListener("touchmove", this.swipeMove);
     graph.removeEventListener("touchend", this.swipeEnd);
   };
