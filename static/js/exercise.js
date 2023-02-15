@@ -10,7 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let graphBtn = document.querySelector("#graph-button");
     let graphSection = document.querySelector("#graph");
     graphBtn.addEventListener("click", () => {
-        graphSection.classList.toggle("hidden");
+        if (graphSection.classList.contains("hidden")) {
+            graphSection.classList.remove("hidden");
+        }
+        else {
+            graphSection.style.transform = "";
+            graphSection.classList.add("hidden");
+        }
     });
     graphSection.addEventListener("touchstart", swipeCloseGraph);
     let sets = document.querySelectorAll(".set-card");
@@ -167,12 +173,23 @@ function swipeCloseGraph(e) {
     }
     e.preventDefault();
     let startY = e.changedTouches[0].pageY;
+    let currentY = startY;
     let graph = e.changedTouches[0].target.closest("#graph");
-    graph.addEventListener("touchend", function swipeEnd(e) {
+    this.swipeMove = function (e) {
+        let endY = e.changedTouches[0].pageY;
+        let translate = Math.min(0, -(startY - endY));
+        let transform = "translateY(" + translate + "px)";
+        graph.style.transform = transform;
+    };
+    this.swipeEnd = function (e) {
         let endY = e.changedTouches[0].pageY;
         if (startY - endY > 30) {
+            graph.style.transform = "";
             graph.classList.add("hidden");
         }
-        graph.removeEventListener("touchend", swipeEnd);
-    });
+        graph.removeEventListener("touchmove", this.swipeMove);
+        graph.removeEventListener("touchend", this.swipeEnd);
+    };
+    graph.addEventListener("touchmove", this.swipeMove);
+    graph.addEventListener("touchend", this.swipeEnd);
 }

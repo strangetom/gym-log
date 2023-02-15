@@ -19,7 +19,12 @@ document.addEventListener("DOMContentLoaded", () => {
     "#graph"
   ) as HTMLElement;
   graphBtn.addEventListener("click", () => {
-    graphSection.classList.toggle("hidden");
+    if (graphSection.classList.contains("hidden")) {
+      graphSection.classList.remove("hidden");
+    } else {
+      graphSection.style.transform = "";
+      graphSection.classList.add("hidden");
+    }
   });
   // Add event listener for swiping up to close graph drop down
   graphSection.addEventListener("touchstart", swipeCloseGraph);
@@ -240,18 +245,33 @@ function swipeCloseGraph(e: TouchEvent) {
   // e.changedTouches should only have a single item
   // Get the y position on the page from that item
   let startY = e.changedTouches[0].pageY;
+  let currentY = startY;
 
-  // Add a touchend event to the graph element
-  let graph = (e.changedTouches[0].target as HTMLElement).closest("#graph");
-  graph.addEventListener("touchend", function swipeEnd(e: TouchEvent) {
+  // Add a touchmove and touchend events to the graph element
+  let graph: HTMLElement = (e.changedTouches[0].target as HTMLElement).closest("#graph");
+
+  this.swipeMove = function (e: TouchEvent) {
+    let endY = e.changedTouches[0].pageY;
+    // Don't allow translate to move graph section down
+    let translate = Math.min(0, -(startY - endY));
+    let transform = "translateY(" + translate + "px)";
+    graph.style.transform = transform;
+  };
+
+  this.swipeEnd = function (e: TouchEvent) {
     let endY = e.changedTouches[0].pageY;
     // If the delta between startY and endY is large enough, add the "hidden" class
     // to trigger the close animation
     if (startY - endY > 30) {
+      graph.style.transform = "";
       graph.classList.add("hidden");
     }
     // Remove this touchend event listener to avoid adding a new one everytime a touchstart
     // event is fired.
-    graph.removeEventListener("touchend", swipeEnd);
-  });
+    graph.removeEventListener("touchmove", this.swipeMove);
+    graph.removeEventListener("touchend", this.swipeEnd);
+  };
+
+  graph.addEventListener("touchmove", this.swipeMove);
+  graph.addEventListener("touchend", this.swipeEnd);
 }
