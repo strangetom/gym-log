@@ -1,0 +1,19 @@
+{
+  "name": "Gym Log",
+  "short_name": "Gym Log",
+  "icons": [{
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }, {
+      "src": "/static/icons/maskable_icon.png",
+      "sizes": "640x640",
+      "type": "image/png",
+      "purpose": "maskable"
+    }],  
+  "lang": "en-GB",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ebdbb2",
+  "theme_color": "#32302f"
+}

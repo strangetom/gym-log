@@ -1,0 +1,310 @@
+:root {
+  color-scheme: dark;
+  --bg: #1d2021;
+  --bg-s: #32302f;
+  --bg-1: #3c3836;
+  --bg-2: #504945;
+  --bg-3: #665c54;
+  --bg-4: #7c6f64;
+  --fg: #fbf1c7;
+  --fg-1: #ebdbb2;
+  --fg-2: #d5c4a1;
+  --gray: #a89984;
+  --red: #cc241d;
+  --red-alt: #fb4934;
+  --green: #98971a;
+  --green-alt: #b8bb26;
+  --yellow: #d79921;
+  --yellow-alt: #fabd2f;
+  --blue: #458588;
+  --blue-alt: #83a598;
+  --purple: #b16286;
+  --purple-alt: #d3869b;
+  --orange: #d65d0e;
+  --orange-alt: #fe8019;
+  --aqua: #689d6a;
+  --aqua-alt: #8ec07c;
+  --brown: #B17744;
+}
+
+body {
+  font-family: sans-serif;
+  color: var(--fg);
+  background-color: var(--bg); 
+  margin: 0 auto;
+  max-width: 80ch;
+  -webkit-font-smoothing: antialiased;
+}
+
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-s);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  font-size: 1.3rem;
+}
+h1 {
+  padding: .7rem;
+  margin: 0;
+  font-weight: 400;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+#home-shortcut svg {
+  position: absolute;
+  top: .7rem;
+  left: .7rem;
+  height: 2rem;
+  width: 2rem;
+  margin: 5px;
+  background-color: var(--fg);
+  border-radius: .5rem;
+}
+
+#graph-button svg {
+  position: absolute;
+  top: .7rem;
+  right: .7rem;
+  height: calc(2rem - 8px);
+  width: calc(2rem - 8px);
+  padding: 4px;
+  margin: 5px;
+  background-color: var(--fg);
+  border-radius: .5rem;
+}
+
+#new-set {
+  position: fixed;
+  max-width: 80ch;
+  margin: 0 auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 9rem;
+  background-color: var(--bg-3);
+  box-shadow: 0 -5px 50px rgba(0, 0, 0, 0.4);
+  padding-top: .3rem;
+  z-index: 1;
+}
+#new-set .new-input {
+  display: block;
+  padding: 1rem 0 0 4rem;
+  font-size: 1.6rem;
+}
+#new-set input {
+  font-size: 2rem;
+  width: 6ch;
+  color: var(--bg);
+  background-color: var(--fg);
+  border: none;
+  border-radius: .2rem;
+}
+#new-set .time-input {
+  width: 3ch;
+}
+
+
+#historical-sets {
+  position: fixed;
+  max-width: 80ch;
+  margin: 0 auto;
+  top: calc(2rem + .7rem + 1rem);
+  bottom: 9rem;
+  left: 0;
+  right: 0;
+  overflow: auto;
+}
+.set-group {
+  border-bottom: 3px solid var(--gray);
+}
+.set-card {
+  display: block;
+  padding: 1rem 2rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--bg-2);
+  color: var(--fg);
+}
+.set-card h3 {
+  margin: 0;
+  font-weight: bold;
+}
+.set-top-row {
+  display: flex;
+  justify-content: space-between;
+}
+.set-top-row .increase {
+  color: var(--green);
+  font-weight: bold;
+}
+.set-top-row .decrease {
+  color: var(--red);
+  font-weight: bold;
+}
+.set-top-row .equal {
+  color: var(--aqua-alt);
+  font-weight: bold;
+}
+.set-card {
+  color: var(--fg-2);
+}
+
+#graph {
+  position: fixed;
+  top: calc(2rem + .7rem + 1rem);
+  bottom: 9rem;
+  left: calc(calc(100vw - 80ch) / 2);
+  right: calc(calc(100vw - 80ch) / 2);
+  max-width: 80ch;
+  background-color: var(--bg-s);
+  transform: translateY(0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+#graph.animate {
+  transition: transform .15s ease-out;
+}
+#graph.hidden {
+  transform: translateY(-100%);
+}
+#graph h4 {
+  font-weight: normal;
+  font-size: 1.4rem;
+  margin-bottom: 2rem;
+}
+#graph .table-wrapper {
+  overflow-x: scroll;
+  direction: rtl;
+  width: 100vw;
+  height: 50%;
+}
+#graph table {
+  width: 150vw;
+  margin: 0 20px;
+  --secondary-axes-color: var(--bg-2);
+  --color-1: var(--green);
+  --color-2: var(--orange);
+  --color-3: var(--blue);
+  --color-4: var(--red);
+  --color-5: var(--aqua);
+  --color-6: var(--purple);
+  --color-7: var(--yellow);
+}
+#graph td {
+  max-width: 20px;
+}
+#graph table .tooltip {
+  bottom: unset;
+  top: -2rem;
+  background-color: var(--fg);
+  color: var(--bg);
+}
+#graph table .tooltip::after {
+  border-top-color: var(--fg);
+}
+#graph .swipe-arrow {
+  position: absolute;
+  bottom: 1rem;
+  color: var(--bg-2);
+  height: 3rem;
+  width: 15%;
+}
+
+#fab {
+  position: absolute;
+  top: -1.9rem;
+  right: 1rem;
+  width: 3.8rem;
+  height: 3.8rem;
+  border: none;
+  border-radius: 3rem;
+  background-color: var(--fg);
+  color: var(--bg-1);
+  font-size: 3rem;
+  font-weight: 100;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
+  transition: rotate .2s;
+
+}
+.save-success {
+  background-color: var(--green-alt) !important;
+}
+.save-error {
+  background-color: var(--red) !important;
+  rotate: 45deg;
+}
+
+/* Dialog specific styles */
+dialog::backdrop {
+  /* Backdrop does not inherit from any element so cannot use CSS variables.
+  https://fullscreen.spec.whatwg.org/#::backdrop-pseudo-element
+  */
+  background-color: #32302f66;
+  backdrop-filter: blur(2px);
+}
+dialog[open] {
+  animation: show .1s ease-out normal;
+}
+@keyframes show {
+  from {transform: translateY(-100%);}
+  to {transform: translateY(0%);}
+}
+#edit-set-dialog {
+  width: 85vw;
+  max-width: 70ch;
+  color: var(--bg);
+  background-color: var(--fg);
+  border: none;
+  margin-top: 2vh;
+  border-radius: .2rem;
+}
+h2 {
+  font-size: 1rem;
+  margin: 0 0 .5rem 0;
+}
+.edit-set-input {
+  width: 100%;
+}
+.edit-set-input label {
+  margin-top: .5rem;
+  display: block;
+  font-size: .8rem;
+  color: var(--bg);
+}
+.edit-set-input input,
+.edit-set-input select {
+  box-sizing: border-box;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: .2rem;
+  padding: .5rem;
+  background-color: var(--blue-alt);
+  color: var(--bg);
+  width: 100%;
+  word-break: break-word;
+}
+.edit-set-input .time-input {
+  width: 5ch;
+}
+
+#edit-set-dialog .buttons {
+  margin-top: 1rem;
+  text-align: right;
+  display: flex;
+  flex-direction: row-reverse;
+}
+#edit-set-dialog button {
+  font-family: sans-serif;
+  font-size: 1rem;
+  text-align: center;
+  border: 1px solid var(--purple-alt);
+  border-radius: .25rem;
+  padding: .5rem .8rem;
+  margin: 0 .2rem;
+  background-color: var(--purple);
+}

@@ -1,0 +1,53 @@
+[project]
+name = "Gym Log"
+dynamic = "0.1.0"
+description = "Web app to log gym workouts"
+readme = "README.md"
+license = { file="LICENSE"}
+requires-python = ">=3.9"
+keywords = ["gym", "exercise", "workout"]
+authors = [
+    { name="Tom Strange", email="tpstrange@gmail.com"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+]
+dependencies = { file="requirements.txt" }
+
+[project.urls]
+Source = "https://gitea.serverpi.xyz/tom/gym-log"
+
+[tool.black]
+target-version = ["py39"]
+include = "\\.py$"
+extend-exclude = "\\.ipynb$"
+
+[tool.isort]
+profile = "black"
+
+[tool.pyright]
+include = ["*.py", "tools/*.py"]
+exclude = ["**/__pycache__", "**/venv"]
+
+[tool.flake8]
+max-line-length = 88
+filename = "*.py"
+extend-ignore = [
+    # import ordering set by isort
+    "E402",
+    # line breaks set by black
+    "W503",
+    # invalid escape sequence
+    "W605",
+    # spaces around colons set by black
+    "E203",
+]
+exclude = [
+    "**/__pycache__",
+    ".git",
+    "venv"
+]
