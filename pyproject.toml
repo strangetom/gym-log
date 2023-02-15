@@ -1,27 +1,25 @@
 [project]
-# Use a slightly different name to avoid conflict with pre-existing package in pypi
-name = "Recipe Manager"
+name = "Gym Log"
 dynamic = "0.1.0"
-description = "Web app to manage recipes for StrangerFoods.org"
+description = "Web app to log gym workouts"
 readme = "README.md"
 license = { file="LICENSE"}
 requires-python = ">=3.9"
-keywords = ["recipe", "ingredient", "ingredients", "nlp", "parsing" ]
+keywords = ["gym", "exercise", "workout"]
 authors = [
     { name="Tom Strange", email="tpstrange@gmail.com"},
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
-    "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
 dependencies = { file="requirements.txt" }
 
 [project.urls]
-Source = "https://gitea.serverpi.xyz/tom/RecipeManager"
+Source = "https://gitea.serverpi.xyz/tom/gym-log"
 
 [tool.black]
 target-version = ["py39"]
@@ -30,11 +28,10 @@ extend-exclude = "\\.ipynb$"
 
 [tool.isort]
 profile = "black"
-src_paths = ["ingredient_parser", "train", "tests"]
 
 [tool.pyright]
-include = ["*.py", "tools"]
-exclude = ["**/__pycache__"]
+include = ["*.py", "tools/*.py"]
+exclude = ["**/__pycache__", "**/venv"]
 
 [tool.flake8]
 max-line-length = 88
