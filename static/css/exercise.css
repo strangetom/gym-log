@@ -30,7 +30,7 @@
 body {
   font-family: sans-serif;
   color: var(--fg);
-  background-color: var(--bg); 
+  background-color: var(--bg-s); 
   margin: 0 auto;
   max-width: 80ch;
   -webkit-font-smoothing: antialiased;
@@ -116,6 +116,7 @@ h1 {
   left: 0;
   right: 0;
   overflow: auto;
+  scroll-snap-type: y mandatory;
 }
 .set-group {
   border-bottom: 3px solid var(--gray);
@@ -124,8 +125,10 @@ h1 {
   display: block;
   padding: 1rem 2rem;
   text-decoration: none;
+  background-color: var(--bg);
   border-bottom: 1px solid var(--bg-2);
   color: var(--fg);
+  scroll-snap-align: start;
 }
 .set-card h3 {
   margin: 0;
