@@ -272,7 +272,7 @@ function swipeCloseGraph(e: TouchEvent) {
     graph.classList.add("animate");
     // If the delta between startY and endY is large enough, add the "hidden" class
     // to trigger the close animation
-    if (startY - endY > 175) {
+    if (startY - endY > 100) {
       graph.classList.add("hidden");
     }
     // Remove the touchend and touchmove event listeners to avoid adding a new one
