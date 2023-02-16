@@ -253,7 +253,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: scale .1s ease-out;
+  transition: scale 250ms;
 }
 .timer-btn:active {
   scale: 1.1;
