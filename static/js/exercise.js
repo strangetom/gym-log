@@ -4,6 +4,58 @@ const hideDialogTiming = {
     duration: 100,
     easing: "ease-out",
 };
+let timer;
+class Timer {
+    constructor(timerEl) {
+        this.timerEl = timerEl;
+        this.displayEl = timerEl.querySelector("#timer-display");
+        this.playPauseEl = timerEl.querySelector("#timer-start-btn");
+        this.counter = 0;
+    }
+    toggle() {
+        if (this.interval == null) {
+            this.interval = setInterval(this.increment.bind(this), 1000);
+            this.togglePlayPause();
+            this.display();
+        }
+        else {
+            clearInterval(this.interval);
+            this.interval = null;
+            this.togglePlayPause();
+        }
+    }
+    reset() {
+        clearInterval(this.interval);
+        this.interval = null;
+        this.counter = 0;
+        let img = this.playPauseEl.querySelector("img");
+        img.src = "/static/img/play.svg";
+        this.displayEl.innerHTML = "&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;";
+    }
+    increment() {
+        this.counter++;
+        this.display();
+    }
+    display() {
+        let hours = Math.floor(this.counter / 3600);
+        let minutes = Math.floor((this.counter % 3600) / 60);
+        let seconds = Math.floor(this.counter % 60);
+        let displayHours = hours < 10 ? "0" + hours : hours.toString();
+        let displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
+        let displaySeconds = seconds < 10 ? "0" + seconds : seconds.toString();
+        this.displayEl.innerText =
+            displayHours + ":" + displayMinutes + ":" + displaySeconds;
+    }
+    togglePlayPause() {
+        let img = this.playPauseEl.querySelector("img");
+        if (img.src.endsWith("play.svg")) {
+            img.src = "/static/img/pause.svg";
+        }
+        else {
+            img.src = "/static/img/play.svg";
+        }
+    }
+}
 document.addEventListener("DOMContentLoaded", () => {
     let fab = document.querySelector("#fab");
     fab.addEventListener("click", saveSet);
@@ -58,6 +110,18 @@ document.addEventListener("DOMContentLoaded", () => {
             editDialog.close("cancel");
         });
     });
+    let timerEl = document.querySelector(".timer");
+    if (timerEl != null) {
+        timer = new Timer(timerEl);
+        let timerStartBtn = document.querySelector("#timer-start-btn");
+        timerStartBtn.addEventListener("click", () => {
+            timer.toggle();
+        });
+        let timerStopBtn = document.querySelector("#timer-stop-btn");
+        timerStopBtn.addEventListener("click", () => {
+            timer.reset();
+        });
+    }
 });
 function saveSet() {
     let setData = {
@@ -186,7 +250,7 @@ function swipeCloseGraph(e) {
         let endY = e.changedTouches[0].pageY;
         graph.style.transform = "";
         graph.classList.add("animate");
-        if (startY - endY > 175) {
+        if (startY - endY > 100) {
             graph.classList.add("hidden");
         }
         graph.removeEventListener("touchmove", this.swipeMove);

@@ -218,22 +218,49 @@ h1 {
   width: 15%;
 }
 
+.fab {
+  border: none;
+  border-radius: 3rem;
+  background-color: var(--fg);
+  color: var(--bg-1);
+  font-size: 3rem;
+
+  font-weight: 100;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
+  transition: rotate .2s;
+}
 #fab {
   position: absolute;
   top: -1.9rem;
   right: 1rem;
   width: 3.8rem;
   height: 3.8rem;
-  border: none;
-  border-radius: 3rem;
-  background-color: var(--fg);
-  color: var(--bg-1);
-  font-size: 3rem;
-  font-weight: 100;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
-  transition: rotate .2s;
-
 }
+.timer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: .5rem;
+  margin: .7rem auto;
+  width: calc(100% - 7.4rem);
+  background-color: var(--blue);
+  padding: .3rem;
+}
+.timer-btn {
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: .5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.timer-btn img {
+  height: 2rem;
+}
+.timer span {;
+  font-size: 2rem;
+}
+
 .save-success {
   background-color: var(--green-alt) !important;
 }

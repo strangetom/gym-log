@@ -5,6 +5,101 @@ const hideDialogTiming = {
   duration: 100,
   easing: "ease-out",
 };
+let timer;
+
+/**
+ * Timer class for time based exercises
+ */
+class Timer {
+  // Store current time in seconds
+  counter: number;
+  // Store interval id
+  interval: number;
+  // Timer element
+  timerEl: HTMLDivElement;
+  // Display element, where we'll show the output
+  displayEl: HTMLSpanElement;
+  // Play pause button element
+  playPauseEl: HTMLButtonElement;
+
+  /**
+   * Initialise timer by getting internal elements and setting counter to 0
+   * @param {HTMLDivElement} timerEl Timer element in DOM
+   */
+  constructor(timerEl: HTMLDivElement) {
+    this.timerEl = timerEl;
+    this.displayEl = timerEl.querySelector("#timer-display") as HTMLSpanElement;
+    this.playPauseEl = timerEl.querySelector(
+      "#timer-start-btn"
+    ) as HTMLButtonElement;
+
+    this.counter = 0;
+  }
+
+  /**
+   * Toggle timer start / pause
+   */
+  toggle() {
+    if (this.interval == null) {
+      this.interval = setInterval(this.increment.bind(this), 1000);
+      this.togglePlayPause();
+      this.display();
+    } else {
+      clearInterval(this.interval);
+      this.interval = null;
+      this.togglePlayPause();
+    }
+  }
+
+  /**
+   * Stop and reset timer
+   */
+  reset() {
+    clearInterval(this.interval);
+    this.interval = null;
+    this.counter = 0;
+
+    // Force start icon to play
+    let img = this.playPauseEl.querySelector("img");
+    img.src = "/static/img/play.svg";
+    this.displayEl.innerHTML = "&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;";
+  }
+
+  /**
+   * Increment timer by 1 second and update display
+   */
+  increment() {
+    this.counter++;
+    this.display();
+  }
+
+  /**
+   * Convert counter in seconds to readble time and display in displayEl
+   */
+  display() {
+    let hours = Math.floor(this.counter / 3600);
+    let minutes = Math.floor((this.counter % 3600) / 60);
+    let seconds = Math.floor(this.counter % 60);
+    let displayHours = hours < 10 ? "0" + hours : hours.toString();
+    let displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
+    let displaySeconds = seconds < 10 ? "0" + seconds : seconds.toString();
+
+    this.displayEl.innerText =
+      displayHours + ":" + displayMinutes + ":" + displaySeconds;
+  }
+
+  /**
+   * Toggle img on play / pause button
+   */
+  togglePlayPause() {
+    let img = this.playPauseEl.querySelector("img");
+    if (img.src.endsWith("play.svg")) {
+      img.src = "/static/img/pause.svg";
+    } else {
+      img.src = "/static/img/play.svg";
+    }
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   let fab: HTMLButtonElement = document.querySelector(
@@ -73,6 +168,23 @@ document.addEventListener("DOMContentLoaded", () => {
       editDialog.close("cancel");
     });
   });
+
+  // Timer element for time-based exercises
+  // Only initialise and add event listeners if it's on the exercise page
+  let timerEl: HTMLDivElement = document.querySelector(".timer");
+  if (timerEl != null) {
+    timer = new Timer(timerEl);
+    let timerStartBtn: HTMLButtonElement =
+      document.querySelector("#timer-start-btn");
+    timerStartBtn.addEventListener("click", () => {
+      timer.toggle();
+    });
+    let timerStopBtn: HTMLButtonElement =
+      document.querySelector("#timer-stop-btn");
+    timerStopBtn.addEventListener("click", () => {
+      timer.reset();
+    });
+  }
 });
 /**
  * Save new set to database

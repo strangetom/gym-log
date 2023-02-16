@@ -82,8 +82,17 @@
                 <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{sets[0][0].mins if sets and sets[0][0].mins is not none}}" placeholder="mm">&nbsp;:
                 <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{sets[0][0].seconds if sets and sets[0][0].seconds is not none}}" placeholder="ss">
             </div>
+            <div class="timer">
+                <button type="button" class="fab timer-btn" id="timer-start-btn">
+                    <img src="/static/img/play.svg">
+                </button>
+                <span id="timer-display">&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;</span>
+                <button type="button" class="fab timer-btn" id="timer-stop-btn">
+                    <img src="/static/img/stop.svg">
+                </button>
+            </div>
             {%- endif -%}
-            <button id="fab">
+            <button class="fab" id="fab">
                 +
             </button>
         </section>
