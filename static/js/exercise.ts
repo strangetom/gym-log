@@ -11,14 +11,17 @@ let timer;
  * Timer class for time based exercises
  */
 class Timer {
-  // Store current time in seconds
-  counter: number;
+  // Store start time from Date.now(), milliseconds
+  startTime: number;
+  // Store pause time, to continue from if paused, milliseconds
+  pauseElapsed: number;
   // Store interval id
   interval: number;
   // Timer element
   timerEl: HTMLDivElement;
   // Display element, where we'll show the output
   displayEl: HTMLSpanElement;
+  millisEl: HTMLSpanElement;
   // Play pause button element
   playPauseEl: HTMLButtonElement;
 
@@ -29,11 +32,15 @@ class Timer {
   constructor(timerEl: HTMLDivElement) {
     this.timerEl = timerEl;
     this.displayEl = timerEl.querySelector("#timer-display") as HTMLSpanElement;
+    this.millisEl = timerEl.querySelector(
+      "#timer-display-millis"
+    ) as HTMLSpanElement;
     this.playPauseEl = timerEl.querySelector(
       "#timer-start-btn"
     ) as HTMLButtonElement;
 
-    this.counter = 0;
+    this.startTime = 0;
+    this.pauseElapsed = 0;
   }
 
   /**
@@ -41,10 +48,12 @@ class Timer {
    */
   toggle() {
     if (this.interval == null) {
-      this.interval = setInterval(this.increment.bind(this), 1000);
+      this.startTime = Date.now();
+      this.interval = setInterval(this.display.bind(this), 100);
       this.togglePlayPause();
       this.display();
     } else {
+      this.pauseElapsed = Date.now() - this.startTime + this.pauseElapsed;
       clearInterval(this.interval);
       this.interval = null;
       this.togglePlayPause();
@@ -57,35 +66,36 @@ class Timer {
   reset() {
     clearInterval(this.interval);
     this.interval = null;
-    this.counter = 0;
 
     // Force start icon to play
     let img = this.playPauseEl.querySelector("img");
     img.src = "/static/img/play.svg";
     this.displayEl.innerHTML = "&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;";
-  }
-
-  /**
-   * Increment timer by 1 second and update display
-   */
-  increment() {
-    this.counter++;
-    this.display();
+    this.millisEl.innerHTML = "&ndash;&ndash;&ndash;";
   }
 
   /**
    * Convert counter in seconds to readble time and display in displayEl
    */
   display() {
-    let hours = Math.floor(this.counter / 3600);
-    let minutes = Math.floor((this.counter % 3600) / 60);
-    let seconds = Math.floor(this.counter % 60);
+    let elapsedMillis = Date.now() - this.startTime + this.pauseElapsed;
+    let elapsedSecs = elapsedMillis / 1000;
+
+    let hours = Math.floor(Math.floor(elapsedSecs) / 3600);
+    let minutes = Math.floor((Math.floor(elapsedSecs) % 3600) / 60);
+    let seconds = Math.floor(Math.floor(elapsedSecs) % 60);
+
+    // Get milli seconds, but only to 10 ms accuracy, so last digit is always 0
+    let millis = (elapsedSecs % 1) * 1000;
+    let roundedMillis = Math.ceil(millis / 10) * 10;
+
     let displayHours = hours < 10 ? "0" + hours : hours.toString();
     let displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
     let displaySeconds = seconds < 10 ? "0" + seconds : seconds.toString();
 
     this.displayEl.innerText =
       displayHours + ":" + displayMinutes + ":" + displaySeconds;
+    this.millisEl.innerText = roundedMillis.toString().padStart(3, "0");
   }
 
   /**

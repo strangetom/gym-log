@@ -9,16 +9,20 @@ class Timer {
     constructor(timerEl) {
         this.timerEl = timerEl;
         this.displayEl = timerEl.querySelector("#timer-display");
+        this.millisEl = timerEl.querySelector("#timer-display-millis");
         this.playPauseEl = timerEl.querySelector("#timer-start-btn");
-        this.counter = 0;
+        this.startTime = 0;
+        this.pauseElapsed = 0;
     }
     toggle() {
         if (this.interval == null) {
-            this.interval = setInterval(this.increment.bind(this), 1000);
+            this.startTime = Date.now();
+            this.interval = setInterval(this.display.bind(this), 100);
             this.togglePlayPause();
             this.display();
         }
         else {
+            this.pauseElapsed = Date.now() - this.startTime + this.pauseElapsed;
             clearInterval(this.interval);
             this.interval = null;
             this.togglePlayPause();
@@ -27,24 +31,25 @@ class Timer {
     reset() {
         clearInterval(this.interval);
         this.interval = null;
-        this.counter = 0;
         let img = this.playPauseEl.querySelector("img");
         img.src = "/static/img/play.svg";
         this.displayEl.innerHTML = "&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;";
-    }
-    increment() {
-        this.counter++;
-        this.display();
+        this.millisEl.innerHTML = "&ndash;&ndash;&ndash;";
     }
     display() {
-        let hours = Math.floor(this.counter / 3600);
-        let minutes = Math.floor((this.counter % 3600) / 60);
-        let seconds = Math.floor(this.counter % 60);
+        let elapsedMillis = Date.now() - this.startTime + this.pauseElapsed;
+        let elapsedSecs = elapsedMillis / 1000;
+        let hours = Math.floor(Math.floor(elapsedSecs) / 3600);
+        let minutes = Math.floor((Math.floor(elapsedSecs) % 3600) / 60);
+        let seconds = Math.floor(Math.floor(elapsedSecs) % 60);
+        let millis = (elapsedSecs % 1) * 1000;
+        let roundedMillis = Math.ceil(millis / 10) * 10;
         let displayHours = hours < 10 ? "0" + hours : hours.toString();
         let displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
         let displaySeconds = seconds < 10 ? "0" + seconds : seconds.toString();
         this.displayEl.innerText =
             displayHours + ":" + displayMinutes + ":" + displaySeconds;
+        this.millisEl.innerText = roundedMillis.toString().padStart(3, "0");
     }
     togglePlayPause() {
         let img = this.playPauseEl.querySelector("img");

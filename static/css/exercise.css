@@ -263,6 +263,10 @@ h1 {
 }
 .timer span {;
   font-size: 2rem;
+  font-family: monospace;
+}
+.timer span.millis {
+  font-size: 1rem;
 }
 
 .save-success {
