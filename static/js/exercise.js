@@ -36,6 +36,8 @@ class Timer {
         img.src = "/static/img/play.svg";
         this.displayEl.innerHTML = "&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;";
         this.millisEl.innerHTML = "&ndash;&ndash;&ndash;";
+        this.timerEl.classList.remove("paused");
+        this.timerEl.classList.remove("running");
     }
     display() {
         let elapsedMillis = Date.now() - this.startTime + this.pauseElapsed;
@@ -56,9 +58,13 @@ class Timer {
         let img = this.playPauseEl.querySelector("img");
         if (img.src.endsWith("play.svg")) {
             img.src = "/static/img/pause.svg";
+            this.timerEl.classList.remove("paused");
+            this.timerEl.classList.add("running");
         }
         else {
             img.src = "/static/img/play.svg";
+            this.timerEl.classList.add("paused");
+            this.timerEl.classList.remove("running");
         }
     }
 }

@@ -240,16 +240,22 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: .5rem;
-  margin: .7rem auto;
-  width: calc(100% - 7.4rem);
-  background-color: var(--blue);
+  border-radius: .8rem;
+  margin: .9rem auto;
+  width: 80%;
+  background-color: var(--bg-s);
   padding: .3rem;
+}
+.timer.running {
+  background-color: var(--blue);
+}
+.timer.paused{
+  background-color: #224244;
 }
 .timer-btn {
   width: 3.2rem;
   height: 3.2rem;
-  border-radius: .5rem;
+  border-radius: .8rem;
   display: flex;
   align-items: center;
   justify-content: center;
