@@ -31,6 +31,7 @@ class Timer {
     reset() {
         clearInterval(this.interval);
         this.interval = null;
+        this.pauseElapsed = 0;
         let img = this.playPauseEl.querySelector("img");
         img.src = "/static/img/play.svg";
         this.displayEl.innerHTML = "&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;";

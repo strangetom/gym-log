@@ -66,6 +66,7 @@ class Timer {
   reset() {
     clearInterval(this.interval);
     this.interval = null;
+    this.pauseElapsed = 0;
 
     // Force start icon to play
     let img = this.playPauseEl.querySelector("img");
