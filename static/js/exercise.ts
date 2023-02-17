@@ -6,17 +6,23 @@ const hideDialogTiming = {
   easing: "ease-out",
 };
 let timer;
+var wakelock = null;
+
+enum WakelockStatus {
+  Enable = 1,
+  Disable,
+}
 
 /**
  * Timer class for time based exercises
  */
 class Timer {
   // Store start time from Date.now(), milliseconds
-  startTime: number;
+  startTime: number = 0;
   // Store pause time, to continue from if paused, milliseconds
-  pauseElapsed: number;
+  pauseElapsed: number = 0;
   // Store interval id
-  interval: number;
+  interval: number = null;
   // Timer element
   timerEl: HTMLDivElement;
   // Display element, where we'll show the output
@@ -24,6 +30,8 @@ class Timer {
   millisEl: HTMLSpanElement;
   // Play pause button element
   playPauseEl: HTMLButtonElement;
+  // Wakelock for timer is running;
+  wakelock = null;
 
   /**
    * Initialise timer by getting internal elements and setting counter to 0
@@ -38,9 +46,6 @@ class Timer {
     this.playPauseEl = timerEl.querySelector(
       "#timer-start-btn"
     ) as HTMLButtonElement;
-
-    this.startTime = 0;
-    this.pauseElapsed = 0;
   }
 
   /**
@@ -52,11 +57,13 @@ class Timer {
       this.interval = setInterval(this.display.bind(this), 100);
       this.togglePlayPause();
       this.display();
+      toggleWakeLock(WakelockStatus.Enable);
     } else {
       this.pauseElapsed = Date.now() - this.startTime + this.pauseElapsed;
       clearInterval(this.interval);
       this.interval = null;
       this.togglePlayPause();
+      toggleWakeLock(WakelockStatus.Disable);
     }
   }
 
@@ -76,6 +83,8 @@ class Timer {
 
     this.timerEl.classList.remove("paused");
     this.timerEl.classList.remove("running");
+
+    toggleWakeLock(WakelockStatus.Disable);
   }
 
   /**
@@ -413,4 +422,20 @@ function swipeCloseGraph(e: TouchEvent) {
 
   graph.addEventListener("touchmove", this.swipeMove);
   graph.addEventListener("touchend", this.swipeEnd);
+}
+
+/**
+ * Toggle wakelock when checkbox state changes
+ */
+async function toggleWakeLock(status: WakelockStatus) {
+  if (status == WakelockStatus.Enable && wakelock == null) {
+    try {
+      wakelock = await navigator.wakeLock.request("screen");
+    } catch (err) {
+      console.log(`Wakelock failed: ${err.message}`);
+    }
+  } else if (status == WakelockStatus.Disable && wakelock != null) {
+    // Release wakelock and set variable back to null
+    wakelock.release().then(() => (wakelock = null));
+  }
 }
