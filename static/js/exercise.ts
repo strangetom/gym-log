@@ -372,7 +372,7 @@ function modifySet() {
  * @param {TouchEvent} e Touchstart event
  */
 function swipeCloseGraph(e: TouchEvent) {
-  if ((e.changedTouches[0].target as HTMLElement).closest("table") != null) {
+  if ((e.changedTouches[0].target as HTMLElement).closest(".graph-wrapper") != null) {
     // If the closest table element is not null, then it means we've touched the graph.
     // Therefore, abort this event listener so we can scroll the graph horizontally without
     // this event listener capturing the touch events

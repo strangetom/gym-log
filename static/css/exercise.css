@@ -180,36 +180,6 @@ h1 {
   font-size: 1.4rem;
   margin-bottom: 2rem;
 }
-#graph .table-wrapper {
-  overflow-x: scroll;
-  direction: rtl;
-  width: 100vw;
-  height: 50%;
-}
-#graph table {
-  width: 150vw;
-  margin: 0 20px;
-  --secondary-axes-color: var(--bg-2);
-  --color-1: var(--green);
-  --color-2: var(--orange);
-  --color-3: var(--blue);
-  --color-4: var(--red);
-  --color-5: var(--aqua);
-  --color-6: var(--purple);
-  --color-7: var(--yellow);
-}
-#graph td {
-  max-width: 20px;
-}
-#graph table .tooltip {
-  bottom: unset;
-  top: -2rem;
-  background-color: var(--fg);
-  color: var(--bg);
-}
-#graph table .tooltip::after {
-  border-top-color: var(--fg);
-}
 #graph .swipe-arrow {
   position: absolute;
   bottom: 1rem;

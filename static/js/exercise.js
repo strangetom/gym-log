@@ -255,7 +255,7 @@ function modifySet() {
     }
 }
 function swipeCloseGraph(e) {
-    if (e.changedTouches[0].target.closest("table") != null) {
+    if (e.changedTouches[0].target.closest(".graph-wrapper") != null) {
         return;
     }
     e.preventDefault();

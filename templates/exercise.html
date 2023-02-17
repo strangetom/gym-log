@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width">
         <title>{{name}} | Gym Log</title>
         <link rel="stylesheet" type="text/css" href="/static/css/exercise.css">
-        <link rel="stylesheet" type="text/css" href="/static/css/vendor/chart.min.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/graph.css">
         <script type="module" src="/static/js/exercise.js"></script>
         <!-- icons and manifest for PWA -->
         <link rel="manifest" href="/static/manifest.json">
@@ -102,25 +102,19 @@
 
         <section id="graph" class="hidden animate">
             <h4>Historical progress</h4>
-            <div class="table-wrapper">
-                <table class="charts-css column multiple show-4-secondary-axes data-spacing-4">
-                    <thead>
-                        <tr>
-                            <th scope="col"> Days ago </th>
-                            <th scope="col"> Value </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {%- for age, values in graph.items() -%}
-                        <tr>
-                            <th> {{age}} </th>
-                            {%- for v in values -%}
-                            <td style="--size:calc({{v.scaled}});"><span class="tooltip"> {{v.value}} </span></td>
-                            {%- endfor -%}
-                        </tr>
+            <div class="graph-wrapper">
+                <div class="graph-chart">
+                    {%- for age, values in graph.items() -%}
+                    <div class="graph-group">
+                        {%- for v in values -%}
+                        <div class="graph-bar" style="--size:{{v.scaled}};" data-value="{{v.value}}"></div>
                         {%- endfor -%}
-                    </tbody>
-                </table>
+                    </div>
+                    {%- endfor -%}
+                    <div class="graph-group">
+                        <div class="graph-bar" style="--size: 1; background-color: var(--bg-s);"></div>
+                    </div>
+                </div>
             </div>
             <p>Most recent ⟶</p>
             <svg xmlns="http://www.w3.org/2000/svg" class="swipe-arrow" preserveAspectRatio="none" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
