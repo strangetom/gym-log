@@ -36,29 +36,15 @@
   /* Position the tooltip text */
   position: absolute;
   z-index: 1;
-  bottom: calc(100% + 5px);
+  bottom: 25px;
   left: -4ch;
   transform: translateX(50%);
   visibility: hidden;
   opacity: 0;
   transition: visibility 0s, opacity 0.3s;
 }
-/* Tooltip arrow */
-.graph-bar::after {
-  content: "";
-  position: absolute;
-  bottom: calc(100% - 5px);
-  left: 50%;
-  margin-left: -5px;
-  border-width: 6px;
-  border-style: solid;
-  border-color: var(--fg) transparent transparent transparent;
-  visibility: hidden;
-  opacity: 0;
-  transition: visibility 0s, opacity 0.3s;
-}
 /* Tooltip visibility */
-.graph-bar:hover::after, .graph-bar:hover::before {
+.graph-bar:hover::before {
   visibility: visible;
   opacity: 1;
 }
