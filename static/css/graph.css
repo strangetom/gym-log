@@ -2,7 +2,9 @@
   overflow-x: scroll;
   direction: rtl;
   width: 100vw;
-  height: 50%;
+  height: 55%;
+  background-image: linear-gradient(var(--bg-2) 1px, transparent 0px);
+  background-size: auto 24%;
 }
 .graph-chart {
   height: 100%;
