@@ -36,15 +36,31 @@
   /* Position the tooltip text */
   position: absolute;
   z-index: 1;
-  bottom: 25px;
+  bottom: calc(100% + 5px);
   left: -4ch;
   transform: translateX(50%);
   visibility: hidden;
   opacity: 0;
   transition: visibility 0s, opacity 0.3s;
 }
+.graph-bar::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% - 7px);
+  /* Place arrow in middle of tooltip, because right side of tooltip is at 100%+1ch and tooltip is 12ch wide
+     If tooltip is wider than word, place at center of word
+  */
+  left: 1ch;
+  margin-left: -5px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--fg) transparent transparent transparent;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.3s;
+}
 /* Tooltip visibility */
-.graph-bar:hover::before {
+.graph-bar:hover::before, .graph-bar:hover::after {
   visibility: visible;
   opacity: 1;
 }

@@ -396,7 +396,7 @@ class WorkoutData:
         # Calculate a scaled value, offset so zero is at the 0.9*min_value, then normalise
         # This is to better show the delta between sets
         # Format the value to 3 significant figures for diplay purposes tooltips
-        max_value = max_value * 1.04
+        max_value = max_value * 1.06
         min_value = min_value * 0.9
         for k, values in data.items():
             data[k] = [
