@@ -81,7 +81,7 @@ function addWorkout() {
 function installServiceWorker() {
   if ("serviceWorker" in navigator) {
     console.log("CLIENT: service worker registration in progress.");
-    navigator.serviceWorker.register("/service-worker.min.js").then(
+    navigator.serviceWorker.register("/service-worker.js").then(
       function () {
         console.log("CLIENT: service worker registration complete.");
       },
