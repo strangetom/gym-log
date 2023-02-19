@@ -151,6 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add event listener for swiping up to close graph drop down
   graphSection.addEventListener("touchstart", swipeCloseGraph);
 
+  // When selecting the new set input
+  let newSetInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll("#new-set input");
+  newSetInputs.forEach( el => {
+    el.addEventListener("click", (e) => {e.target.select()});
+  })
+
   let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card");
   sets.forEach((el) => {
     el.addEventListener("click", showEditSetDialog);

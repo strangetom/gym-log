@@ -94,6 +94,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     graphSection.addEventListener("touchstart", swipeCloseGraph);
+    let newSetInputs = document.querySelectorAll("#new-set input");
+    newSetInputs.forEach(el => {
+        el.addEventListener("click", (e) => { e.target.select(); });
+    });
     let sets = document.querySelectorAll(".set-card");
     sets.forEach((el) => {
         el.addEventListener("click", showEditSetDialog);
