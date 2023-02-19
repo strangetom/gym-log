@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // When selecting the new set input
   let newSetInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll("#new-set input");
   newSetInputs.forEach( el => {
-    el.addEventListener("click", (e) => {e.target.select()});
+    el.addEventListener("click", (e) => {(e.target as HTMLInputElement).select()});
   })
 
   let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card");
