@@ -4,6 +4,7 @@ const hideDialogTiming = {
     easing: "ease-out",
 };
 document.addEventListener("DOMContentLoaded", () => {
+    installServiceWorker();
     let fab = document.querySelector("#fab");
     let addWorkoutDialog = document.querySelector("#new-workout-dialog");
     fab.addEventListener("click", () => {
@@ -48,6 +49,19 @@ function addWorkout() {
                 window.location.reload();
             }
         });
+    }
+}
+function installServiceWorker() {
+    if ("serviceWorker" in navigator) {
+        console.log("CLIENT: service worker registration in progress.");
+        navigator.serviceWorker.register("/service-worker.min.js").then(function () {
+            console.log("CLIENT: service worker registration complete.");
+        }, function () {
+            console.log("CLIENT: service worker registration failure.");
+        });
+    }
+    else {
+        console.log("CLIENT: service worker is not supported.");
     }
 }
 export {};
