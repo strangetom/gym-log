@@ -1,4 +1,5 @@
 import { saveError, saveSuccess } from "./saveFunctions.js";
+import { Offline } from "./offline.js";
 
 const hideDialogAnimation = [{ transform: "translateY(-100%" }];
 const hideDialogTiming = {
@@ -7,6 +8,7 @@ const hideDialogTiming = {
 };
 let timer;
 var wakelock = null;
+var offline = new Offline();
 
 enum WakelockStatus {
   Enable = 1,
@@ -152,10 +154,13 @@ document.addEventListener("DOMContentLoaded", () => {
   graphSection.addEventListener("touchstart", swipeCloseGraph);
 
   // When selecting the new set input
-  let newSetInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll("#new-set input");
-  newSetInputs.forEach( el => {
-    el.addEventListener("click", (e) => {(e.target as HTMLInputElement).select()});
-  })
+  let newSetInputs: NodeListOf<HTMLInputElement> =
+    document.querySelectorAll("#new-set input");
+  newSetInputs.forEach((el) => {
+    el.addEventListener("click", (e) => {
+      (e.target as HTMLInputElement).select();
+    });
+  });
 
   let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card");
   sets.forEach((el) => {
@@ -223,6 +228,30 @@ document.addEventListener("DOMContentLoaded", () => {
  * Save new set to database
  */
 function saveSet() {
+  let setData = getNewSetData();
+  let postData = new FormData();
+  postData.append("set", JSON.stringify(setData));
+
+  fetch("/set/", {
+    method: "POST",
+    body: postData,
+  })
+    .then((res) => {
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        saveError("#fab");
+      }
+    })
+    .catch((e) => {
+      offline.addSetToCache(setData);
+    });
+}
+
+/**
+ * Get new set data
+ */
+function getNewSetData() {
   let setData = {
     exerciseID: "",
     datetime: isoDateTime(),
@@ -277,19 +306,7 @@ function saveSet() {
     setData.time_s = time_s.toString();
   }
 
-  let postData = new FormData();
-  postData.append("set", JSON.stringify(setData));
-
-  fetch("/set/", {
-    method: "POST",
-    body: postData,
-  }).then((res) => {
-    if (res.ok) {
-      window.location.reload();
-    } else {
-      saveError("#fab");
-    }
-  });
+  return setData;
 }
 
 /**

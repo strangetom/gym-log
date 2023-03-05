@@ -1,4 +1,5 @@
 import { saveError } from "./saveFunctions.js";
+import { Offline } from "./offline.js";
 const hideDialogAnimation = [{ transform: "translateY(-100%" }];
 const hideDialogTiming = {
     duration: 100,
@@ -6,6 +7,7 @@ const hideDialogTiming = {
 };
 let timer;
 var wakelock = null;
+var offline = new Offline();
 var WakelockStatus;
 (function (WakelockStatus) {
     WakelockStatus[WakelockStatus["Enable"] = 1] = "Enable";
@@ -151,6 +153,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 function saveSet() {
+    let setData = getNewSetData();
+    let postData = new FormData();
+    postData.append("set", JSON.stringify(setData));
+    fetch("/set/", {
+        method: "POST",
+        body: postData,
+    }).then((res) => {
+        if (res.ok) {
+            window.location.reload();
+        }
+        else {
+            saveError("#fab");
+        }
+    }).catch(e => {
+        offline.addSetToCache(setData);
+    });
+}
+function getNewSetData() {
     let setData = {
         exerciseID: "",
         datetime: isoDateTime(),
@@ -184,19 +204,7 @@ function saveSet() {
         let time_s = Number(secs.value) + Number(mins.value) * 60 + Number(hours.value) * 3600;
         setData.time_s = time_s.toString();
     }
-    let postData = new FormData();
-    postData.append("set", JSON.stringify(setData));
-    fetch("/set/", {
-        method: "POST",
-        body: postData,
-    }).then((res) => {
-        if (res.ok) {
-            window.location.reload();
-        }
-        else {
-            saveError("#fab");
-        }
-    });
+    return setData;
 }
 function isoDateTime() {
     return new Date().toISOString().split(".")[0] + "Z";
