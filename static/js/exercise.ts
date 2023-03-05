@@ -411,12 +411,47 @@ function showOfflineBanner() {
     } else {
       banner.innerText = `${offlineSets.length} new set not sync'd`;
     }
+    banner.addEventListener("click", uploadOfflineSets);
 
     let historicalSets = document.querySelector("#historical-sets");
     let latestSetGroup = document.querySelector(".set-group");
     historicalSets.insertBefore(banner, latestSetGroup);
     banner.scrollIntoView();
   }
+}
+
+/**
+ * Upload any offline sets to server
+ */
+async function uploadOfflineSets() {
+  let offlineSets: Array<Object> = offline.getAllOfflineSets();
+
+  let failure = false;
+  for (let i = 0; i < offlineSets.length; i++) {
+    let setData = offlineSets[i];
+    let postData = new FormData();
+    postData.append("set", JSON.stringify(setData));
+
+    await fetch("/set/", {
+      method: "POST",
+      body: postData,
+    })
+      .then((res) => {
+        if (res.ok) {
+          offline.shift();
+        } else {
+          failure = true;
+        }
+      })
+      .catch((e) => {
+        failure = true;
+      });
+
+    if (failure) {
+      break;
+    }
+  }
+  window.location.reload();
 }
 
 /**

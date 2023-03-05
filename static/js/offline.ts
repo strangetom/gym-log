@@ -21,4 +21,10 @@ export class Offline {
     let offlineCache = JSON.parse(localStorage.getItem("offline"));
     return offlineCache;
   }
+
+  shift() {
+    let offlineCache = JSON.parse(localStorage.getItem("offline"));
+    offlineCache.shift();
+    localStorage.setItem("offline", JSON.stringify(offlineCache));
+  }
 }

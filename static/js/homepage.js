@@ -65,11 +65,40 @@ function showOfflineBanner() {
         else {
             banner.innerText = `${offlineSets.length} new set not sync'd`;
         }
+        banner.addEventListener("click", uploadOfflineSets);
         let workouts = document.querySelector("#workouts");
         let topCard = document.querySelector(".workout-card");
         workouts.insertBefore(banner, topCard);
         banner.scrollIntoView();
     }
+}
+async function uploadOfflineSets() {
+    let offlineSets = offline.getAllOfflineSets();
+    let failure = false;
+    for (let i = 0; i < offlineSets.length; i++) {
+        let setData = offlineSets[i];
+        let postData = new FormData();
+        postData.append("set", JSON.stringify(setData));
+        await fetch("/set/", {
+            method: "POST",
+            body: postData,
+        })
+            .then((res) => {
+            if (res.ok) {
+                offline.shift();
+            }
+            else {
+                failure = true;
+            }
+        })
+            .catch((e) => {
+            failure = true;
+        });
+        if (failure) {
+            break;
+        }
+    }
+    window.location.reload();
 }
 function installServiceWorker() {
     if ("serviceWorker" in navigator) {
