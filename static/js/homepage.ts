@@ -1,13 +1,16 @@
 import { saveError, saveSuccess } from "./saveFunctions.js";
+import { Offline } from "./offline.js";
 
 const hideDialogAnimation = [{ transform: "translateY(-100%" }];
 const hideDialogTiming = {
   duration: 100,
   easing: "ease-out",
 };
+var offline = new Offline();
 
 document.addEventListener("DOMContentLoaded", () => {
   installServiceWorker();
+  showOfflineBanner();
   let fab: HTMLButtonElement = document.querySelector(
     "#fab"
   ) as HTMLButtonElement;
@@ -72,6 +75,28 @@ function addWorkout() {
         window.location.reload();
       }
     });
+  }
+}
+
+/**
+ * Show banner indicating offline data
+ */
+function showOfflineBanner() {
+  let offlineSets: Array<Object> = offline.getAllOfflineSets();
+
+  if (offlineSets.length > 0) {
+    let banner = document.createElement("h4");
+    banner.classList.add("offline-set-banner");
+    if (offlineSets.length > 1) {
+      banner.innerText = `${offlineSets.length} new sets not sync'd`;
+    } else {
+      banner.innerText = `${offlineSets.length} new set not sync'd`;
+    }
+
+    let workouts = document.querySelector("#workouts");
+    let topCard = document.querySelector(".workout-card");
+    workouts.insertBefore(banner, topCard);
+    banner.scrollIntoView();
   }
 }
 

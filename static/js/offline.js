@@ -10,4 +10,12 @@ export class Offline {
         offlineCache.push(setData);
         localStorage.setItem("offline", JSON.stringify(offlineCache));
     }
+    getOfflineSets(exerciseID) {
+        let offlineCache = JSON.parse(localStorage.getItem("offline"));
+        return offlineCache.filter((set) => set.exerciseID == exerciseID);
+    }
+    getAllOfflineSets() {
+        let offlineCache = JSON.parse(localStorage.getItem("offline"));
+        return offlineCache;
+    }
 }

@@ -156,6 +156,14 @@ h1 {
   color: var(--fg-2);
 }
 
+.offline-set-banner {
+  padding: .7rem 2rem;
+  margin: 0;
+  text-align: center;
+  background-color: var(--red);
+  scroll-snap-align: start;
+}
+
 #graph {
   position: fixed;
   top: calc(2rem + .7rem + 1rem);

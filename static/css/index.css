@@ -42,7 +42,7 @@ body {
   left: 0;
   right: 0;
   background-color: var(--bg-s);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
   z-index: 1;
   font-size: 1.3rem;
   max-width: calc(80ch / 1.3);
@@ -70,7 +70,8 @@ h1 {
 }
 
 #workouts {
-  margin-top: 5.5rem;
+  margin-top: 4rem;
+  padding: 0.05px; /* Prevent margin collapse with child elements */
 }
 .workout-card {
   margin: 2rem 1.5rem;
@@ -121,6 +122,14 @@ h1 {
   margin: 0;
   font-size: 0.9rem;
   color: var(--fg-2);
+}
+
+.offline-set-banner {
+  padding: .7rem 2rem;
+  margin: 0;
+  text-align: center;
+  background-color: var(--red);
+  scroll-snap-align: start;
 }
 
 

@@ -131,6 +131,8 @@ class Timer {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  showOfflineBanner();
+
   let fab: HTMLButtonElement = document.querySelector(
     "#fab"
   ) as HTMLButtonElement;
@@ -224,6 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
 /**
  * Save new set to database
  */
@@ -245,6 +248,7 @@ function saveSet() {
     })
     .catch((e) => {
       offline.addSetToCache(setData);
+      window.location.reload();
     });
 }
 
@@ -387,6 +391,31 @@ function modifySet() {
         window.location.reload();
       }
     });
+  }
+}
+
+/**
+ * Show banner indicating offline data
+ */
+function showOfflineBanner() {
+  let exerciseID: string = (
+    document.querySelector("#exerciseID") as HTMLInputElement
+  ).value;
+  let offlineSets: Array<Object> = offline.getOfflineSets(Number(exerciseID));
+
+  if (offlineSets.length > 0) {
+    let banner = document.createElement("h4");
+    banner.classList.add("offline-set-banner");
+    if (offlineSets.length > 1) {
+      banner.innerText = `${offlineSets.length} new sets not sync'd`;
+    } else {
+      banner.innerText = `${offlineSets.length} new set not sync'd`;
+    }
+
+    let historicalSets = document.querySelector("#historical-sets");
+    let latestSetGroup = document.querySelector(".set-group");
+    historicalSets.insertBefore(banner, latestSetGroup);
+    banner.scrollIntoView();
   }
 }
 

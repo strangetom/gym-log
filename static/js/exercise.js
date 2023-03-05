@@ -82,6 +82,7 @@ class Timer {
     }
 }
 document.addEventListener("DOMContentLoaded", () => {
+    showOfflineBanner();
     let fab = document.querySelector("#fab");
     fab.addEventListener("click", saveSet);
     let graphBtn = document.querySelector("#graph-button");
@@ -97,8 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     graphSection.addEventListener("touchstart", swipeCloseGraph);
     let newSetInputs = document.querySelectorAll("#new-set input");
-    newSetInputs.forEach(el => {
-        el.addEventListener("click", (e) => { e.target.select(); });
+    newSetInputs.forEach((el) => {
+        el.addEventListener("click", (e) => {
+            e.target.select();
+        });
     });
     let sets = document.querySelectorAll(".set-card");
     sets.forEach((el) => {
@@ -159,15 +162,18 @@ function saveSet() {
     fetch("/set/", {
         method: "POST",
         body: postData,
-    }).then((res) => {
+    })
+        .then((res) => {
         if (res.ok) {
             window.location.reload();
         }
         else {
             saveError("#fab");
         }
-    }).catch(e => {
+    })
+        .catch((e) => {
         offline.addSetToCache(setData);
+        window.location.reload();
     });
 }
 function getNewSetData() {
@@ -264,6 +270,24 @@ function modifySet() {
                 window.location.reload();
             }
         });
+    }
+}
+function showOfflineBanner() {
+    let exerciseID = document.querySelector("#exerciseID").value;
+    let offlineSets = offline.getOfflineSets(Number(exerciseID));
+    if (offlineSets.length > 0) {
+        let banner = document.createElement("h4");
+        banner.classList.add("offline-set-banner");
+        if (offlineSets.length > 1) {
+            banner.innerText = `${offlineSets.length} new sets not sync'd`;
+        }
+        else {
+            banner.innerText = `${offlineSets.length} new set not sync'd`;
+        }
+        let historicalSets = document.querySelector("#historical-sets");
+        let latestSetGroup = document.querySelector(".set-group");
+        historicalSets.insertBefore(banner, latestSetGroup);
+        banner.scrollIntoView();
     }
 }
 function swipeCloseGraph(e) {
