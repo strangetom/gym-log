@@ -199,13 +199,16 @@ class WorkoutData:
                     (exerciseID,),
                 )
                 name, exercise_type = cur.fetchone()
-                last_update, last_set = self._get_exercise_last_set(exerciseID)
+                last_update, last_set, is_today = self._get_exercise_last_set(
+                    exerciseID
+                )
 
                 exercise_data.append(
                     {
                         "name": name,
                         "exerciseID": exerciseID,
                         "last_update": last_update,
+                        "is_today": is_today,
                         "last_set": last_set,
                     }
                 )
@@ -615,7 +618,7 @@ class WorkoutData:
 
         Returns
         -------
-        Tuple[str, str]
+        Tuple[str, str, bool]
             Last exercise
             Human readable relative datetime string
         """
@@ -681,6 +684,7 @@ class WorkoutData:
         Tuple[str, str]
             Human readable relative timestamp
             Last set string
+            True if last exercise is today
         """
         with sqlite3.connect(self.db) as conn:
             cur = conn.cursor()
@@ -703,9 +707,13 @@ class WorkoutData:
         conn.close()
 
         if timestamp is None:
-            return "Never", set_string
+            return "Never", set_string, False
         else:
-            return self._readable_datetime(timestamp), set_string
+            return (
+                self._readable_datetime(timestamp),
+                set_string,
+                self._timestamp_is_today(timestamp),
+            )
 
     def _readable_datetime(self, timestamp: str) -> str:
         """Convert an ISO8601 timestamp into a human readable relative string
@@ -746,6 +754,22 @@ class WorkoutData:
                 return f"{days} days ago"
             else:
                 return dt.strftime("%b %d %Y")
+
+    def _timestamp_is_today(self, timestamp: str) -> bool:
+        """Return True is timestamp is same day as today
+
+        Parameters
+        ----------
+        timestamp : str
+            ISO8601 timestamp
+
+        Returns
+        -------
+        bool
+            True is timestamp day is today
+        """
+        dt = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+        return (datetime.datetime.now() - dt).days == 0
 
     def _create_set_summary(self, details: ExerciseSet) -> str:
         """Generate string that summarises a set

@@ -103,8 +103,11 @@ h1 {
   font-size: .9rem;
 }
 .exercise-last-update {
-  padding: 2px 7px;
+  padding: 2px 9px;
   margin-right: 10px;
   border-radius: 10px;
   background-color: var(--workout-colour);
+}
+.today {
+  filter: contrast(2);
 }
