@@ -769,7 +769,7 @@ class WorkoutData:
             True is timestamp day is today
         """
         dt = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
-        return (datetime.datetime.now() - dt).days == 0
+        return dt.date() == datetime.date.today()
 
     def _create_set_summary(self, details: ExerciseSet) -> str:
         """Generate string that summarises a set
