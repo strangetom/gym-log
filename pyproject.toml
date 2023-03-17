@@ -51,3 +51,9 @@ exclude = [
     ".git",
     "venv"
 ]
+
+[tool.djlint]
+profile = "jinja"
+ignore = "J004,J018"
+extension = "html"
+exclude = ["**/__pycache__", "venv"]

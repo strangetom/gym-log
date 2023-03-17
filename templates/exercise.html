@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
-        <meta name="Description" content="Gym Log">
-        <meta name="viewport" content="width=device-width">
-        <title>{{name}} | Gym Log</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/exercise.css">
-        <link rel="stylesheet" type="text/css" href="/static/css/graph.css">
+        <meta charset="utf-8"/>
+        <meta name="Description" content="Gym Log"/>
+        <meta name="viewport" content="width=device-width"/>
+        <title>{{ name }} | Gym Log</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/exercise.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/css/graph.css"/>
         <script type="module" src="/static/js/exercise.js"></script>
         <!-- icons and manifest for PWA -->
-        <link rel="manifest" href="/static/manifest.json">
-        <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+        <link rel="manifest" href="/static/manifest.json"/>
+        <link rel="icon" href="/static/favicon.svg" type="image/svg+xml"/>
         <meta name="theme-color" content="#32302f"/>
     </head>
     <body>
@@ -23,7 +23,7 @@
                     </g>
                 </svg>
             </a>
-            <h1>{{name}}</h1>
+            <h1>{{ name }}</h1>
             <div id="graph-button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0Zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5Z"/>
@@ -35,63 +35,63 @@
             {%- for group in sets -%}
             <div class="set-group">
                 {%- for s in group -%}
-                <div class="set-card" data-uid="{{s.uid}}" data-type="{{type}}" data-distance="{{s.distance if s.distance if not none}}" data-repetitions="{{s.repetitions if s.repetitions if not none}}" data-weight="{{s.weight if s.weight if not none}}" data-hours="{{s.hours if s.hours if not none}}" data-mins="{{s.mins if s.mins if not none}}" data-seconds="{{s.seconds if s.seconds if not none}}">
+                <div class="set-card" data-uid="{{ s.uid }}" data-type="{{ type }}" data-distance="{{ s.distance if s.distance is not none }}" data-repetitions="{{ s.repetitions if s.repetitions is not none }}" data-weight="{{ s.weight if s.weight if not none }}" data-hours="{{ s.hours if s.hours if not none }}" data-mins="{{ s.mins if s.mins is not none }}" data-seconds="{{ s.seconds if s.seconds is not none }}">
                     <div class="set-top-row">
-                        <h3>{{s.set_detail}}</h3>
+                        <h3>{{ s.set_detail }}</h3>
                         {% if s.delta is not none %}
                             {%- if s.delta > 0 %}
-                            <span class="increase">{{"+%.1f"|format(s.delta)}}%</span>
+                            <span class="increase">{{ "+%.1f"|format(s.delta) }}%</span>
                             {%- else -%}
-                            <span class="decrease">{{"%.1f"|format(s.delta)}}%</span>
+                            <span class="decrease">{{ "%.1f"|format(s.delta) }}%</span>
                             {%- endif -%}
                         {% else %}
                         <span class="equal">=</span>
                         {% endif %}
                     </div>
-                    <small>{{s.readable_time}}</small>
+                    <small>{{ s.readable_time }}</small>
                 </div>
                 {%- endfor -%}
             </div>
             {%- endfor -%}
         </section>
 
-        <section id=new-set>
-            <input type="hidden" name="exerciseID" id="exerciseID" value="{{exerciseID}}">
+        <section id="new-set">
+            <input type="hidden" name="exerciseID" id="exerciseID" value="{{ exerciseID }}"/>
             {%- if type == "weight-repetitions" -%}
             <div class="new-input">
-                <input type="text" inputmode="numeric" id="reps" name="reps" autocomplete="off" value="{{sets[0][0].repetitions if sets and sets[0][0].repetitions is not none}}">
+                <input type="text" inputmode="numeric" id="reps" name="reps" autocomplete="off" value="{{ sets[0][0].repetitions if sets and sets[0][0].repetitions is not none }}"/>
                 Reps
             </div>
             <div class="new-input">
-                <input type="text" inputmode="numeric" id="weight" name="weight" autocomplete="off" value="{{sets[0][0].weight if sets and sets[0][0].weight is not none}}">
+                <input type="text" inputmode="numeric" id="weight" name="weight" autocomplete="off" value="{{ sets[0][0].weight if sets and sets[0][0].weight is not none }}"/>
                 kg
             </div>
             {%- elif type == "distance-time" -%}
             <div class="new-input">
-                <input type="text" inputmode="numeric" id="distance" name="distance" autocomplete="off" value="{{sets[0][0].distance if sets and sets[0][0].distance is not none}}">
+                <input type="text" inputmode="numeric" id="distance" name="distance" autocomplete="off" value="{{ sets[0][0].distance if sets and sets[0][0].distance is not none }}"/>
                 m
             </div>
             <div class="new-input">
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{sets[0][0].hours if sets and sets[0][0].hours is not none}}" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{sets[0][0].mins if sets and sets[0][0].mins is not none}}" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{sets[0][0].seconds if sets and sets[0][0].seconds is not none}}" placeholder="ss">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{ sets[0][0].hours if sets and sets[0][0].hours is not none }}" placeholder="hh"/>&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{ sets[0][0].mins if sets and sets[0][0].mins is not none }}" placeholder="mm"/>&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{ sets[0][0].seconds if sets and sets[0][0].seconds is not none }}" placeholder="ss"/>
             </div>
             {%- elif type == "time" -%}
             <div class="new-input">
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{sets[0][0].hours if sets and sets[0][0].hours is not none}}" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{sets[0][0].mins if sets and sets[0][0].mins is not none}}" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{sets[0][0].seconds if sets and sets[0][0].seconds is not none}}" placeholder="ss">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="{{ sets[0][0].hours if sets and sets[0][0].hours is not none }}" placeholder="hh"/>&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="{{ sets[0][0].mins if sets and sets[0][0].mins is not none }}" placeholder="mm"/>&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="secs" name="secs" autocomplete="off" value="{{ sets[0][0].seconds if sets and sets[0][0].seconds is not none }}" placeholder="ss"/>
             </div>
             <div class="timer">
                 <button type="button" class="fab timer-btn" id="timer-start-btn">
-                    <img src="/static/img/play.svg">
+                    <img src="/static/img/play.svg" alt="Start timer" height="1" width="1"/>
                 </button>
                 <div>
                     <span id="timer-display">&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;</span>
                     <span id="timer-display-millis" class="millis">&ndash;&ndash;&ndash;</span>
                 </div>
                 <button type="button" class="fab timer-btn" id="timer-stop-btn">
-                    <img src="/static/img/stop.svg">
+                    <img src="/static/img/stop.svg" alt="Stop timer" height="1" width="1"/>
                 </button>
             </div>
             {%- endif -%}
@@ -107,7 +107,7 @@
                     {%- for age, values in graph.items() -%}
                     <div class="graph-group">
                         {%- for v in values -%}
-                        <div class="graph-bar" style="--size:{{v.scaled}};" data-value="{{v.value}}"></div>
+                        <div class="graph-bar" style="--size:{{ v.scaled }};" data-value="{{ v.value }}"></div>
                         {%- endfor -%}
                     </div>
                     {%- endfor -%}
@@ -127,33 +127,33 @@
     <dialog id="edit-set-dialog">
         <form method="dialog">
             <h2>Edit set</h2>
-            <input type="hidden" name="setID" id="setID" value="">
+            <input type="hidden" name="setID" id="setID" value=""/>
             {%- if type == "weight-repetitions" -%}
             <div class="edit-set-input">
                 <label for="repetitions">Reps</label>
-                <input type="text" inputmode="numeric" id="repetitions" name="repetitions" autocomplete="off" value="">
+                <input type="text" inputmode="numeric" id="repetitions" name="repetitions" autocomplete="off" value=""/>
             </div>
             <div class="edit-set-input">
                 <label for="weight_kg">Weight (kg)</label>
-                <input type="text" inputmode="numeric" id="weight_kg" name="weight_kg" autocomplete="off" value="">
+                <input type="text" inputmode="numeric" id="weight_kg" name="weight_kg" autocomplete="off" value=""/>
             </div>
             {%- elif type == "distance-time" -%}
             <div class="edit-set-input">
                 <label for="distance_m">Distance (m)</label>
-                <input type="text" inputmode="numeric" id="distance_m" name="distance_m" autocomplete="off" value="">
+                <input type="text" inputmode="numeric" id="distance_m" name="distance_m" autocomplete="off" value=""/>
             </div>
             <div class="edit-set-input">
                 <label for="hours">Time</label>
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh"/>&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm"/>&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss"/>
             </div>
             {%- elif type == "time" -%}
             <div class="edit-set-input">
                 <label for="hours">Time</label>
-                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm">&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss">
+                <input class="time-input" type="text" inputmode="numeric" id="hours" name="hours" autocomplete="off" value="" placeholder="hh"/>&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="mins" name="mins" autocomplete="off" value="" placeholder="mm"/>&nbsp;:
+                <input class="time-input" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss"/>
             </div>
             {%- endif -%}
             <div class="buttons">

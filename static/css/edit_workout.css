@@ -74,6 +74,8 @@ h1 {
 .fab img {
   scale: 0.7;
   padding-top: 5px;
+  height: auto;
+  width: auto;
 }
 #fab-save {
   bottom: 2rem;
@@ -177,6 +179,7 @@ h1 {
   float: right;
   height: 1rem;
   top: 2px;
+  width: auto;
 }
 
 /* Dialog specific styles */

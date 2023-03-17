@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
-        <meta name="Description" content="Gym Log">
-        <meta name="viewport" content="width=device-width">
-        <title>{{name}} | Gym Log</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/workout.css">
+        <meta charset="utf-8"/>
+        <meta name="Description" content="Gym Log"/>
+        <meta name="viewport" content="width=device-width"/>
+        <title>{{ name }} | Gym Log</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/workout.css"/>
         <!-- icons and manifest for PWA -->
-        <link rel="manifest" href="/static/manifest.json">
+        <link rel="manifest" href="/static/manifest.json"/>
         <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
         <meta name="theme-color" content="#32302f"/>
         <style type="text/css">
-            :root {--workout-colour: {{colour}};}
+            :root {--workout-colour: {{ colour }};}
         </style>
     </head>
     <body>
 
         <section id="header">
-            <h1>{{name}}</h1>
+            <h1>{{ name }}</h1>
             <a href="/" id="home">
                 <svg width="550" height="550" viewBox="0 0 412.5 412.5" xmlns="http://www.w3.org/2000/svg">
                     <g fill="var(--workout-colour)">
@@ -29,18 +29,18 @@
 
         <section id="exercises">
              {%- for e in exercises -%}
-            <a href="/exercise/{{e.exerciseID}}" class="exercise-card">
-                <h2>{{e.name}}</h2>
+            <a href="/exercise/{{ e.exerciseID }}" class="exercise-card">
+                <h2>{{ e.name }}</h2>
                 <div class="exercise-details">
-                    <span class="exercise-last-update {{"today" if e.is_today}}">{{e.last_update}}</span>
-                    <span class="exercise-last-set">{{e.last_set}}</span>
+                    <span class="exercise-last-update {{ "today" if e.is_today }}">{{ e.last_update }}</span>
+                    <span class="exercise-last-set">{{ e.last_set }}</span>
                 </div>
             </a>
             {%- endfor -%}
         </section>
 
-        <a href="/edit-workout/{{workoutID}}" id="fab-edit">
-            <img src="/static/img/edit.svg" alt="Edit workout">
+        <a href="/edit-workout/{{ workoutID }}" id="fab-edit">
+            <img src="/static/img/edit.svg" alt="Edit workout" height="1" width="1"/>
         </a>
     </body>
 </html>

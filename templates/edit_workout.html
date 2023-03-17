@@ -1,44 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
-        <meta name="Description" content="Gym Log">
-        <meta name="viewport" content="width=device-width">
-        <title>Edit: {{name}} | Gym Log</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/edit_workout.css">
+        <meta charset="utf-8"/>
+        <meta name="Description" content="Gym Log"/>
+        <meta name="viewport" content="width=device-width"/>
+        <title>Edit: {{ name }} | Gym Log</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/edit_workout.css"/>
         <script type="module" src="/static/js/edit_workout.js"></script>
         <!-- icons and manifest for PWA -->
-        <link rel="manifest" href="/static/manifest.json">
+        <link rel="manifest" href="/static/manifest.json"/>
         <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
         <meta name="theme-color" content="#32302f"/>
     </head>
     <body>
 
         <section id="header">
-            <h1>Edit: <input name="name" id="workout-name" value="{{name}}"></input></h1>
+            <h1>Edit: <input name="name" id="workout-name" value="{{ name }}"/></h1>
         </section>
 
         <section id="exercises">
-            <input type="hidden" name="workoutID" id="workoutID" value="{{workoutID}}">
+            <input type="hidden" name="workoutID" id="workoutID" value="{{ workoutID }}"/>
             {%- for e in all_exercises -%}
             <div class="checkbox">
                 <div>
-                    <input type="checkbox" id="{{e.name}}" name="{{e.name}}" data-exerciseID="{{e.exerciseID}}" {{"checked" if e.name in workout_exercises}}>
-                    <label for="{{e.name}}">{{e.name}}</label>
+                    <input type="checkbox" id="{{ e.name }}" name="{{ e.name }}" data-exerciseID="{{ e.exerciseID }}" {{ "checked" if e.name in workout_exercises }}/>
+                    <label for="{{ e.name }}">{{ e.name }}</label>
                 </div>
-                <img class="delete-exercise" src="/static/img/delete.svg" data-exerciseID="{{e.exerciseID}}" alt="Delete exercise">
+                <img class="delete-exercise" src="/static/img/delete.svg" data-exerciseID="{{ e.exerciseID }}" alt="Delete exercise" height="1" width="1"/>
             </div>
             {%- endfor -%}
         </section>
 
         <button id="fab-save" class="fab">
-            <img src="/static/img/save.svg" alt="Save workout">
+            <img src="/static/img/save.svg" alt="Save workout" height="1" width="1"/>
         </button>
         <button id="fab-new-exercise" class="fab">
             +
         </button>
         <button id="fab-delete" class="fab">
-            <img src="/static/img/delete.svg" alt="Delete workout">
+            <img src="/static/img/delete.svg" alt="Delete workout" height="1" width="1"/>
         </button>
     </body>
 
@@ -47,7 +47,7 @@
             <h2>Add new exercise</h2>
             <div class="new-exercise-input">
                 <label for="name">Name</label>
-                <input type="text" id="name" name="name" autocomplete="off" value="">
+                <input type="text" id="name" name="name" autocomplete="off" value=""/>
             </div>
             <div class="new-exercise-input">
                 <label for="type">Type</label>
