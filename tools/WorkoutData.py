@@ -328,10 +328,9 @@ class WorkoutData:
                 res = cur.fetchall()
 
                 for timestamp, weight_kg, repetitions in res:
-                    time_delta = (
-                        datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
-                        - datetime.datetime.now()
-                    )
+                    time_delta = self._parse_timestamp(
+                        timestamp
+                    ) - datetime.datetime.now(datetime.timezone.utc)
 
                     if time_delta.days in data.keys():
                         data[time_delta.days].append(weight_kg * repetitions)
@@ -354,10 +353,9 @@ class WorkoutData:
                 res = cur.fetchall()
 
                 for timestamp, distance_m, time_s in res:
-                    time_delta = (
-                        datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
-                        - datetime.datetime.now()
-                    )
+                    time_delta = self._parse_timestamp(
+                        timestamp
+                    ) - datetime.datetime.now(datetime.timezone.utc)
 
                     if time_delta.days in data.keys():
                         data[time_delta.days].append(distance_m / time_s)
@@ -380,10 +378,9 @@ class WorkoutData:
                 res = cur.fetchall()
 
                 for timestamp, time_s in res:
-                    time_delta = (
-                        datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
-                        - datetime.datetime.now()
-                    )
+                    time_delta = self._parse_timestamp(
+                        timestamp
+                    ) - datetime.datetime.now(datetime.timezone.utc)
 
                     if time_delta.days in data.keys():
                         data[time_delta.days].append(time_s)
@@ -728,9 +725,11 @@ class WorkoutData:
         str
             Human readable relative string
         """
-        dt = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+        # Python <3.11 doesn't parse the Z in the timestamp, so the dt object is not
+        # timezone aware. Replace Z with +00:00 to make it timezone aware
+        dt = self._parse_timestamp(timestamp)
 
-        delta = datetime.datetime.now() - dt
+        delta = datetime.datetime.now(datetime.timezone.utc) - dt
         delta_seconds = int(delta.total_seconds())
 
         if dt.date() == datetime.date.today():
@@ -768,7 +767,7 @@ class WorkoutData:
         bool
             True is timestamp day is today
         """
-        dt = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+        dt = self._parse_timestamp(timestamp)
         return dt.date() == datetime.date.today()
 
     def _create_set_summary(self, details: ExerciseSet) -> str:
@@ -861,3 +860,19 @@ class WorkoutData:
             delta = change_from_previous
 
         return delta
+
+    def _parse_timestamp(self, timestamp: str) -> datetime.datetime:
+        """Parse timestemp string into datetime.datetime object,
+        being timezone aware
+
+        Parameters
+        ----------
+        timestamp : str
+            ISO8601 formatted timestamp
+
+        Returns
+        -------
+        datetime.datetime
+            Timestamp convert to datetime.datetime object
+        """
+        return datetime.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
