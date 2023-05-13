@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple
 
+from peewee import fn
+
+from .orm import Workout, Exercise, Sets, WorkoutExercise
+
 
 @dataclass
 class ExerciseSet:
@@ -35,13 +39,8 @@ class WorkoutData:
         str
             Workout name
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT name FROM workout WHERE workoutID = ?", (workoutID,))
-            name = cur.fetchone()
-
-        conn.close()
-        return name[0]
+        query = Workout.get(Workout.workout_id == workoutID)
+        return query.name
 
     def get_workout_colour(self, workoutID: int) -> str:
         """Return hex colour for workout from workoutID
@@ -56,13 +55,8 @@ class WorkoutData:
         str
             Colour associated with workout
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT colour FROM workout WHERE workoutID = ?", (workoutID,))
-            colour = cur.fetchone()
-
-        conn.close()
-        return colour[0]
+        query = Workout.get(Workout.workout_id == workoutID)
+        return query.colour
 
     def get_exercise_name(self, exerciseID: int) -> str:
         """Return exercise name from exercise ID
@@ -77,13 +71,8 @@ class WorkoutData:
         str
             Exercise name
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT name FROM exercise WHERE exerciseID = ?", (exerciseID,))
-            name = cur.fetchone()
-
-        conn.close()
-        return name[0]
+        query = Exercise.get(Exercise.exercise_id == exerciseID)
+        return query.name
 
     def get_exercise_type(self, exerciseID: int) -> str:
         """Return exercise type from exercise ID
@@ -98,13 +87,8 @@ class WorkoutData:
         str
             Exercise name
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT type FROM exercise WHERE exerciseID = ?", (exerciseID,))
-            type_ = cur.fetchone()
-
-        conn.close()
-        return type_[0]
+        query = Exercise.get(Exercise.exercise_id == exerciseID)
+        return query.type_
 
     def list_workouts(self) -> List[Dict[str, Any]]:
         """List all workouts in log
@@ -122,32 +106,26 @@ class WorkoutData:
         """
         workout_data = []
         # Get list of workouts
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT workoutID, name, colour FROM workout")
-            workout_names = cur.fetchall()
-
+        workouts = Workout.select()
+        for w in workouts:
             # For each workout, count number of exercises
-            for workoutID, name, colour in workout_names:
-                cur.execute(
-                    "SELECT COUNT(*) FROM workout_exercise WHERE workoutID = ?",
-                    (workoutID,),
-                )
-                count = cur.fetchone()
+            count = (
+                WorkoutExercise.select()
+                .where(WorkoutExercise.workout == w.workout_id)
+                .count()
+            )
 
-                exercise, update = self._get_workout_last_update(workoutID)
-                workout_data.append(
-                    {
-                        "name": name,
-                        "exercise_count": count[0],
-                        "workoutID": workoutID,
-                        "colour": colour,
-                        "last_update": update,
-                        "last_exercise": exercise,
-                    }
-                )
-
-        conn.close()
+            exercise, update = self._get_workout_last_update(w.workout_id)
+            workout_data.append(
+                {
+                    "name": w.name,
+                    "exercise_count": count,
+                    "workoutID": w.workout_id,
+                    "colour": w.colour,
+                    "last_update": update,
+                    "last_exercise": exercise,
+                }
+            )
 
         return workout_data
 
@@ -160,14 +138,10 @@ class WorkoutData:
             List of dicts containing name and exercise ID for all exercises
         """
         all_exercises = []
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT name, exerciseID FROM exercise")
-            exercises = cur.fetchall()
-
-            for name, exerciseID in exercises:
-                all_exercises.append({"name": name, "exerciseID": exerciseID})
-
+        exercises = Exercise.select()
+        all_exercises = [
+            {"name": e.name, "exerciseID": e.exercise_id} for e in exercises
+        ]
         return sorted(all_exercises, key=lambda x: x["name"])
 
     def list_workout_exercises(self, workoutID: int) -> List[Dict[str, str]]:
@@ -185,35 +159,21 @@ class WorkoutData:
             and last set details
         """
         exercise_data = []
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT exerciseID FROM workout_exercise WHERE workoutID = ?",
-                (workoutID,),
+        exercises = WorkoutExercise.select().where(WorkoutExercise.workout == workoutID)
+        for e in exercises:
+
+            query = Exercise.get(Exercise.exercise_id == e.exercise)
+            last_update, last_set, is_today = self._get_exercise_last_set(e.exercise)
+
+            exercise_data.append(
+                {
+                    "name": query.name,
+                    "exerciseID": query.exercise_id,
+                    "last_update": last_update,
+                    "is_today": is_today,
+                    "last_set": last_set,
+                }
             )
-            exerciseIDs = cur.fetchall()
-
-            for (exerciseID,) in exerciseIDs:
-                cur.execute(
-                    "SELECT name, type FROM exercise WHERE exerciseID = ?",
-                    (exerciseID,),
-                )
-                name, exercise_type = cur.fetchone()
-                last_update, last_set, is_today = self._get_exercise_last_set(
-                    exerciseID
-                )
-
-                exercise_data.append(
-                    {
-                        "name": name,
-                        "exerciseID": exerciseID,
-                        "last_update": last_update,
-                        "is_today": is_today,
-                        "last_set": last_set,
-                    }
-                )
-
-        conn.close()
 
         # Sort alpabetically by name and return
         return sorted(exercise_data, key=lambda x: x["name"])
@@ -237,49 +197,49 @@ class WorkoutData:
             List of dicts containing set timestamp and detail, grouped by date.
         """
         set_data = []
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT * FROM sets WHERE exerciseID = ? ORDER BY uid DESC LIMIT ?",
-                (exerciseID, number),
+        sets = (
+            Sets.select()
+            .where(Sets.exercise == exerciseID)
+            .order_by(Sets.uid.desc())
+            .limit(number)
+        )
+        for s in sets:
+            current_set = ExerciseSet(
+                s.uid, s.datetime, s.distance_m, s.weight_kg, s.time_s, s.repetitions
             )
-            sets = cur.fetchall()
+            set_string = self._create_set_summary(current_set)
 
-            for info in sets:
-                uid, _, timestamp, distance, weight, time, repetitions = info
-                current_set = ExerciseSet(
-                    uid, timestamp, distance, weight, time, repetitions
-                )
-                previous_set = self._get_previous_set(exerciseID, uid)
-
-                set_string = self._create_set_summary(current_set)
+            previous_set = self._get_previous_set(exerciseID, s.uid)
+            if previous_set is not None:
                 delta = self._calculate_set_delta(current_set, previous_set)
+            else:
+                delta = None
 
-                # Convert time (seconds) to hours, minutes and seconds
-                if time is not None:
-                    hours = math.floor(float(time) / 3600) or None
-                    mins = math.floor((float(time) % 3600) / 60) or None
-                    seconds = math.floor(float(time) % 60) or None
-                else:
-                    hours = None
-                    mins = None
-                    seconds = None
+            # Convert time (seconds) to hours, minutes and seconds
+            if s.time_s is not None:
+                hours = math.floor(float(s.time_s) / 3600) or None
+                mins = math.floor((float(s.time_s) % 3600) / 60) or None
+                seconds = math.floor(float(s.time_s) % 60) or None
+            else:
+                hours = None
+                mins = None
+                seconds = None
 
-                set_data.append(
-                    {
-                        "uid": uid,
-                        "timestamp": timestamp,
-                        "readable_time": self._readable_datetime(timestamp),
-                        "set_detail": set_string,
-                        "distance": distance,
-                        "weight": weight,
-                        "hours": hours,
-                        "mins": mins,
-                        "seconds": seconds,
-                        "repetitions": repetitions,
-                        "delta": delta,
-                    }
-                )
+            set_data.append(
+                {
+                    "uid": s.uid,
+                    "timestamp": s.datetime,
+                    "readable_time": self._readable_datetime(s.datetime),
+                    "set_detail": set_string,
+                    "distance": s.distance_m,
+                    "weight": s.weight_kg,
+                    "hours": hours,
+                    "mins": mins,
+                    "seconds": seconds,
+                    "repetitions": s.repetitions,
+                    "delta": delta,
+                }
+            )
 
         # Group sets by date (i.e. the bit before 'T' in the timestamp)
         grouped_sets = [
@@ -318,80 +278,62 @@ class WorkoutData:
         data = {}
         max_value = 0
         min_value = 1e6
+
+        sets = (
+            Sets.select()
+            .where(Sets.exercise == exerciseID)
+            .order_by(Sets.datetime.desc())
+        )
         if exercise_type == "weight-repetitions":
-            with sqlite3.connect(self.db) as conn:
-                cur = conn.cursor()
-                cur.execute(
-                    "SELECT datetime, weight_kg, repetitions FROM sets WHERE exerciseID = ? ORDER BY datetime DESC",
-                    (exerciseID,),
+            for s in sets:
+                time_delta = self._parse_timestamp(s.datetime) - datetime.datetime.now(
+                    datetime.timezone.utc
                 )
-                res = cur.fetchall()
 
-                for timestamp, weight_kg, repetitions in res:
-                    time_delta = self._parse_timestamp(
-                        timestamp
-                    ) - datetime.datetime.now(datetime.timezone.utc)
+                if time_delta.days in data.keys():
+                    data[time_delta.days].append(s.weight_kg * s.repetitions)
+                else:
+                    data[time_delta.days] = [s.weight_kg * s.repetitions]
 
-                    if time_delta.days in data.keys():
-                        data[time_delta.days].append(weight_kg * repetitions)
-                    else:
-                        data[time_delta.days] = [weight_kg * repetitions]
+                max_value = max(max_value, s.weight_kg * s.repetitions)
+                min_value = min(min_value, s.weight_kg * s.repetitions)
 
-                    max_value = max(max_value, weight_kg * repetitions)
-                    min_value = min(min_value, weight_kg * repetitions)
-
-                    if len(data.keys()) == num_sets:
-                        break
+                if len(data.keys()) == num_sets:
+                    break
 
         elif exercise_type == "distance-time":
-            with sqlite3.connect(self.db) as conn:
-                cur = conn.cursor()
-                cur.execute(
-                    "SELECT datetime, distance_m, time_s FROM sets WHERE exerciseID = ? ORDER BY datetime DESC",
-                    (exerciseID,),
+            for s in sets:
+                time_delta = self._parse_timestamp(s.datetime) - datetime.datetime.now(
+                    datetime.timezone.utc
                 )
-                res = cur.fetchall()
 
-                for timestamp, distance_m, time_s in res:
-                    time_delta = self._parse_timestamp(
-                        timestamp
-                    ) - datetime.datetime.now(datetime.timezone.utc)
+                if time_delta.days in data.keys():
+                    data[time_delta.days].append(s.distance_m / s.time_s)
+                else:
+                    data[time_delta.days] = [s.distance_m / s.time_s]
 
-                    if time_delta.days in data.keys():
-                        data[time_delta.days].append(distance_m / time_s)
-                    else:
-                        data[time_delta.days] = [distance_m / time_s]
+                max_value = max(max_value, s.distance_m / s.time_s)
+                min_value = min(min_value, s.distance_m / s.time_s)
 
-                    max_value = max(max_value, distance_m / time_s)
-                    min_value = min(min_value, distance_m / time_s)
-
-                    if len(data.keys()) == num_sets:
-                        break
+                if len(data.keys()) == num_sets:
+                    break
 
         elif exercise_type == "time":
-            with sqlite3.connect(self.db) as conn:
-                cur = conn.cursor()
-                cur.execute(
-                    "SELECT datetime, time_s FROM sets WHERE exerciseID = ? ORDER BY datetime DESC",
-                    (exerciseID,),
+            for s in sets:
+                time_delta = self._parse_timestamp(s.datetime) - datetime.datetime.now(
+                    datetime.timezone.utc
                 )
-                res = cur.fetchall()
 
-                for timestamp, time_s in res:
-                    time_delta = self._parse_timestamp(
-                        timestamp
-                    ) - datetime.datetime.now(datetime.timezone.utc)
+                if time_delta.days in data.keys():
+                    data[time_delta.days].append(s.time_s)
+                else:
+                    data[time_delta.days] = [s.time_s]
 
-                    if time_delta.days in data.keys():
-                        data[time_delta.days].append(time_s)
-                    else:
-                        data[time_delta.days] = [time_s]
+                max_value = max(max_value, s.time_s)
+                min_value = min(min_value, s.time_s)
 
-                    max_value = max(max_value, time_s)
-                    min_value = min(min_value, time_s)
-
-                    if len(data.keys()) == num_sets:
-                        break
+                if len(data.keys()) == num_sets:
+                    break
 
         # Calculate a scaled value, offset so zero is at the 0.9*min_value, then normalise
         # This is to better show the delta between sets
@@ -414,21 +356,15 @@ class WorkoutData:
         # Replace empty strings in keys with None
         data = {key: None if value == "" else value for key, value in set_data.items()}
 
-        # Insert into database
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "INSERT INTO sets (exerciseID, datetime, distance_m, weight_kg, time_s, repetitions) VALUES (?, ?, ?, ?, ?, ?)",
-                (
-                    data["exerciseID"],
-                    data["datetime"],
-                    data["distance_m"],
-                    data["weight_kg"],
-                    data["time_s"],
-                    data["repetitions"],
-                ),
-            )
-        conn.close()
+        new = Sets.create(
+            datetime=data["datetime"],
+            distance_m=data["distance_m"],
+            exercise=data["exerciseID"],
+            repetitions=data["repetitions"],
+            time_s=data["time_s"],
+            weight_kg=data["weight_kg"],
+        )
+        new.save()
 
     def delete_set(self, uid: int) -> None:
         """Delete set given by set uid
@@ -438,10 +374,8 @@ class WorkoutData:
         uid : int
             Set unique ID
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("DELETE FROM sets WHERE uid = ?", (uid,))
-        conn.close()
+        set_ = Sets.get(Sets.uid == uid)
+        set_.delete_instance()
 
     def update_set(self, uid: int, data: Dict[str, str]) -> None:
         """Update set with new data.
@@ -456,34 +390,26 @@ class WorkoutData:
             exercise type are in the dict.
         """
         time_updated = False
-        # Iterate through items in dict and update field in table
-        for key, value in data.items():
-            if key == "setID":
-                # Skip set ID
-                continue
-            elif key in ["hours", "mins", "seconds"]:
-                if not time_updated:
-                    # Calculate time in seconds
-                    seconds = (
-                        int(data["hours"] or 0) * 3600
-                        + int(data["mins"] or 0) * 60
-                        + int(data["seconds"] or 0)
-                    )
-                    with sqlite3.connect(self.db) as conn:
-                        cur = conn.cursor()
-                        cur.execute(
-                            "UPDATE sets SET time_s = ?  WHERE uid = ?", (seconds, uid)
-                        )
-                    conn.close()
-                    # Mark time update as done so we don't do it 3 times
-                    time_updated = True
-            else:
-                with sqlite3.connect(self.db) as conn:
-                    cur = conn.cursor()
-                    cur.execute(
-                        f"UPDATE sets SET {key} = ?  WHERE uid = ?", (value, uid)
-                    )
-                conn.close()
+        set_ = Sets.get(Sets.uid == uid)
+        set_.distance_m = data.get("distance_m", None)
+        set_.weight_kg = data.get("weight_kg", None)
+        set_.repetitions = data.get("repetitions", None)
+
+        if (
+            "hours" in data.keys()
+            and "mins" in data.keys()
+            and "seconds" in data.keys()
+        ):
+            # Calculate time in seconds
+            seconds = (
+                int(data["hours"] or 0) * 3600
+                + int(data["mins"] or 0) * 60
+                + int(data["seconds"] or 0)
+            )
+
+            set_.time_s = seconds
+
+        set_.save()
 
     def save_workout(self, workoutID: int, workout_data: Dict[str, Any]) -> None:
         """Save changes to workout
@@ -541,12 +467,8 @@ class WorkoutData:
         exercise_type : str
             Type of exercise
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "INSERT INTO exercise (name, type) VALUES (?, ?)", (name, exercise_type)
-            )
-        conn.close()
+        new = Exercise.create(name=name, type_=exercise_type)
+        new.save()
 
     def delete_exercise(self, exerciseID: int) -> None:
         """Delete exercise given by set exerciseID.
@@ -558,15 +480,8 @@ class WorkoutData:
         exerciseID : int
             Exercise ID
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("DELETE FROM exercise WHERE exerciseID = ?", (exerciseID,))
-            cur.execute(
-                "DELETE FROM workout_exercise WHERE exerciseID = ?", (exerciseID,)
-            )
-            cur.execute("DELETE FROM sets WHERE exerciseID = ?", (exerciseID,))
-
-        conn.close()
+        exercise = Exercise.get(Exercise.exercise_id == exerciseID)
+        exercise.delete_instance(recursive=True)
 
     def new_workout(self, name: str, colour: str) -> None:
         """Add new workout to database
@@ -578,13 +493,8 @@ class WorkoutData:
         colour : str
             Workout colour
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "INSERT INTO workout (name, colour) VALUES (?, ?)",
-                (name, colour),
-            )
-        conn.close()
+        new = Workout.create(name=name, colour=colour)
+        new.save()
 
     def delete_workout(self, workoutID: int) -> None:
         """Delete workout given by set workoutID.
@@ -595,14 +505,10 @@ class WorkoutData:
         workoutID : int
             Workout ID
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute("DELETE FROM workout WHERE workoutID = ?", (workoutID,))
-            cur.execute(
-                "DELETE FROM workout_exercise WHERE workoutID = ?", (workoutID,)
-            )
-
-        conn.close()
+        workout = Workout.get(Workout.workout_id == workoutID)
+        # Recursive deletes related model i.e. any WorkoutExercise
+        # instance with same workoutID
+        workout.delete_instance(recursive=True)
 
     def _get_workout_last_update(self, workoutID: int) -> Tuple[str, str]:
         """Return human readable string for when timestamp of last set
@@ -619,21 +525,19 @@ class WorkoutData:
             Last exercise
             Human readable relative datetime string
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT MAX(datetime), exerciseID FROM sets WHERE exerciseID in (SELECT exerciseID FROM workout_exercise WHERE workoutID = ?)",
-                (workoutID,),
-            )
-            timestamp, exerciseID = cur.fetchone()
+        exercises = WorkoutExercise.select(WorkoutExercise.exercise).where(
+            WorkoutExercise.workout == workoutID
+        )
+        query = Sets.select(fn.MAX(Sets.datetime), Sets.exercise).where(
+            Sets.exercise.in_(exercises)
+        )
+        latest = query[0]
 
-        conn.close()
-
-        if timestamp is None:
+        if latest.datetime is None:
             return "", "Never"
         else:
-            return self.get_exercise_name(exerciseID), self._readable_datetime(
-                timestamp
+            return self.get_exercise_name(latest.exercise), self._readable_datetime(
+                latest.datetime
             )
 
     def _get_previous_set(self, exerciseID: int, uid: int):
@@ -646,26 +550,21 @@ class WorkoutData:
         uid : int
             uid of set to find previous set for
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT MAX(uid), * FROM sets WHERE exerciseID = ? and uid < ?",
-                (exerciseID, uid),
-            )
-            (
-                prev_uid,
-                _,
-                _,
-                timestamp,
-                distance,
-                weight,
-                time,
-                repetitions,
-            ) = cur.fetchone()
+        prev_set_id = Sets.select(fn.MAX(Sets.uid)).where(
+            (Sets.exercise == exerciseID) & (Sets.uid < uid)
+        )
+        set_ = Sets.get_or_none(Sets.uid == prev_set_id)
+        if set_ is None:
+            return set_
 
-        conn.close()
-
-        return ExerciseSet(prev_uid, timestamp, distance, weight, time, repetitions)
+        return ExerciseSet(
+            set_.uid,
+            set_.datetime,
+            set_.distance_m,
+            set_.weight_kg,
+            set_.time_s,
+            set_.repetitions,
+        )
 
     def _get_exercise_last_set(self, exerciseID: int) -> Tuple[str, str]:
         """Return human readable string for when timestamp of last set
@@ -683,33 +582,32 @@ class WorkoutData:
             Last set string
             True if last exercise is today
         """
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT MAX(datetime), * FROM sets WHERE exerciseID = ?",
-                (exerciseID,),
-            )
-            timestamp, _, _, _, distance, weight, time, repetitions = cur.fetchone()
+        query = Sets.select(
+            fn.MAX(Sets.datetime),
+            Sets.distance_m,
+            Sets.weight_kg,
+            Sets.time_s,
+            Sets.repetitions,
+        ).where(Sets.exercise == exerciseID)
+        set_ = query[0]
 
-            if repetitions is not None and weight is not None:
-                set_string = f"{repetitions} x {weight} kg"
-            elif distance is not None and time is not None:
-                time_string = str(datetime.timedelta(seconds=int(time)))[2:]
-                set_string = f"{int(distance)} m - {time_string}"
-            elif time is not None:
-                set_string = f"{time} s"
-            else:
-                set_string = ""
+        if set_.repetitions is not None and set_.weight_kg is not None:
+            set_string = f"{set_.repetitions} x {set_.weight_kg} kg"
+        elif set_.distance_m is not None and set_.time_s is not None:
+            time_string = str(datetime.timedelta(seconds=int(set_.time_s)))[2:]
+            set_string = f"{int(set_.distance_m)} m - {time_string}"
+        elif set_.time_s is not None:
+            set_string = f"{set_.time_s} s"
+        else:
+            set_string = ""
 
-        conn.close()
-
-        if timestamp is None:
+        if set_.datetime is None:
             return "Never", set_string, False
         else:
             return (
-                self._readable_datetime(timestamp),
+                self._readable_datetime(set_.datetime),
                 set_string,
-                self._timestamp_is_today(timestamp),
+                self._timestamp_is_today(set_.datetime),
             )
 
     def _readable_datetime(self, timestamp: str) -> str:
