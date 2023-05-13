@@ -238,6 +238,7 @@ h1 {
 }
 .timer-btn img {
   height: 2rem;
+  width: auto;
 }
 .timer span {;
   font-size: 2rem;
