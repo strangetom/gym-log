@@ -104,6 +104,9 @@ h1 {
   border: none;
   border-radius: .2rem;
 }
+#new-set input:invalid {
+  background-color: var(--red-alt);
+}
 #new-set .time-input {
   width: 3ch;
 }

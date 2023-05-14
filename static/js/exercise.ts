@@ -152,10 +152,13 @@ document.addEventListener("DOMContentLoaded", () => {
   graphSection.addEventListener("touchstart", swipeCloseGraph);
 
   // When selecting the new set input
-  let newSetInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll("#new-set input");
-  newSetInputs.forEach( el => {
-    el.addEventListener("click", (e) => {(e.target as HTMLInputElement).select()});
-  })
+  let newSetInputs: NodeListOf<HTMLInputElement> =
+    document.querySelectorAll("#new-set input");
+  newSetInputs.forEach((el) => {
+    el.addEventListener("click", (e) => {
+      (e.target as HTMLInputElement).select();
+    });
+  });
 
   let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card");
   sets.forEach((el) => {
@@ -221,6 +224,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 /**
  * Save new set to database
+ * If there text in the input is not valid (determined by the pattern),
+ * then abort attempt to save.
  */
 function saveSet() {
   let setData = {
@@ -245,21 +250,33 @@ function saveSet() {
     "#distance"
   ) as HTMLInputElement;
   if (distance_m != null) {
-    setData.distance_m = distance_m.value;
+    if (distance_m.checkValidity()) {
+      setData.distance_m = distance_m.value;
+    } else {
+      return;
+    }
   }
 
   let weight_kg: HTMLInputElement = document.querySelector(
     "#weight"
   ) as HTMLInputElement;
   if (weight_kg != null) {
-    setData.weight_kg = weight_kg.value;
+    if (weight_kg.checkValidity()) {
+      setData.weight_kg = weight_kg.value;
+    } else {
+      return;
+    }
   }
 
   let reps: HTMLInputElement = document.querySelector(
     "#reps"
   ) as HTMLInputElement;
   if (reps != null) {
-    setData.repetitions = reps.value;
+    if (reps.checkValidity()) {
+      setData.repetitions = reps.value;
+    } else {
+      return;
+    }
   }
 
   let hours: HTMLInputElement = document.querySelector(
@@ -272,9 +289,15 @@ function saveSet() {
     "#secs"
   ) as HTMLInputElement;
   if (hours != null && mins != null && secs != null) {
-    let time_s =
-      Number(secs.value) + Number(mins.value) * 60 + Number(hours.value) * 3600;
-    setData.time_s = time_s.toString();
+    if (hours.checkValidity() && mins.checkValidity() && secs.checkValidity()) {
+      let time_s =
+        Number(secs.value) +
+        Number(mins.value) * 60 +
+        Number(hours.value) * 3600;
+      setData.time_s = time_s.toString();
+    } else {
+      return;
+    }
   }
 
   let postData = new FormData();

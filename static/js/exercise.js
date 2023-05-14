@@ -167,22 +167,42 @@ function saveSet() {
     }
     let distance_m = document.querySelector("#distance");
     if (distance_m != null) {
-        setData.distance_m = distance_m.value;
+        if (distance_m.checkValidity()) {
+            setData.distance_m = distance_m.value;
+        }
+        else {
+            return;
+        }
     }
     let weight_kg = document.querySelector("#weight");
     if (weight_kg != null) {
-        setData.weight_kg = weight_kg.value;
+        if (weight_kg.checkValidity()) {
+            setData.weight_kg = weight_kg.value;
+        }
+        else {
+            return;
+        }
     }
     let reps = document.querySelector("#reps");
     if (reps != null) {
-        setData.repetitions = reps.value;
+        if (reps.checkValidity()) {
+            setData.repetitions = reps.value;
+        }
+        else {
+            return;
+        }
     }
     let hours = document.querySelector("#hours");
     let mins = document.querySelector("#mins");
     let secs = document.querySelector("#secs");
     if (hours != null && mins != null && secs != null) {
-        let time_s = Number(secs.value) + Number(mins.value) * 60 + Number(hours.value) * 3600;
-        setData.time_s = time_s.toString();
+        if (hours.checkValidity() && mins.checkValidity() && secs.checkValidity()) {
+            let time_s = Number(secs.value) + Number(mins.value) * 60 + Number(hours.value) * 3600;
+            setData.time_s = time_s.toString();
+        }
+        else {
+            return;
+        }
     }
     let postData = new FormData();
     postData.append("set", JSON.stringify(setData));
