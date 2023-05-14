@@ -2,7 +2,6 @@
 
 import datetime
 import math
-import sqlite3
 from dataclasses import dataclass
 from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple
@@ -335,8 +334,8 @@ class WorkoutData:
                 if len(data.keys()) == num_sets:
                     break
 
-        # Calculate a scaled value, offset so zero is at the 0.9*min_value, then normalise
-        # This is to better show the delta between sets
+        # Calculate a scaled value, offset so zero is at the 0.9*min_value,
+        # then normalise. This is to better show the delta between sets
         # Format the value to 3 significant figures for diplay purposes tooltips
         max_value = max_value * 1.06
         min_value = min_value * 0.9
@@ -389,7 +388,6 @@ class WorkoutData:
             Dict containing updated values. Only the values relevant to the
             exercise type are in the dict.
         """
-        time_updated = False
         set_ = Sets.get(Sets.uid == uid)
         set_.distance_m = data.get("distance_m", None)
         set_.weight_kg = data.get("weight_kg", None)
@@ -421,16 +419,9 @@ class WorkoutData:
         workout_data : Dict[str, Any]
             Dict containing latest workout name and exercise list
         """
-        # Update name
-        workout_name = workout_data["name"]
-
-        with sqlite3.connect(self.db) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "UPDATE workout SET name = ? WHERE workoutID = ?",
-                (workout_name, workoutID),
-            )
-        conn.close()
+        workout = Workout.get(Workout.workout_id == workoutID)
+        workout.name = workout_data["name"]
+        workout.save()
 
         # Get set of current exercise IDs
         current_exercises = self.list_workout_exercises(workoutID)
@@ -440,22 +431,15 @@ class WorkoutData:
         deleted_exercises = current_exercise_IDs - set(workout_data["exerciseIDs"])
 
         for exerciseID in new_exercises:
-            with sqlite3.connect(self.db) as conn:
-                cur = conn.cursor()
-                cur.execute(
-                    "INSERT INTO workout_exercise (workoutID, exerciseID) VALUES (?, ?)",
-                    (workoutID, exerciseID),
-                )
-            conn.close()
+            new = WorkoutExercise.create(workout=workoutID, exercise=exerciseID)
+            new.save()
 
         for exerciseID in deleted_exercises:
-            with sqlite3.connect(self.db) as conn:
-                cur = conn.cursor()
-                cur.execute(
-                    "DELETE FROM workout_exercise WHERE (workoutID = ? AND exerciseID = ?)",
-                    (workoutID, exerciseID),
-                )
-            conn.close()
+            delete = WorkoutExercise.get(
+                WorkoutExercise.workout == workoutID,
+                WorkoutExercise.exercise == exerciseID,
+            )
+            delete.delete_instance()
 
     def new_exercise(self, name: str, exercise_type: str) -> None:
         """Add new exercise to database
