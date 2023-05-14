@@ -1,11 +1,10 @@
-import json
-import sys
+#!/usr/bin/env python3
 
-sys.path.append(".")
+import json
 
 from flask import Flask, Response, g, render_template, request
 
-from tools.WorkoutData import WorkoutData
+from .tools.WorkoutData import WorkoutData
 
 app = Flask(__name__)
 
