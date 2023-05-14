@@ -95,8 +95,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     graphSection.addEventListener("touchstart", swipeCloseGraph);
     let newSetInputs = document.querySelectorAll("#new-set input");
-    newSetInputs.forEach(el => {
-        el.addEventListener("click", (e) => { e.target.select(); });
+    newSetInputs.forEach((el) => {
+        el.addEventListener("click", (e) => {
+            e.target.select();
+        });
+    });
+    let editSetInputs = document.querySelectorAll("#edit-set-dialog input");
+    editSetInputs.forEach((el) => {
+        el.addEventListener("click", (e) => {
+            e.target.select();
+        });
     });
     let sets = document.querySelectorAll(".set-card");
     sets.forEach((el) => {
@@ -197,7 +205,9 @@ function saveSet() {
     let secs = document.querySelector("#secs");
     if (hours != null && mins != null && secs != null) {
         if (hours.checkValidity() && mins.checkValidity() && secs.checkValidity()) {
-            let time_s = Number(secs.value) + Number(mins.value) * 60 + Number(hours.value) * 3600;
+            let time_s = Number(secs.value) +
+                Number(mins.value) * 60 +
+                Number(hours.value) * 3600;
             setData.time_s = time_s.toString();
         }
         else {

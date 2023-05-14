@@ -160,6 +160,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  let editSetInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll(
+    "#edit-set-dialog input"
+  );
+  editSetInputs.forEach((el) => {
+    el.addEventListener("click", (e) => {
+      (e.target as HTMLInputElement).select();
+    });
+  });
+
   let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card");
   sets.forEach((el) => {
     el.addEventListener("click", showEditSetDialog);
