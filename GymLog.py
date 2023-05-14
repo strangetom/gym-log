@@ -4,7 +4,7 @@ import json
 
 from flask import Flask, Response, g, render_template, request
 
-from .tools.WorkoutData import WorkoutData
+from tools.WorkoutData import WorkoutData
 
 app = Flask(__name__)
 
