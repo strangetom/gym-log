@@ -2,7 +2,7 @@
 
 import json
 
-from flask import Flask, Response, g, render_template, request
+from flask import Flask, Response, g, render_template, request, redirect, url_for
 
 from tools.WorkoutData import WorkoutData
 
@@ -183,9 +183,10 @@ def set_endpoint(setID: int):
     w = get_workout_data()
     if request.method == "POST":
         post_data = request.form
-        set_data = json.loads(post_data["set"])
-        w.save_set(set_data)
-        return Response(status=200)
+        w.save_set(post_data)
+        return redirect(
+            url_for("exercise_endpoint", exerciseID=post_data["exerciseID"])
+        )
 
     elif request.method == "DELETE":
         w.delete_set(setID)

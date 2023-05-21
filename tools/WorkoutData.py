@@ -350,18 +350,32 @@ class WorkoutData:
 
         return data
 
-    def save_set(self, set_data: Dict[str, str]) -> None:
+    def save_set(self, post_data: Dict[str, str]) -> None:
+        """Save new set to database
 
-        # Replace empty strings in keys with None
-        data = {key: None if value == "" else value for key, value in set_data.items()}
+        Parameters
+        ----------
+        post_data : Dict[str, str]
+            Data sent by client
+        """
+        # Create timestamp in iso format, without milliseconds
+        timestamp = datetime.datetime.now().isoformat().split(".")[0] + "Z"
+
+        # Convert time from hours, minutes, seconds into total seconds
+        time = None
+        hours = post_data.get("hours", None)
+        mins = post_data.get("mins", None)
+        secs = post_data.get("secs", None)
+        if hours is not None and mins is not None and secs is not None:
+            time = int(secs or 0) + 60 * int(mins or 0) + 3600 * int(hours or 0)
 
         new = Sets.create(
-            datetime=data["datetime"],
-            distance_m=data["distance_m"],
-            exercise=data["exerciseID"],
-            repetitions=data["repetitions"],
-            time_s=data["time_s"],
-            weight_kg=data["weight_kg"],
+            datetime=timestamp,
+            distance_m=post_data.get("distance", None),
+            exercise=post_data.get("exerciseID", None),
+            repetitions=post_data.get("reps", None),
+            time_s=time,
+            weight_kg=post_data.get("weight", None),
         )
         new.save()
 

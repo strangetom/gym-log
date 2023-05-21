@@ -132,7 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let fab: HTMLButtonElement = document.querySelector(
     "#fab"
   ) as HTMLButtonElement;
-  fab.addEventListener("click", saveSet);
 
   let graphBtn: HTMLDivElement = document.querySelector(
     "#graph-button"
@@ -231,99 +230,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-/**
- * Save new set to database
- * If there text in the input is not valid (determined by the pattern),
- * then abort attempt to save.
- */
-function saveSet() {
-  let setData = {
-    exerciseID: "",
-    datetime: isoDateTime(),
-    distance_m: "",
-    weight_kg: "",
-    time_s: "",
-    repetitions: "",
-  };
-
-  let exerciseIDEl: HTMLInputElement = document.querySelector(
-    "#exerciseID"
-  ) as HTMLInputElement;
-  if (exerciseIDEl == null) {
-    //error
-  } else {
-    setData.exerciseID = exerciseIDEl.value;
-  }
-
-  let distance_m: HTMLInputElement = document.querySelector(
-    "#distance"
-  ) as HTMLInputElement;
-  if (distance_m != null) {
-    if (distance_m.checkValidity()) {
-      setData.distance_m = distance_m.value;
-    } else {
-      return;
-    }
-  }
-
-  let weight_kg: HTMLInputElement = document.querySelector(
-    "#weight"
-  ) as HTMLInputElement;
-  if (weight_kg != null) {
-    if (weight_kg.checkValidity()) {
-      setData.weight_kg = weight_kg.value;
-    } else {
-      return;
-    }
-  }
-
-  let reps: HTMLInputElement = document.querySelector(
-    "#reps"
-  ) as HTMLInputElement;
-  if (reps != null) {
-    if (reps.checkValidity()) {
-      setData.repetitions = reps.value;
-    } else {
-      return;
-    }
-  }
-
-  let hours: HTMLInputElement = document.querySelector(
-    "#hours"
-  ) as HTMLInputElement;
-  let mins: HTMLInputElement = document.querySelector(
-    "#mins"
-  ) as HTMLInputElement;
-  let secs: HTMLInputElement = document.querySelector(
-    "#secs"
-  ) as HTMLInputElement;
-  if (hours != null && mins != null && secs != null) {
-    if (hours.checkValidity() && mins.checkValidity() && secs.checkValidity()) {
-      let time_s =
-        Number(secs.value) +
-        Number(mins.value) * 60 +
-        Number(hours.value) * 3600;
-      setData.time_s = time_s.toString();
-    } else {
-      return;
-    }
-  }
-
-  let postData = new FormData();
-  postData.append("set", JSON.stringify(setData));
-
-  fetch("/set/", {
-    method: "POST",
-    body: postData,
-  }).then((res) => {
-    if (res.ok) {
-      window.location.reload();
-    } else {
-      saveError("#fab");
-    }
-  });
-}
-
 /**
  * Return current ISO8601 datetime without milliseconds.
  */

@@ -56,48 +56,50 @@
         </section>
 
         <section id="new-set">
-            <input type="hidden" name="exerciseID" id="exerciseID" value="{{ exerciseID }}"/>
-            {%- if type == "weight-repetitions" -%}
-            <div class="new-input">
-                <input type="text" inputmode="numeric" pattern="[0-9]+" id="reps" name="reps" autocomplete="off" value="{{ sets[0][0].repetitions if sets and sets[0][0].repetitions is not none }}"/>
-                Reps
-            </div>
-            <div class="new-input">
-                <input type="text" inputmode="numeric" pattern="[0-9]+([\.][0-9]+)?" id="weight" name="weight" autocomplete="off" value="{{ sets[0][0].weight if sets and sets[0][0].weight is not none }}"/>
-                kg
-            </div>
-            {%- elif type == "distance-time" -%}
-            <div class="new-input">
-                <input type="text" inputmode="numeric" pattern="[0-9]+([\.][0-9]+)?" id="distance" name="distance" autocomplete="off" value="{{ sets[0][0].distance if sets and sets[0][0].distance is not none }}"/>
-                m
-            </div>
-            <div class="new-input">
-                <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="hours" name="hours" autocomplete="off" value="{{ sets[0][0].hours if sets and sets[0][0].hours is not none }}" placeholder="hh"/>&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="mins" name="mins" autocomplete="off" value="{{ sets[0][0].mins if sets and sets[0][0].mins is not none }}" placeholder="mm"/>&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="secs" name="secs" autocomplete="off" value="{{ sets[0][0].seconds if sets and sets[0][0].seconds is not none }}" placeholder="ss"/>
-            </div>
-            {%- elif type == "time" -%}
-            <div class="new-input">
-                <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="hours" name="hours" autocomplete="off" value="{{ sets[0][0].hours if sets and sets[0][0].hours is not none }}" placeholder="hh"/>&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="mins" name="mins" autocomplete="off" value="{{ sets[0][0].mins if sets and sets[0][0].mins is not none }}" placeholder="mm"/>&nbsp;:
-                <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="secs" name="secs" autocomplete="off" value="{{ sets[0][0].seconds if sets and sets[0][0].seconds is not none }}" placeholder="ss"/>
-            </div>
-            <div class="timer">
-                <button type="button" class="fab timer-btn" id="timer-start-btn">
-                    <img src="/static/img/play.svg" alt="Start timer" height="1" width="1"/>
-                </button>
-                <div>
-                    <span id="timer-display">&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;</span>
-                    <span id="timer-display-millis" class="millis">&ndash;&ndash;&ndash;</span>
+            <form action="/set/" method="POST">
+                <input type="hidden" name="exerciseID" id="exerciseID" value="{{ exerciseID }}"/>
+                {%- if type == "weight-repetitions" -%}
+                <div class="new-input">
+                    <input type="text" inputmode="numeric" pattern="[0-9]+" id="reps" name="reps" autocomplete="off" value="{{ sets[0][0].repetitions if sets and sets[0][0].repetitions is not none }}"/>
+                    Reps
                 </div>
-                <button type="button" class="fab timer-btn" id="timer-stop-btn">
-                    <img src="/static/img/stop.svg" alt="Stop timer" height="1" width="1"/>
+                <div class="new-input">
+                    <input type="text" inputmode="numeric" pattern="[0-9]+([\.][0-9]+)?" id="weight" name="weight" autocomplete="off" value="{{ sets[0][0].weight if sets and sets[0][0].weight is not none }}"/>
+                    kg
+                </div>
+                {%- elif type == "distance-time" -%}
+                <div class="new-input">
+                    <input type="text" inputmode="numeric" pattern="[0-9]+([\.][0-9]+)?" id="distance" name="distance" autocomplete="off" value="{{ sets[0][0].distance if sets and sets[0][0].distance is not none }}"/>
+                    m
+                </div>
+                <div class="new-input">
+                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="hours" name="hours" autocomplete="off" value="{{ sets[0][0].hours if sets and sets[0][0].hours is not none }}" placeholder="hh"/>&nbsp;:
+                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="mins" name="mins" autocomplete="off" value="{{ sets[0][0].mins if sets and sets[0][0].mins is not none }}" placeholder="mm"/>&nbsp;:
+                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="secs" name="secs" autocomplete="off" value="{{ sets[0][0].seconds if sets and sets[0][0].seconds is not none }}" placeholder="ss"/>
+                </div>
+                {%- elif type == "time" -%}
+                <div class="new-input">
+                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="hours" name="hours" autocomplete="off" value="{{ sets[0][0].hours if sets and sets[0][0].hours is not none }}" placeholder="hh"/>&nbsp;:
+                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="mins" name="mins" autocomplete="off" value="{{ sets[0][0].mins if sets and sets[0][0].mins is not none }}" placeholder="mm"/>&nbsp;:
+                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="secs" name="secs" autocomplete="off" value="{{ sets[0][0].seconds if sets and sets[0][0].seconds is not none }}" placeholder="ss"/>
+                </div>
+                <div class="timer">
+                    <button type="button" class="fab timer-btn" id="timer-start-btn">
+                        <img src="/static/img/play.svg" alt="Start timer" height="1" width="1"/>
+                    </button>
+                    <div>
+                        <span id="timer-display">&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;</span>
+                        <span id="timer-display-millis" class="millis">&ndash;&ndash;&ndash;</span>
+                    </div>
+                    <button type="button" class="fab timer-btn" id="timer-stop-btn">
+                        <img src="/static/img/stop.svg" alt="Stop timer" height="1" width="1"/>
+                    </button>
+                </div>
+                {%- endif -%}
+                <button type="submit" class="fab" id="fab">
+                    +
                 </button>
-            </div>
-            {%- endif -%}
-            <button class="fab" id="fab">
-                +
-            </button>
+            </form>
         </section>
 
         <section id="graph" class="hidden animate">

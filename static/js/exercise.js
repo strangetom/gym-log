@@ -1,4 +1,3 @@
-import { saveError } from "./saveFunctions.js";
 const hideDialogAnimation = [{ transform: "translateY(-100%" }];
 const hideDialogTiming = {
     duration: 100,
@@ -81,7 +80,6 @@ class Timer {
 }
 document.addEventListener("DOMContentLoaded", () => {
     let fab = document.querySelector("#fab");
-    fab.addEventListener("click", saveSet);
     let graphBtn = document.querySelector("#graph-button");
     let graphSection = document.querySelector("#graph");
     graphBtn.addEventListener("click", () => {
@@ -158,76 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
-function saveSet() {
-    let setData = {
-        exerciseID: "",
-        datetime: isoDateTime(),
-        distance_m: "",
-        weight_kg: "",
-        time_s: "",
-        repetitions: "",
-    };
-    let exerciseIDEl = document.querySelector("#exerciseID");
-    if (exerciseIDEl == null) {
-    }
-    else {
-        setData.exerciseID = exerciseIDEl.value;
-    }
-    let distance_m = document.querySelector("#distance");
-    if (distance_m != null) {
-        if (distance_m.checkValidity()) {
-            setData.distance_m = distance_m.value;
-        }
-        else {
-            return;
-        }
-    }
-    let weight_kg = document.querySelector("#weight");
-    if (weight_kg != null) {
-        if (weight_kg.checkValidity()) {
-            setData.weight_kg = weight_kg.value;
-        }
-        else {
-            return;
-        }
-    }
-    let reps = document.querySelector("#reps");
-    if (reps != null) {
-        if (reps.checkValidity()) {
-            setData.repetitions = reps.value;
-        }
-        else {
-            return;
-        }
-    }
-    let hours = document.querySelector("#hours");
-    let mins = document.querySelector("#mins");
-    let secs = document.querySelector("#secs");
-    if (hours != null && mins != null && secs != null) {
-        if (hours.checkValidity() && mins.checkValidity() && secs.checkValidity()) {
-            let time_s = Number(secs.value) +
-                Number(mins.value) * 60 +
-                Number(hours.value) * 3600;
-            setData.time_s = time_s.toString();
-        }
-        else {
-            return;
-        }
-    }
-    let postData = new FormData();
-    postData.append("set", JSON.stringify(setData));
-    fetch("/set/", {
-        method: "POST",
-        body: postData,
-    }).then((res) => {
-        if (res.ok) {
-            window.location.reload();
-        }
-        else {
-            saveError("#fab");
-        }
-    });
-}
 function isoDateTime() {
     return new Date().toISOString().split(".")[0] + "Z";
 }
@@ -330,3 +258,4 @@ async function toggleWakeLock(status) {
         wakelock.release().then(() => (wakelock = null));
     }
 }
+export {};
