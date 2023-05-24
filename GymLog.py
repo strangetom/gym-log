@@ -143,6 +143,10 @@ def exercise_endpoint(exerciseID: int):
     """
     w = get_workout_data()
     if request.method == "GET":
+        # Get workout ID for parent workout from query string
+        # /exercise/1?workoutID=1
+        workoutID = request.args.get("workoutID")
+
         return render_template(
             "exercise.html",
             sets=w.list_exercise_sets(exerciseID),
@@ -150,6 +154,8 @@ def exercise_endpoint(exerciseID: int):
             type=w.get_exercise_type(exerciseID),
             graph=w.get_exercise_history(exerciseID),
             exerciseID=exerciseID,
+            workoutID=workoutID,
+            workoutColour=w.get_workout_colour(workoutID),
         )
 
     elif request.method == "POST":

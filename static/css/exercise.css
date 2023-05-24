@@ -55,15 +55,34 @@ h1 {
   text-align: center;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 }
-#home-shortcut svg {
-  position: absolute;
-  top: .7rem;
-  left: .7rem;
+#header a {
   height: 2rem;
   width: 2rem;
   margin: 5px;
   background-color: var(--fg);
   border-radius: .5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#workout-shortcut {
+  color: var(--workoutColor);
+  position: absolute;
+  top: .7rem;
+  left: .7rem;
+}
+#workout-shortcut svg {
+  width: 75%;
+  height: 75%;
+}
+#home-shortcut {
+  position: absolute;
+  top: .7rem;
+  left: calc(.7rem + .7rem + 2rem);
+}
+#home-shortcut svg {
+  width: 100%;
+  height: 100%;
 }
 
 #graph-button svg {

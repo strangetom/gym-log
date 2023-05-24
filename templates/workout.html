@@ -29,7 +29,7 @@
 
         <section id="exercises">
              {%- for e in exercises -%}
-            <a href="/exercise/{{ e.exerciseID }}" class="exercise-card">
+            <a href="/exercise/{{ e.exerciseID }}?workoutID={{ workoutID }}" class="exercise-card">
                 <h2>{{ e.name }}</h2>
                 <div class="exercise-details">
                     <span class="exercise-last-update {{ "today" if e.is_today }}">{{ e.last_update }}</span>
