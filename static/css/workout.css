@@ -53,7 +53,7 @@ h1 {
   font-weight: 400;
   text-align: center;
 }
-#header svg {
+#header a {
   position: absolute;
   top: .7rem;
   left: .7rem;
@@ -62,6 +62,13 @@ h1 {
   margin: 5px;
   background-color: var(--fg);
   border-radius: .5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#header svg {
+  width: 75%;
+  height: 75%;
 }
 
 #fab-edit {
