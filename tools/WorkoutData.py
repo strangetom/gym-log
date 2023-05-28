@@ -359,7 +359,9 @@ class WorkoutData:
             Data sent by client
         """
         # Create timestamp in iso format, without milliseconds
-        timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat().split(".")[0] + "Z"
+        timestamp = (
+            datetime.datetime.now(datetime.timezone.utc).isoformat().split(".")[0] + "Z"
+        )
 
         # Convert time from hours, minutes, seconds into total seconds
         time = None

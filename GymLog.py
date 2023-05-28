@@ -189,9 +189,14 @@ def set_endpoint(setID: int):
     w = get_workout_data()
     if request.method == "POST":
         post_data = request.form
+        print(post_data)
         w.save_set(post_data)
         return redirect(
-            url_for("exercise_endpoint", exerciseID=post_data["exerciseID"])
+            url_for(
+                "exercise_endpoint",
+                exerciseID=post_data["exerciseID"],
+                workoutID=post_data["workoutID"],
+            )
         )
 
     elif request.method == "DELETE":
