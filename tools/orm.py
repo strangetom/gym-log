@@ -1,7 +1,6 @@
 import peewee as pw
 
 database = pw.SqliteDatabase("gym-log.db")
-database.connect()
 
 
 class UnknownField(object):

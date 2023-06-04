@@ -5,8 +5,33 @@ import json
 from flask import Flask, Response, g, render_template, request, redirect, url_for
 
 from tools.WorkoutData import WorkoutData
+from tools.orm import database
 
 app = Flask(__name__)
+
+
+@app.before_request
+def before_request():
+    """Connect to database before processing each request"""
+    database.connect()
+
+
+@app.after_request
+def after_request(response: Response) -> Response:
+    """Close database connection after processing each request
+
+    Parameters
+    ----------
+    response : Response
+        Request Response object
+
+    Returns
+    -------
+    Response
+        Request Response object
+    """
+    database.close()
+    return response
 
 
 def get_workout_data():
