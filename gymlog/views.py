@@ -2,50 +2,12 @@
 
 import json
 
-from flask import Flask, Response, g, render_template, request, redirect, url_for
+from flask import Response, render_template, request, redirect, url_for
 
-from tools.WorkoutData import WorkoutData
-from tools.orm import database
+from gymlog import app
+from gymlog.interfaces import WorkoutInterface
 
-app = Flask(__name__)
-
-
-@app.before_request
-def before_request():
-    """Connect to database before processing each request"""
-    database.connect()
-
-
-@app.after_request
-def after_request(response: Response) -> Response:
-    """Close database connection after processing each request
-
-    Parameters
-    ----------
-    response : Response
-        Request Response object
-
-    Returns
-    -------
-    Response
-        Request Response object
-    """
-    database.close()
-    return response
-
-
-def get_workout_data():
-    """Get workout data from global object
-
-    Returns
-    -------
-    data
-        WorkoutData instance
-    """
-    data = getattr(g, "_WorkoutData", None)
-    if data is None:
-        data = g._WorkoutData = WorkoutData("gym-log.db")
-    return data
+W = WorkoutInterface()
 
 
 @app.route("/service-worker.js", methods=["GET"])
@@ -70,9 +32,7 @@ def home():
     str
         Rendered HTML template
     """
-    W = get_workout_data()
     workouts = W.list_workouts()
-
     return render_template("homepage.html", workouts=workouts)
 
 
@@ -90,13 +50,12 @@ def edit_workout(workoutID: int):
     str
         Rendered HTML template
     """
-    w = get_workout_data()
-    all_exercises = w.list_all_exercises()
-    workout_exercises = [ex["name"] for ex in w.list_workout_exercises(workoutID)]
+    all_exercises = W.list_all_exercises()
+    workout_exercises = [ex["name"] for ex in W.list_workout_exercises(workoutID)]
 
     return render_template(
         "edit_workout.html",
-        name=w.get_workout_name(workoutID),
+        name=W.get_workout_name(workoutID),
         all_exercises=all_exercises,
         workout_exercises=workout_exercises,
         workoutID=workoutID,
@@ -122,29 +81,28 @@ def workout_endpoint(workoutID: int):
     workoutID : int
         Workout ID
     """
-    w = get_workout_data()
     if request.method == "GET":
         return render_template(
             "workout.html",
-            exercises=w.list_workout_exercises(workoutID),
-            name=w.get_workout_name(workoutID),
+            exercises=W.list_workout_exercises(workoutID),
+            name=W.get_workout_name(workoutID),
             workoutID=workoutID,
-            colour=w.get_workout_colour(workoutID),
+            colour=W.get_workout_colour(workoutID),
         )
 
     elif request.method == "POST":
         post_data = request.form
-        w.new_workout(post_data["name"], post_data["colour"])
+        W.new_workout(post_data["name"], post_data["colour"])
         return Response(status=200)
 
     elif request.method == "PUT":
         post_data = request.form
         workout_data = json.loads(post_data["workout"])
-        w.save_workout(workoutID, workout_data)
+        W.save_workout(workoutID, workout_data)
         return Response(status=200)
 
     elif request.method == "DELETE":
-        w.delete_workout(workoutID)
+        W.delete_workout(workoutID)
         return Response(status=200)
 
 
@@ -166,7 +124,6 @@ def exercise_endpoint(exerciseID: int):
     exerciseID : int
         Exercise ID
     """
-    w = get_workout_data()
     if request.method == "GET":
         # Get workout ID for parent workout from query string
         # /exercise/1?workoutID=1
@@ -174,22 +131,22 @@ def exercise_endpoint(exerciseID: int):
 
         return render_template(
             "exercise.html",
-            sets=w.list_exercise_sets(exerciseID),
-            name=w.get_exercise_name(exerciseID),
-            type=w.get_exercise_type(exerciseID),
-            graph=w.get_exercise_history(exerciseID),
+            sets=W.list_exercise_sets(exerciseID),
+            name=W.get_exercise_name(exerciseID),
+            type=W.get_exercise_type(exerciseID),
+            graph=W.get_exercise_history(exerciseID),
             exerciseID=exerciseID,
             workoutID=workoutID,
-            workoutColour=w.get_workout_colour(workoutID),
+            workoutColour=W.get_workout_colour(workoutID),
         )
 
     elif request.method == "POST":
         post_data = request.form
-        w.new_exercise(post_data["name"], post_data["type"])
+        W.new_exercise(post_data["name"], post_data["type"])
         return Response(status=200)
 
     elif request.method == "DELETE":
-        w.delete_exercise(exerciseID)
+        W.delete_exercise(exerciseID)
         return Response(status=200)
 
 
@@ -211,10 +168,9 @@ def set_endpoint(setID: int):
     setID : int
         Set ID
     """
-    w = get_workout_data()
     if request.method == "POST":
         post_data = request.form
-        w.save_set(post_data)
+        W.save_set(post_data)
         return redirect(
             url_for(
                 "exercise_endpoint",
@@ -224,10 +180,10 @@ def set_endpoint(setID: int):
         )
 
     elif request.method == "DELETE":
-        w.delete_set(setID)
+        W.delete_set(setID)
         return Response(status=200)
 
     elif request.method == "PUT":
         post_data = request.form
-        w.update_set(setID, post_data)
+        W.update_set(setID, post_data)
         return Response(status=200)

@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from peewee import fn
 
-from .orm import Workout, Exercise, Sets, WorkoutExercise
+from gymlog.models import Workout, Exercise, Sets, WorkoutExercise
 
 
 @dataclass
@@ -21,9 +21,9 @@ class ExerciseSet:
     repetitions: Optional[int]
 
 
-class WorkoutData:
-    def __init__(self, db):
-        self.db = db
+class WorkoutInterface:
+    def __init__(self):
+        pass
 
     def get_workout_name(self, workoutID: int) -> str:
         """Return workout name from workoutID

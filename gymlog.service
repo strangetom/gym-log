@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 WorkingDirectory=/home/pi/GymLog
 Environment="PATH=/home/pi/GymLog/venv/bin"
-ExecStart=/home/pi/GymLog/venv/bin/gunicorn --chdir /home/pi/GymLog/ GymLog:app
+ExecStart=/home/pi/GymLog/venv/bin/gunicorn --chdir /home/pi/GymLog/ gymlog:app
 
 [Install]
 WantedBy=multi-user.target
