@@ -1,6 +1,5 @@
 [project]
 name = "Gym Log"
-dynamic = "0.1.0"
 description = "Web app to log gym workouts"
 readme = "README.md"
 license = { file="LICENSE"}
@@ -16,7 +15,10 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.10",
 ]
-dependencies = { file="requirements.txt" }
+
+[tool.setuptools.dynamic]
+version =  {attr = "gymlog.__version__"}
+dependencies = { file = ["requirements.txt"] }
 
 [project.urls]
 Source = "https://gitea.serverpi.xyz/tom/gym-log"
@@ -51,3 +53,9 @@ exclude = [
     ".git",
     "venv"
 ]
+
+[tool.djlint]
+profile = "jinja"
+ignore = "J004,J018"
+extension = "html"
+exclude = ["**/__pycache__", "venv"]

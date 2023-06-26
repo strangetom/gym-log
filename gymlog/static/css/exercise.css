@@ -30,7 +30,7 @@
 body {
   font-family: sans-serif;
   color: var(--fg);
-  background-color: var(--bg); 
+  background-color: var(--bg-s); 
   margin: 0 auto;
   max-width: 80ch;
   -webkit-font-smoothing: antialiased;
@@ -45,6 +45,8 @@ body {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   z-index: 1;
   font-size: 1.3rem;
+  max-width: calc(80ch / 1.3);
+  margin: 0 auto;
 }
 h1 {
   padding: .7rem;
@@ -53,15 +55,34 @@ h1 {
   text-align: center;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 }
-#home-shortcut svg {
-  position: absolute;
-  top: .7rem;
-  left: .7rem;
+#header a {
   height: 2rem;
   width: 2rem;
   margin: 5px;
   background-color: var(--fg);
   border-radius: .5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#workout-shortcut {
+  color: var(--workoutColor);
+  position: absolute;
+  top: .7rem;
+  left: .7rem;
+}
+#workout-shortcut svg {
+  width: 75%;
+  height: 75%;
+}
+#home-shortcut {
+  position: absolute;
+  top: .7rem;
+  left: calc(.7rem + .7rem + 2rem);
+}
+#home-shortcut svg {
+  width: 100%;
+  height: 100%;
 }
 
 #graph-button svg {
@@ -102,6 +123,9 @@ h1 {
   border: none;
   border-radius: .2rem;
 }
+#new-set input:invalid {
+  background-color: var(--red-alt);
+}
 #new-set .time-input {
   width: 3ch;
 }
@@ -116,6 +140,7 @@ h1 {
   left: 0;
   right: 0;
   overflow: auto;
+  scroll-snap-type: y mandatory;
 }
 .set-group {
   border-bottom: 3px solid var(--gray);
@@ -124,8 +149,10 @@ h1 {
   display: block;
   padding: 1rem 2rem;
   text-decoration: none;
+  background-color: var(--bg);
   border-bottom: 1px solid var(--bg-2);
   color: var(--fg);
+  scroll-snap-align: start;
 }
 .set-card h3 {
   margin: 0;
@@ -177,36 +204,6 @@ h1 {
   font-size: 1.4rem;
   margin-bottom: 2rem;
 }
-#graph .table-wrapper {
-  overflow-x: scroll;
-  direction: rtl;
-  width: 100vw;
-  height: 50%;
-}
-#graph table {
-  width: 150vw;
-  margin: 0 20px;
-  --secondary-axes-color: var(--bg-2);
-  --color-1: var(--green);
-  --color-2: var(--orange);
-  --color-3: var(--blue);
-  --color-4: var(--red);
-  --color-5: var(--aqua);
-  --color-6: var(--purple);
-  --color-7: var(--yellow);
-}
-#graph td {
-  max-width: 20px;
-}
-#graph table .tooltip {
-  bottom: unset;
-  top: -2rem;
-  background-color: var(--fg);
-  color: var(--bg);
-}
-#graph table .tooltip::after {
-  border-top-color: var(--fg);
-}
 #graph .swipe-arrow {
   position: absolute;
   bottom: 1rem;
@@ -215,22 +212,64 @@ h1 {
   width: 15%;
 }
 
+.fab {
+  border: none;
+  border-radius: 3rem;
+  background-color: var(--fg);
+  color: var(--bg-1);
+  font-size: 3rem;
+
+  font-weight: 100;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
+  transition: rotate .2s;
+}
 #fab {
   position: absolute;
   top: -1.9rem;
   right: 1rem;
   width: 3.8rem;
   height: 3.8rem;
-  border: none;
-  border-radius: 3rem;
-  background-color: var(--fg);
-  color: var(--bg-1);
-  font-size: 3rem;
-  font-weight: 100;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
-  transition: rotate .2s;
-
 }
+.timer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: .8rem;
+  margin: .9rem auto;
+  width: 80%;
+  background-color: var(--bg-s);
+  padding: .3rem;
+}
+.timer.running {
+  background-color: var(--blue);
+}
+.timer.paused{
+  background-color: #224244;
+}
+.timer-btn {
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: .8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: scale 250ms;
+}
+.timer-btn:active {
+  scale: 1.1;
+}
+.timer-btn img {
+  height: 2rem;
+  width: auto;
+}
+.timer span {;
+  font-size: 2rem;
+  font-family: monospace;
+}
+.timer span.millis {
+  font-size: 1rem;
+}
+
 .save-success {
   background-color: var(--green-alt) !important;
 }

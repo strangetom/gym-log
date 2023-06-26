@@ -2,3 +2,4 @@ black
 pyright
 isort
 pyproject-flake8
+djlint

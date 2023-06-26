@@ -5,12 +5,133 @@ const hideDialogTiming = {
   duration: 100,
   easing: "ease-out",
 };
+let timer;
+var wakelock = null;
+
+enum WakelockStatus {
+  Enable = 1,
+  Disable,
+}
+
+/**
+ * Timer class for time based exercises
+ */
+class Timer {
+  // Store start time from Date.now(), milliseconds
+  startTime: number = 0;
+  // Store pause time, to continue from if paused, milliseconds
+  pauseElapsed: number = 0;
+  // Store interval id
+  interval: number = null;
+  // Timer element
+  timerEl: HTMLDivElement;
+  // Display element, where we'll show the output
+  displayEl: HTMLSpanElement;
+  millisEl: HTMLSpanElement;
+  // Play pause button element
+  playPauseEl: HTMLButtonElement;
+  // Wakelock for timer is running;
+  wakelock = null;
+
+  /**
+   * Initialise timer by getting internal elements and setting counter to 0
+   * @param {HTMLDivElement} timerEl Timer element in DOM
+   */
+  constructor(timerEl: HTMLDivElement) {
+    this.timerEl = timerEl;
+    this.displayEl = timerEl.querySelector("#timer-display") as HTMLSpanElement;
+    this.millisEl = timerEl.querySelector(
+      "#timer-display-millis"
+    ) as HTMLSpanElement;
+    this.playPauseEl = timerEl.querySelector(
+      "#timer-start-btn"
+    ) as HTMLButtonElement;
+  }
+
+  /**
+   * Toggle timer start / pause
+   */
+  toggle() {
+    if (this.interval == null) {
+      this.startTime = Date.now();
+      this.interval = setInterval(this.display.bind(this), 100);
+      this.togglePlayPause();
+      this.display();
+      toggleWakeLock(WakelockStatus.Enable);
+    } else {
+      this.pauseElapsed = Date.now() - this.startTime + this.pauseElapsed;
+      clearInterval(this.interval);
+      this.interval = null;
+      this.togglePlayPause();
+      toggleWakeLock(WakelockStatus.Disable);
+    }
+  }
+
+  /**
+   * Stop and reset timer
+   */
+  reset() {
+    clearInterval(this.interval);
+    this.interval = null;
+    this.pauseElapsed = 0;
+
+    // Force start icon to play
+    let img = this.playPauseEl.querySelector("img");
+    img.src = "/static/img/play.svg";
+    this.displayEl.innerHTML = "&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;";
+    this.millisEl.innerHTML = "&ndash;&ndash;&ndash;";
+
+    this.timerEl.classList.remove("paused");
+    this.timerEl.classList.remove("running");
+
+    toggleWakeLock(WakelockStatus.Disable);
+  }
+
+  /**
+   * Convert counter in seconds to readble time and display in displayEl
+   */
+  display() {
+    let elapsedMillis = Date.now() - this.startTime + this.pauseElapsed;
+    let elapsedSecs = elapsedMillis / 1000;
+
+    let hours = Math.floor(Math.floor(elapsedSecs) / 3600);
+    let minutes = Math.floor((Math.floor(elapsedSecs) % 3600) / 60);
+    let seconds = Math.floor(Math.floor(elapsedSecs) % 60);
+
+    // Get milli seconds, but only to 10 ms accuracy, so last digit is always 0
+    let millis = (elapsedSecs % 1) * 1000;
+    let roundedMillis = Math.ceil(millis / 10) * 10;
+
+    let displayHours = hours < 10 ? "0" + hours : hours.toString();
+    let displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
+    let displaySeconds = seconds < 10 ? "0" + seconds : seconds.toString();
+
+    this.displayEl.innerText =
+      displayHours + ":" + displayMinutes + ":" + displaySeconds;
+    this.millisEl.innerText = roundedMillis.toString().padStart(3, "0");
+  }
+
+  /**
+   * Toggle img on play / pause button
+   */
+  togglePlayPause() {
+    let img = this.playPauseEl.querySelector("img");
+    if (img.src.endsWith("play.svg")) {
+      img.src = "/static/img/pause.svg";
+      this.timerEl.classList.remove("paused");
+      this.timerEl.classList.add("running");
+    } else {
+      img.src = "/static/img/play.svg";
+      this.timerEl.classList.add("paused");
+      this.timerEl.classList.remove("running");
+    }
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   let fab: HTMLButtonElement = document.querySelector(
     "#fab"
   ) as HTMLButtonElement;
-  fab.addEventListener("click", saveSet);
 
   let graphBtn: HTMLDivElement = document.querySelector(
     "#graph-button"
@@ -28,6 +149,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   // Add event listener for swiping up to close graph drop down
   graphSection.addEventListener("touchstart", swipeCloseGraph);
+
+  // When selecting the new set input
+  let newSetInputs: NodeListOf<HTMLInputElement> =
+    document.querySelectorAll("#new-set input");
+  newSetInputs.forEach((el) => {
+    el.addEventListener("click", (e) => {
+      (e.target as HTMLInputElement).select();
+    });
+  });
+
+  let editSetInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll(
+    "#edit-set-dialog input"
+  );
+  editSetInputs.forEach((el) => {
+    el.addEventListener("click", (e) => {
+      (e.target as HTMLInputElement).select();
+    });
+  });
 
   let sets: NodeListOf<HTMLDivElement> = document.querySelectorAll(".set-card");
   sets.forEach((el) => {
@@ -73,80 +212,24 @@ document.addEventListener("DOMContentLoaded", () => {
       editDialog.close("cancel");
     });
   });
+
+  // Timer element for time-based exercises
+  // Only initialise and add event listeners if it's on the exercise page
+  let timerEl: HTMLDivElement = document.querySelector(".timer");
+  if (timerEl != null) {
+    timer = new Timer(timerEl);
+    let timerStartBtn: HTMLButtonElement =
+      document.querySelector("#timer-start-btn");
+    timerStartBtn.addEventListener("click", () => {
+      timer.toggle();
+    });
+    let timerStopBtn: HTMLButtonElement =
+      document.querySelector("#timer-stop-btn");
+    timerStopBtn.addEventListener("click", () => {
+      timer.reset();
+    });
+  }
 });
-/**
- * Save new set to database
- */
-function saveSet() {
-  let setData = {
-    exerciseID: "",
-    datetime: isoDateTime(),
-    distance_m: "",
-    weight_kg: "",
-    time_s: "",
-    repetitions: "",
-  };
-
-  let exerciseIDEl: HTMLInputElement = document.querySelector(
-    "#exerciseID"
-  ) as HTMLInputElement;
-  if (exerciseIDEl == null) {
-    //error
-  } else {
-    setData.exerciseID = exerciseIDEl.value;
-  }
-
-  let distance_m: HTMLInputElement = document.querySelector(
-    "#distance"
-  ) as HTMLInputElement;
-  if (distance_m != null) {
-    setData.distance_m = distance_m.value;
-  }
-
-  let weight_kg: HTMLInputElement = document.querySelector(
-    "#weight"
-  ) as HTMLInputElement;
-  if (weight_kg != null) {
-    setData.weight_kg = weight_kg.value;
-  }
-
-  let reps: HTMLInputElement = document.querySelector(
-    "#reps"
-  ) as HTMLInputElement;
-  if (reps != null) {
-    setData.repetitions = reps.value;
-  }
-
-  let hours: HTMLInputElement = document.querySelector(
-    "#hours"
-  ) as HTMLInputElement;
-  let mins: HTMLInputElement = document.querySelector(
-    "#mins"
-  ) as HTMLInputElement;
-  let secs: HTMLInputElement = document.querySelector(
-    "#secs"
-  ) as HTMLInputElement;
-  if (hours != null && mins != null && secs != null) {
-    let time_s =
-      Number(secs.value) + Number(mins.value) * 60 + Number(hours.value) * 3600;
-    setData.time_s = time_s.toString();
-  }
-
-  let postData = new FormData();
-  postData.append("set", JSON.stringify(setData));
-
-  fetch("/set/", {
-    method: "POST",
-    body: postData,
-  }).then((res) => {
-    if (res.ok) {
-      window.location.reload();
-    } else {
-      saveError("#fab");
-    }
-  });
-}
-
 /**
  * Return current ISO8601 datetime without milliseconds.
  */
@@ -233,7 +316,10 @@ function modifySet() {
  * @param {TouchEvent} e Touchstart event
  */
 function swipeCloseGraph(e: TouchEvent) {
-  if ((e.changedTouches[0].target as HTMLElement).closest("table") != null) {
+  if (
+    (e.changedTouches[0].target as HTMLElement).closest(".graph-wrapper") !=
+    null
+  ) {
     // If the closest table element is not null, then it means we've touched the graph.
     // Therefore, abort this event listener so we can scroll the graph horizontally without
     // this event listener capturing the touch events
@@ -272,7 +358,7 @@ function swipeCloseGraph(e: TouchEvent) {
     graph.classList.add("animate");
     // If the delta between startY and endY is large enough, add the "hidden" class
     // to trigger the close animation
-    if (startY - endY > 175) {
+    if (startY - endY > 100) {
       graph.classList.add("hidden");
     }
     // Remove the touchend and touchmove event listeners to avoid adding a new one
@@ -283,4 +369,20 @@ function swipeCloseGraph(e: TouchEvent) {
 
   graph.addEventListener("touchmove", this.swipeMove);
   graph.addEventListener("touchend", this.swipeEnd);
+}
+
+/**
+ * Toggle wakelock when checkbox state changes
+ */
+async function toggleWakeLock(status: WakelockStatus) {
+  if (status == WakelockStatus.Enable && wakelock == null) {
+    try {
+      wakelock = await navigator.wakeLock.request("screen");
+    } catch (err) {
+      console.log(`Wakelock failed: ${err.message}`);
+    }
+  } else if (status == WakelockStatus.Disable && wakelock != null) {
+    // Release wakelock and set variable back to null
+    wakelock.release().then(() => (wakelock = null));
+  }
 }

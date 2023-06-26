@@ -1,0 +1,86 @@
+.graph-wrapper {
+  overflow-x: scroll;
+  direction: rtl;
+  width: 100vw;
+  height: 55%;
+  background-image: linear-gradient(var(--bg-2) 1px, transparent 0px);
+  background-size: auto 24%;
+}
+.graph-chart {
+  height: 100%;
+  margin: 0 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+}
+.graph-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+.graph-bar {
+  position: relative;
+  width: 20px;
+  height: calc(100% * var(--size));
+  background-color: var(--fg);
+  border-radius: 3px;
+}
+.graph-bar::before {
+  content: attr(data-value);
+  font-size: 1.2rem;
+  font-weight: bold;
+  width: 5ch;
+  background-color: var(--fg);
+  color: var(--bg);
+  text-align: center;
+  padding: 2px 0;
+  border-radius: 4px;
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: calc(100% + 5px);
+  left: -4ch;
+  transform: translateX(50%);
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.3s;
+}
+.graph-bar::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% - 7px);
+  /* Place arrow in middle of tooltip, because right side of tooltip is at 100%+1ch and tooltip is 12ch wide
+     If tooltip is wider than word, place at center of word
+  */
+  left: 1ch;
+  margin-left: -5px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--fg) transparent transparent transparent;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.3s;
+}
+/* Tooltip visibility */
+.graph-bar:hover::before, .graph-bar:hover::after {
+  visibility: visible;
+  opacity: 1;
+}
+.graph-bar:nth-of-type(6n+1) {
+  background-color: var(--green);
+}
+.graph-bar:nth-of-type(6n+2) {
+  background-color: var(--orange);
+}
+.graph-bar:nth-of-type(6n+3) {
+  background-color: var(--blue);
+}
+.graph-bar:nth-of-type(6n+4) {
+  background-color: var(--red);
+}
+.graph-bar:nth-of-type(6n+5) {
+  background-color: var(--aqua);
+}
+.graph-bar:nth-of-type(6n+6) {
+  background-color: var(--purple);
+}

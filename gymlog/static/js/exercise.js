@@ -1,12 +1,85 @@
-import { saveError } from "./saveFunctions.js";
 const hideDialogAnimation = [{ transform: "translateY(-100%" }];
 const hideDialogTiming = {
     duration: 100,
     easing: "ease-out",
 };
+let timer;
+var wakelock = null;
+var WakelockStatus;
+(function (WakelockStatus) {
+    WakelockStatus[WakelockStatus["Enable"] = 1] = "Enable";
+    WakelockStatus[WakelockStatus["Disable"] = 2] = "Disable";
+})(WakelockStatus || (WakelockStatus = {}));
+class Timer {
+    constructor(timerEl) {
+        this.startTime = 0;
+        this.pauseElapsed = 0;
+        this.interval = null;
+        this.wakelock = null;
+        this.timerEl = timerEl;
+        this.displayEl = timerEl.querySelector("#timer-display");
+        this.millisEl = timerEl.querySelector("#timer-display-millis");
+        this.playPauseEl = timerEl.querySelector("#timer-start-btn");
+    }
+    toggle() {
+        if (this.interval == null) {
+            this.startTime = Date.now();
+            this.interval = setInterval(this.display.bind(this), 100);
+            this.togglePlayPause();
+            this.display();
+            toggleWakeLock(WakelockStatus.Enable);
+        }
+        else {
+            this.pauseElapsed = Date.now() - this.startTime + this.pauseElapsed;
+            clearInterval(this.interval);
+            this.interval = null;
+            this.togglePlayPause();
+            toggleWakeLock(WakelockStatus.Disable);
+        }
+    }
+    reset() {
+        clearInterval(this.interval);
+        this.interval = null;
+        this.pauseElapsed = 0;
+        let img = this.playPauseEl.querySelector("img");
+        img.src = "/static/img/play.svg";
+        this.displayEl.innerHTML = "&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;";
+        this.millisEl.innerHTML = "&ndash;&ndash;&ndash;";
+        this.timerEl.classList.remove("paused");
+        this.timerEl.classList.remove("running");
+        toggleWakeLock(WakelockStatus.Disable);
+    }
+    display() {
+        let elapsedMillis = Date.now() - this.startTime + this.pauseElapsed;
+        let elapsedSecs = elapsedMillis / 1000;
+        let hours = Math.floor(Math.floor(elapsedSecs) / 3600);
+        let minutes = Math.floor((Math.floor(elapsedSecs) % 3600) / 60);
+        let seconds = Math.floor(Math.floor(elapsedSecs) % 60);
+        let millis = (elapsedSecs % 1) * 1000;
+        let roundedMillis = Math.ceil(millis / 10) * 10;
+        let displayHours = hours < 10 ? "0" + hours : hours.toString();
+        let displayMinutes = minutes < 10 ? "0" + minutes : minutes.toString();
+        let displaySeconds = seconds < 10 ? "0" + seconds : seconds.toString();
+        this.displayEl.innerText =
+            displayHours + ":" + displayMinutes + ":" + displaySeconds;
+        this.millisEl.innerText = roundedMillis.toString().padStart(3, "0");
+    }
+    togglePlayPause() {
+        let img = this.playPauseEl.querySelector("img");
+        if (img.src.endsWith("play.svg")) {
+            img.src = "/static/img/pause.svg";
+            this.timerEl.classList.remove("paused");
+            this.timerEl.classList.add("running");
+        }
+        else {
+            img.src = "/static/img/play.svg";
+            this.timerEl.classList.add("paused");
+            this.timerEl.classList.remove("running");
+        }
+    }
+}
 document.addEventListener("DOMContentLoaded", () => {
     let fab = document.querySelector("#fab");
-    fab.addEventListener("click", saveSet);
     let graphBtn = document.querySelector("#graph-button");
     let graphSection = document.querySelector("#graph");
     graphBtn.addEventListener("click", () => {
@@ -19,6 +92,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     graphSection.addEventListener("touchstart", swipeCloseGraph);
+    let newSetInputs = document.querySelectorAll("#new-set input");
+    newSetInputs.forEach((el) => {
+        el.addEventListener("click", (e) => {
+            e.target.select();
+        });
+    });
+    let editSetInputs = document.querySelectorAll("#edit-set-dialog input");
+    editSetInputs.forEach((el) => {
+        el.addEventListener("click", (e) => {
+            e.target.select();
+        });
+    });
     let sets = document.querySelectorAll(".set-card");
     sets.forEach((el) => {
         el.addEventListener("click", showEditSetDialog);
@@ -58,55 +143,19 @@ document.addEventListener("DOMContentLoaded", () => {
             editDialog.close("cancel");
         });
     });
+    let timerEl = document.querySelector(".timer");
+    if (timerEl != null) {
+        timer = new Timer(timerEl);
+        let timerStartBtn = document.querySelector("#timer-start-btn");
+        timerStartBtn.addEventListener("click", () => {
+            timer.toggle();
+        });
+        let timerStopBtn = document.querySelector("#timer-stop-btn");
+        timerStopBtn.addEventListener("click", () => {
+            timer.reset();
+        });
+    }
 });
-function saveSet() {
-    let setData = {
-        exerciseID: "",
-        datetime: isoDateTime(),
-        distance_m: "",
-        weight_kg: "",
-        time_s: "",
-        repetitions: "",
-    };
-    let exerciseIDEl = document.querySelector("#exerciseID");
-    if (exerciseIDEl == null) {
-    }
-    else {
-        setData.exerciseID = exerciseIDEl.value;
-    }
-    let distance_m = document.querySelector("#distance");
-    if (distance_m != null) {
-        setData.distance_m = distance_m.value;
-    }
-    let weight_kg = document.querySelector("#weight");
-    if (weight_kg != null) {
-        setData.weight_kg = weight_kg.value;
-    }
-    let reps = document.querySelector("#reps");
-    if (reps != null) {
-        setData.repetitions = reps.value;
-    }
-    let hours = document.querySelector("#hours");
-    let mins = document.querySelector("#mins");
-    let secs = document.querySelector("#secs");
-    if (hours != null && mins != null && secs != null) {
-        let time_s = Number(secs.value) + Number(mins.value) * 60 + Number(hours.value) * 3600;
-        setData.time_s = time_s.toString();
-    }
-    let postData = new FormData();
-    postData.append("set", JSON.stringify(setData));
-    fetch("/set/", {
-        method: "POST",
-        body: postData,
-    }).then((res) => {
-        if (res.ok) {
-            window.location.reload();
-        }
-        else {
-            saveError("#fab");
-        }
-    });
-}
 function isoDateTime() {
     return new Date().toISOString().split(".")[0] + "Z";
 }
@@ -168,7 +217,8 @@ function modifySet() {
     }
 }
 function swipeCloseGraph(e) {
-    if (e.changedTouches[0].target.closest("table") != null) {
+    if (e.changedTouches[0].target.closest(".graph-wrapper") !=
+        null) {
         return;
     }
     e.preventDefault();
@@ -186,7 +236,7 @@ function swipeCloseGraph(e) {
         let endY = e.changedTouches[0].pageY;
         graph.style.transform = "";
         graph.classList.add("animate");
-        if (startY - endY > 175) {
+        if (startY - endY > 100) {
             graph.classList.add("hidden");
         }
         graph.removeEventListener("touchmove", this.swipeMove);
@@ -195,3 +245,17 @@ function swipeCloseGraph(e) {
     graph.addEventListener("touchmove", this.swipeMove);
     graph.addEventListener("touchend", this.swipeEnd);
 }
+async function toggleWakeLock(status) {
+    if (status == WakelockStatus.Enable && wakelock == null) {
+        try {
+            wakelock = await navigator.wakeLock.request("screen");
+        }
+        catch (err) {
+            console.log(`Wakelock failed: ${err.message}`);
+        }
+    }
+    else if (status == WakelockStatus.Disable && wakelock != null) {
+        wakelock.release().then(() => (wakelock = null));
+    }
+}
+export {};
