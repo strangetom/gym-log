@@ -33,7 +33,7 @@ def home():
         Rendered HTML template
     """
     workouts = W.list_workouts()
-    return render_template("homepage.html", workouts=workouts)
+    return render_template("homepage.html.jinja", workouts=workouts)
 
 
 @app.route("/edit-workout/<int:workoutID>")
@@ -54,7 +54,7 @@ def edit_workout(workoutID: int):
     workout_exercises = [ex["name"] for ex in W.list_workout_exercises(workoutID)]
 
     return render_template(
-        "edit_workout.html",
+        "edit_workout.html.jinja",
         name=W.get_workout_name(workoutID),
         all_exercises=all_exercises,
         workout_exercises=workout_exercises,
@@ -83,7 +83,7 @@ def workout_endpoint(workoutID: int):
     """
     if request.method == "GET":
         return render_template(
-            "workout.html",
+            "workout.html.jinja",
             exercises=W.list_workout_exercises(workoutID),
             name=W.get_workout_name(workoutID),
             workoutID=workoutID,
@@ -130,7 +130,7 @@ def exercise_endpoint(exerciseID: int):
         workoutID = request.args.get("workoutID")
 
         return render_template(
-            "exercise.html",
+            "exercise.html.jinja",
             sets=W.list_exercise_sets(exerciseID),
             name=W.get_exercise_name(exerciseID),
             type=W.get_exercise_type(exerciseID),
