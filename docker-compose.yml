@@ -1,5 +1,6 @@
 services:
   gymlog:
+    user: 1000:1000
     image: gitea.serverpi.xyz/tom/gymlog:latest
     ports:
       - 8001:5000
