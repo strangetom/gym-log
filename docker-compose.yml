@@ -1,0 +1,10 @@
+services:
+  gymlog:
+    image: gitea.serverpi.xyz/tom/gymlog:latest
+    ports:
+      - 8001:5000
+    volumes:
+      - type: bind
+        source: /home/tom/Documents/gym-log/data
+        target: /app/data
+    restart: always

@@ -1,6 +1,6 @@
 import peewee as pw
 
-database = pw.SqliteDatabase("gym-log.db")
+database = pw.SqliteDatabase("data/gym-log.db")
 
 
 class UnknownField(object):

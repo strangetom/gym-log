@@ -12,18 +12,14 @@
 
 ## Deployment
 
-1. Install dependencies
+Build the docker container
 
-   ```bash
-   python3 -m venv venv
-   . venv/bin/activate/sh
-   python3 -m pip install -r requirements.txt
-   ```
+```bash
+docker buildx build -t gymlog:latest .
+```
 
-2. Test
+Then modify the template docker-compose.yml file to set the correct path for the `data` directory and run with
 
-   ```bash
-   gunicorn gymlog:app
-   ```
-
-   The ```gymlog.service```  can be used as a template for setting up a systemd service.
+```bash
+docker-compose up -d
+```
