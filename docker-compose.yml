@@ -1,5 +1,5 @@
 services:
-  recipe-manager:
+  gymlog:
     image: gitea.serverpi.xyz/tom/gymlog:latest
     ports:
       - 8001:5000
