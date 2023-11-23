@@ -80,7 +80,12 @@ class Timer {
 }
 document.addEventListener("DOMContentLoaded", () => {
     let form = document.querySelector("#new-set > form");
-    form.addEventListener("formdata", insertUUID);
+    form.addEventListener("formdata", insertUUIDTimestamp);
+    let offline = JSON.parse(localStorage.getItem("offline"));
+    if (offline) {
+        document.querySelector("#offline").classList.remove("hidden");
+        form.addEventListener("submit", saveLocally);
+    }
     let graphBtn = document.querySelector("#graph-button");
     let graphSection = document.querySelector("#graph");
     graphBtn.addEventListener("click", () => {
@@ -259,8 +264,22 @@ async function toggleWakeLock(status) {
         wakelock.release().then(() => (wakelock = null));
     }
 }
-function insertUUID(e) {
+function insertUUIDTimestamp(e) {
     let uuid = crypto.randomUUID();
+    let timestamp = new Date().toISOString().split(".")[0] + "Z";
+    e.formData.append("timestamp", timestamp);
     e.formData.append("uuid", uuid);
+}
+function saveLocally(e) {
+    e.preventDefault();
+    let form = document.querySelector("#new-set > form");
+    let formdata = new FormData(form);
+    let data = Object.fromEntries(formdata);
+    let offlineData = JSON.parse(localStorage.getItem("offline-data"));
+    if (offlineData === null) {
+        offlineData = [];
+    }
+    offlineData.push(data);
+    localStorage.setItem("offline-data", JSON.stringify(offlineData));
 }
 export {};

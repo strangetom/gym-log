@@ -53,6 +53,20 @@ h1 {
   font-weight: 400;
   text-align: center;
 }
+#offline {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  height: calc(2.5rem);
+  width: calc(2.5rem);
+  padding: 0;
+  background: none;
+  border: none;
+}
+#offline img{
+  width: 100%;
+  height: 100%;
+}
 
 #fab {
   position: fixed;

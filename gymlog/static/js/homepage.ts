@@ -6,8 +6,24 @@ const hideDialogTiming = {
   easing: "ease-out",
 };
 
+enum OfflineStatus {
+  ONLINE,
+  OFFLINE,
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   installServiceWorker();
+
+  let offlineBtn: HTMLButtonElement = document.querySelector(
+    "#offline",
+  ) as HTMLButtonElement;
+  offlineBtn.addEventListener("click", toggleOfflineStatus);
+  // Check is already in offline mode and set icon
+  let offline = JSON.parse(localStorage.getItem("offline"));
+  if (offline) {
+    setOfflineStatus(OfflineStatus.OFFLINE);
+  }
+
   let fab: HTMLButtonElement = document.querySelector(
     "#fab",
   ) as HTMLButtonElement;
@@ -72,6 +88,36 @@ function addWorkout() {
         window.location.reload();
       }
     });
+  }
+}
+
+/**
+ * Toggle offline status to opposite of current value
+ */
+function toggleOfflineStatus() {
+  let offline = JSON.parse(localStorage.getItem("offline"));
+  if (offline) {
+    setOfflineStatus(OfflineStatus.ONLINE);
+  } else {
+    setOfflineStatus(OfflineStatus.OFFLINE);
+  }
+}
+
+/**
+ * Set offline status in localStorage to specifiy value
+ * Update icon on homepage to match
+ * @param {OfflineStatus} mode Selected mode
+ */
+function setOfflineStatus(mode: OfflineStatus) {
+  let btn = document.querySelector("#offline");
+  let img = btn.querySelector("img");
+
+  if (mode == OfflineStatus.ONLINE) {
+    localStorage.setItem("offline", "false");
+    img.src = "/static/img/online.svg";
+  } else {
+    localStorage.setItem("offline", "true");
+    img.src = "/static/img/offline.svg";
   }
 }
 

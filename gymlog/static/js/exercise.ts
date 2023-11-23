@@ -132,7 +132,15 @@ document.addEventListener("DOMContentLoaded", () => {
   let form: HTMLButtonElement = document.querySelector(
     "#new-set > form",
   ) as HTMLButtonElement;
-  form.addEventListener("formdata", insertUUID);
+  form.addEventListener("formdata", insertUUIDTimestamp);
+
+  // Set offline mode
+  let offline = JSON.parse(localStorage.getItem("offline"));
+  if (offline) {
+    document.querySelector("#offline").classList.remove("hidden");
+    // Redirect saved sets to localStorage
+    form.addEventListener("submit", saveLocally);
+  }
 
   let graphBtn: HTMLDivElement = document.querySelector(
     "#graph-button",
@@ -392,7 +400,24 @@ async function toggleWakeLock(status: WakelockStatus) {
  * Insert UUID into POSTed data
  * @param {FormDataEvent} e FormDataEvent triggered when submitting new set form
  */
-function insertUUID(e: FormDataEvent) {
+function insertUUIDTimestamp(e: FormDataEvent) {
   let uuid = crypto.randomUUID();
+  let timestamp = new Date().toISOString().split(".")[0] + "Z";
+  e.formData.append("timestamp", timestamp);
   e.formData.append("uuid", uuid);
+}
+
+function saveLocally(e: Event){
+  e.preventDefault();
+  
+  let form = (document.querySelector("#new-set > form") as HTMLFormElement);
+  let formdata = new FormData(form);
+  let data = Object.fromEntries(formdata);
+
+  let offlineData = JSON.parse(localStorage.getItem("offline-data"));
+  if (offlineData === null) {
+    offlineData = [];
+  }
+  offlineData.push(data);
+  localStorage.setItem("offline-data", JSON.stringify(offlineData));
 }

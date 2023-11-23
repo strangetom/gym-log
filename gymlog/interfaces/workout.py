@@ -359,8 +359,8 @@ class WorkoutInterface:
         post_data : Dict[str, str]
             Data sent by client
         """
-        # Create timestamp in iso format, without milliseconds
-        timestamp = (
+        # Create fallback timestamp in iso format, without milliseconds
+        fallback_timestamp = (
             datetime.datetime.now(datetime.timezone.utc).isoformat().split(".")[0] + "Z"
         )
 
@@ -373,7 +373,7 @@ class WorkoutInterface:
             time = int(secs or 0) + 60 * int(mins or 0) + 3600 * int(hours or 0)
 
         new = Sets.create(
-            datetime=timestamp,
+            datetime=post_data.get("timestamp", fallback_timestamp),
             distance_m=post_data.get("distance", None),
             exercise=post_data.get("exerciseID", None),
             repetitions=post_data.get("reps", None),

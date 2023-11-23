@@ -3,8 +3,19 @@ const hideDialogTiming = {
     duration: 100,
     easing: "ease-out",
 };
+var OfflineStatus;
+(function (OfflineStatus) {
+    OfflineStatus[OfflineStatus["ONLINE"] = 0] = "ONLINE";
+    OfflineStatus[OfflineStatus["OFFLINE"] = 1] = "OFFLINE";
+})(OfflineStatus || (OfflineStatus = {}));
 document.addEventListener("DOMContentLoaded", () => {
     installServiceWorker();
+    let offlineBtn = document.querySelector("#offline");
+    offlineBtn.addEventListener("click", toggleOfflineStatus);
+    let offline = JSON.parse(localStorage.getItem("offline"));
+    if (offline) {
+        setOfflineStatus(OfflineStatus.OFFLINE);
+    }
     let fab = document.querySelector("#fab");
     let addWorkoutDialog = document.querySelector("#new-workout-dialog");
     fab.addEventListener("click", () => {
@@ -49,6 +60,27 @@ function addWorkout() {
                 window.location.reload();
             }
         });
+    }
+}
+function toggleOfflineStatus() {
+    let offline = JSON.parse(localStorage.getItem("offline"));
+    if (offline) {
+        setOfflineStatus(OfflineStatus.ONLINE);
+    }
+    else {
+        setOfflineStatus(OfflineStatus.OFFLINE);
+    }
+}
+function setOfflineStatus(mode) {
+    let btn = document.querySelector("#offline");
+    let img = btn.querySelector("img");
+    if (mode == OfflineStatus.ONLINE) {
+        localStorage.setItem("offline", "false");
+        img.src = "/static/img/online.svg";
+    }
+    else {
+        localStorage.setItem("offline", "true");
+        img.src = "/static/img/offline.svg";
     }
 }
 function installServiceWorker() {

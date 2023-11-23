@@ -97,6 +97,19 @@ h1 {
   border-radius: .5rem;
 }
 
+.hidden {
+  display: none;
+}
+
+#offline {
+  background-color: var(--red);
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
 #new-set {
   position: fixed;
   max-width: 80ch;
