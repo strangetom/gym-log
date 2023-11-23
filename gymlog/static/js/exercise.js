@@ -79,7 +79,8 @@ class Timer {
     }
 }
 document.addEventListener("DOMContentLoaded", () => {
-    let fab = document.querySelector("#fab");
+    let form = document.querySelector("#new-set > form");
+    form.addEventListener("formdata", insertUUID);
     let graphBtn = document.querySelector("#graph-button");
     let graphSection = document.querySelector("#graph");
     graphBtn.addEventListener("click", () => {
@@ -257,5 +258,9 @@ async function toggleWakeLock(status) {
     else if (status == WakelockStatus.Disable && wakelock != null) {
         wakelock.release().then(() => (wakelock = null));
     }
+}
+function insertUUID(e) {
+    let uuid = crypto.randomUUID();
+    e.formData.append("uuid", uuid);
 }
 export {};

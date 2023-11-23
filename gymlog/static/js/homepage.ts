@@ -9,10 +9,10 @@ const hideDialogTiming = {
 document.addEventListener("DOMContentLoaded", () => {
   installServiceWorker();
   let fab: HTMLButtonElement = document.querySelector(
-    "#fab"
+    "#fab",
   ) as HTMLButtonElement;
   let addWorkoutDialog: HTMLDialogElement = document.querySelector(
-    "#new-workout-dialog"
+    "#new-workout-dialog",
   );
   fab.addEventListener("click", () => {
     addWorkoutDialog.showModal();
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if ((event.target as HTMLElement).nodeName === "DIALOG") {
       let animation = addWorkoutDialog.animate(
         hideDialogAnimation,
-        hideDialogTiming
+        hideDialogTiming,
       );
       animation.addEventListener("finish", () => {
         addWorkoutDialog.close("cancel");
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     let animation = addWorkoutDialog.animate(
       hideDialogAnimation,
-      hideDialogTiming
+      hideDialogTiming,
     );
     animation.addEventListener("finish", () => {
       addWorkoutDialog.close("cancel");
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     let animation = addWorkoutDialog.animate(
       hideDialogAnimation,
-      hideDialogTiming
+      hideDialogTiming,
     );
     animation.addEventListener("finish", () => {
       addWorkoutDialog.close("submit");
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function addWorkout() {
   let addWorkoutDialog: HTMLDialogElement = document.querySelector(
-    "#new-workout-dialog"
+    "#new-workout-dialog",
   );
   let formEl: HTMLFormElement = addWorkoutDialog.querySelector("form");
   let post_data = new FormData(formEl);
@@ -87,7 +87,7 @@ function installServiceWorker() {
       },
       function () {
         console.log("CLIENT: service worker registration failure.");
-      }
+      },
     );
   } else {
     console.log("CLIENT: service worker is not supported.");

@@ -41,10 +41,10 @@ class Timer {
     this.timerEl = timerEl;
     this.displayEl = timerEl.querySelector("#timer-display") as HTMLSpanElement;
     this.millisEl = timerEl.querySelector(
-      "#timer-display-millis"
+      "#timer-display-millis",
     ) as HTMLSpanElement;
     this.playPauseEl = timerEl.querySelector(
-      "#timer-start-btn"
+      "#timer-start-btn",
     ) as HTMLButtonElement;
   }
 
@@ -129,15 +129,16 @@ class Timer {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  let fab: HTMLButtonElement = document.querySelector(
-    "#fab"
+  let form: HTMLButtonElement = document.querySelector(
+    "#new-set > form",
   ) as HTMLButtonElement;
+  form.addEventListener("formdata", insertUUID);
 
   let graphBtn: HTMLDivElement = document.querySelector(
-    "#graph-button"
+    "#graph-button",
   ) as HTMLDivElement;
   let graphSection: HTMLElement = document.querySelector(
-    "#graph"
+    "#graph",
   ) as HTMLElement;
   graphBtn.addEventListener("click", () => {
     if (graphSection.classList.contains("hidden")) {
@@ -160,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   let editSetInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll(
-    "#edit-set-dialog input"
+    "#edit-set-dialog input",
   );
   editSetInputs.forEach((el) => {
     el.addEventListener("click", (e) => {
@@ -335,7 +336,7 @@ function swipeCloseGraph(e: TouchEvent) {
 
   // Add a touchmove and touchend events to the graph element
   let graph: HTMLElement = (e.changedTouches[0].target as HTMLElement).closest(
-    "#graph"
+    "#graph",
   );
   // Remove animation on touchstart event so it doesn't make the touch iteraction laggy.
   // We'll restore it when closing the graph
@@ -385,4 +386,13 @@ async function toggleWakeLock(status: WakelockStatus) {
     // Release wakelock and set variable back to null
     wakelock.release().then(() => (wakelock = null));
   }
+}
+
+/**
+ * Insert UUID into POSTed data
+ * @param {FormDataEvent} e FormDataEvent triggered when submitting new set form
+ */
+function insertUUID(e: FormDataEvent) {
+  let uuid = crypto.randomUUID();
+  e.formData.append("uuid", uuid);
 }

@@ -2,6 +2,7 @@
 
 import datetime
 import math
+import uuid
 from dataclasses import dataclass
 from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple
@@ -378,6 +379,7 @@ class WorkoutInterface:
             repetitions=post_data.get("reps", None),
             time_s=time,
             weight_kg=post_data.get("weight", None),
+            uuid=post_data.get("uuid", uuid.uuid4()),
         )
         new.save()
 
