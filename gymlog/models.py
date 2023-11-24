@@ -32,7 +32,7 @@ class Sets(BaseModel):
     time_s = pw.IntegerField(null=True)
     uid = pw.AutoField()
     weight_kg = pw.FloatField(null=True)
-    uuid = pw.TextField(null=False)
+    uuid = pw.TextField(null=False, unique=True)
 
     class Meta:
         table_name = "sets"

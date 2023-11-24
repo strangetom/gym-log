@@ -187,3 +187,22 @@ def set_endpoint(setID: int):
         post_data = request.form
         W.update_set(setID, post_data)
         return Response(status=200)
+
+
+@app.route("/sync", methods=["POST"])
+def sync_sets():
+    """Sync sets cached when offline to database.
+
+    Sets are only added to database there is no other set with the same UUID
+    in the database.
+
+    Returns
+    -------
+    Response
+        Response object
+    """
+    if request.method == "POST":
+        post_data = request.form
+        offline_sets = json.loads(post_data["offline_sets"])
+        W.sync_sets(offline_sets)
+        return Response(status=200)

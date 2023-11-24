@@ -407,17 +407,17 @@ function insertUUIDTimestamp(e: FormDataEvent) {
   e.formData.append("uuid", uuid);
 }
 
-function saveLocally(e: Event){
+function saveLocally(e: Event) {
   e.preventDefault();
-  
-  let form = (document.querySelector("#new-set > form") as HTMLFormElement);
+
+  let form = document.querySelector("#new-set > form") as HTMLFormElement;
   let formdata = new FormData(form);
   let data = Object.fromEntries(formdata);
 
-  let offlineData = JSON.parse(localStorage.getItem("offline-data"));
+  let offlineData = JSON.parse(localStorage.getItem("offline-sets"));
   if (offlineData === null) {
     offlineData = [];
   }
   offlineData.push(data);
-  localStorage.setItem("offline-data", JSON.stringify(offlineData));
+  localStorage.setItem("offline-sets", JSON.stringify(offlineData));
 }

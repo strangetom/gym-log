@@ -66,6 +66,7 @@ function toggleOfflineStatus() {
     let offline = JSON.parse(localStorage.getItem("offline"));
     if (offline) {
         setOfflineStatus(OfflineStatus.ONLINE);
+        syncOfflineSets();
     }
     else {
         setOfflineStatus(OfflineStatus.OFFLINE);
@@ -82,6 +83,22 @@ function setOfflineStatus(mode) {
         localStorage.setItem("offline", "true");
         img.src = "/static/img/offline.svg";
     }
+}
+function syncOfflineSets() {
+    let offlineSets = JSON.parse(localStorage.getItem("offline-sets"));
+    if (offlineSets === null || offlineSets.length == 0) {
+        return;
+    }
+    let form = new FormData();
+    form.append("offline_sets", JSON.stringify(offlineSets));
+    fetch("/sync", {
+        method: "POST",
+        body: form,
+    }).then(res => {
+        if (res.ok) {
+            localStorage.setItem("offline-sets", "[]");
+        }
+    });
 }
 function installServiceWorker() {
     if ("serviceWorker" in navigator) {

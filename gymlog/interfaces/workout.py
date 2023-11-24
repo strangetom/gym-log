@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple
 
-from peewee import fn
+from peewee import fn, IntegrityError
 
 from gymlog.models import Workout, Exercise, Sets, WorkoutExercise
 
@@ -426,6 +426,23 @@ class WorkoutInterface:
             set_.time_s = seconds
 
         set_.save()
+
+    def sync_sets(self, offline_sets: list[dict[str, str]]) -> None:
+        """Sync sets saved offline to database.
+
+        New sets are added to sets table. Any new sets with duplicate UUID are ignored.
+
+        Parameters
+        ----------
+        offline_sets : list[dict[str, str]]
+            List of sets saved offline
+        """
+        for set_ in offline_sets:
+            try:
+                self.save_set(set_)
+            except IntegrityError:
+                # Database constraint violated, probably due to duplicate UUID
+                pass
 
     def save_workout(self, workoutID: int, workout_data: Dict[str, Any]) -> None:
         """Save changes to workout
