@@ -94,7 +94,7 @@ function syncOfflineSets() {
     fetch("/sync", {
         method: "POST",
         body: form,
-    }).then(res => {
+    }).then((res) => {
         if (res.ok) {
             localStorage.setItem("offline-sets", "[]");
         }

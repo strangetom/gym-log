@@ -191,6 +191,26 @@ h1 {
   color: var(--fg-2);
 }
 
+.offline {
+  border-bottom: 3px solid var(--red);
+}
+.offline-card {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: var(--bg-s);
+  border-bottom: 1px solid var(--bg-2);
+  color: var(--gray);
+  scroll-snap-align: start;
+}
+.offline-card img {
+  margin-left: 1rem;
+  padding-bottom: 4px;
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: middle;
+}
+
 #graph {
   position: fixed;
   top: calc(2rem + .7rem + 1rem);

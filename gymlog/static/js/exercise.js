@@ -161,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
             timer.reset();
         });
     }
+    showOfflineSets();
 });
 function isoDateTime() {
     return new Date().toISOString().split(".")[0] + "Z";
@@ -281,5 +282,66 @@ function saveLocally(e) {
     }
     offlineData.push(data);
     localStorage.setItem("offline-sets", JSON.stringify(offlineData));
+    showOfflineSets();
+}
+function removeLocalSet(e) {
+    let set = e.target.closest("div");
+    let uuid = set.dataset.uuid;
+    let offlineData = JSON.parse(localStorage.getItem("offline-sets"));
+    let setRemovedData = offlineData.filter((s) => {
+        return s.uuid != uuid;
+    });
+    localStorage.setItem("offline-sets", JSON.stringify(setRemovedData));
+    showOfflineSets();
+}
+function showOfflineSets() {
+    let exerciseID = document.querySelector("#exerciseID")
+        .value;
+    let offlineSets = JSON.parse(localStorage.getItem("offline-sets"));
+    if (offlineSets == null) {
+        return;
+    }
+    let offlineSetContainer = document.querySelector("#historical-sets > .offline");
+    offlineSetContainer.innerHTML = "";
+    let relevantOfflineSets = offlineSets.filter((s) => {
+        return s.exerciseID == exerciseID;
+    });
+    if (relevantOfflineSets.length == 0) {
+        return;
+    }
+    relevantOfflineSets.forEach((data) => {
+        let card = document.createElement("div");
+        card.classList.add("offline-card");
+        card.dataset.uuid = data.uuid;
+        let value = document.createElement("span");
+        value.innerText = formatSetValue(data);
+        let date = document.createElement("span");
+        date.innerText = formatSetTimestamp(data.timestamp);
+        let icon = document.createElement("img");
+        icon.src = "/static/img/delete.svg";
+        icon.addEventListener("click", removeLocalSet);
+        date.appendChild(icon);
+        card.appendChild(value);
+        card.appendChild(date);
+        offlineSetContainer.appendChild(card);
+    });
+    offlineSetContainer.parentElement.scrollTop = 0;
+}
+function formatSetValue(data) {
+    let keys = Object.keys(data);
+    if (keys.includes("weight") && keys.includes("reps")) {
+        return `${data.reps} x ${data.weight}`;
+    }
+    if (keys.includes("secs") && keys.includes("distance")) {
+        return `${Math.floor(data.distance)} m - ${data.mins}:${data.secs}`;
+    }
+    if (keys.includes("secs")) {
+        return `${data.secs} s`;
+    }
+    return "";
+}
+function formatSetTimestamp(timestamp) {
+    let date = new Date(timestamp);
+    return date.toDateString().slice(4);
 }
 export {};
