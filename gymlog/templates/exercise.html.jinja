@@ -59,6 +59,7 @@
             </div>
             <form action="/set/" method="post">
                 <input type="hidden" name="exerciseID" id="exerciseID" value="{{ exerciseID }}"/>
+                <!-- Need to send workoutID so we know where the back button goes after redirected after submitting new set -->
                 <input type="hidden" name="workoutID" id="workoutID" value="{{ workoutID }}"/>
                 {%- if type == "weight-repetitions" -%}
                 <div class="new-input">
