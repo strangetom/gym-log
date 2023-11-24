@@ -3,7 +3,7 @@
 /* A version number is useful when updating the worker logic,
    allowing you to remove outdated cache entries during the update.
 */
-const VERSION = 'v1::';
+const VERSION = 'v2::';
 
 /* The install event fires when the service worker is first installed.
    You can use this event to prepare the service worker to be able to serve
@@ -14,10 +14,10 @@ self.addEventListener("install", function(event) {
 });
 
 self.addEventListener("fetch", function(event) {
-  /* We should only cache GET requests, and deal with the rest of method in the
-     client-side, by handling failed POST,PUT,PATCH,etc. requests.
+  /* We should only cache GET requests starting https, and deal with the rest of method
+     in the client-side, by handling failed POST,PUT,PATCH,etc. requests.
   */
-  if (event.request.method !== 'GET') {
+  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
     /* If we don't block the event as shown below, then the request will go to
        the network as usual.
     */
