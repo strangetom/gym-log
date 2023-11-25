@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width"/>
         <title>{{ name }} | Gym Log</title>
         <link rel="stylesheet" type="text/css" href="/static/css/workout.css"/>
+        <script type="module" src="/static/js/workout.js"></script>
         <!-- icons and manifest for PWA -->
         <link rel="manifest" href="/static/manifest.json"/>
         <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
@@ -27,12 +28,13 @@
 
         <section id="exercises">
              {%- for e in exercises -%}
-            <a href="/exercise/{{ e.exerciseID }}?workoutID={{ workoutID }}" class="exercise-card">
+            <a href="/exercise/{{ e.exerciseID }}?workoutID={{ workoutID }}" data-exerciseid="{{ e.exerciseID }}" class="exercise-card">
                 <h2>{{ e.name }}</h2>
                 <div class="exercise-details">
                     <span class="exercise-last-update {{ "today" if e.is_today }}">{{ e.last_update }}</span>
                     <span class="exercise-last-set">{{ e.last_set }}</span>
                 </div>
+                <img class="offline hidden" src="/static/img/offline.svg">
             </a>
             {%- endfor -%}
         </section>

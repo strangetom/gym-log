@@ -120,3 +120,13 @@ h1 {
 .today {
   filter: contrast(2);
 }
+.exercise-card .offline {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+.hidden {
+  display: none;
+}

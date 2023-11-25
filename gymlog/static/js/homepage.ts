@@ -34,6 +34,19 @@ document.addEventListener("DOMContentLoaded", () => {
     addWorkoutDialog.showModal();
   });
 
+  let workouts: NodeListOf<HTMLAnchorElement> =
+    document.querySelectorAll("a.workout-card");
+  let offlineSets = JSON.parse(localStorage.getItem("offline-sets"));
+  workouts.forEach((el) => {
+    let workoutID = el.dataset.workoutid;
+    let count = offlineSets.filter((s) => {
+      return s.workoutID == workoutID;
+    }).length;
+    if (count > 0) {
+      el.querySelector("img.offline").classList.remove("hidden");
+    }
+  });
+
   addWorkoutDialog.addEventListener("click", (event) => {
     if ((event.target as HTMLElement).nodeName === "DIALOG") {
       let animation = addWorkoutDialog.animate(

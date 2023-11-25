@@ -21,6 +21,17 @@ document.addEventListener("DOMContentLoaded", () => {
     fab.addEventListener("click", () => {
         addWorkoutDialog.showModal();
     });
+    let workouts = document.querySelectorAll("a.workout-card");
+    let offlineSets = JSON.parse(localStorage.getItem("offline-sets"));
+    workouts.forEach((el) => {
+        let workoutID = el.dataset.workoutid;
+        let count = offlineSets.filter((s) => {
+            return s.workoutID == workoutID;
+        }).length;
+        if (count > 0) {
+            el.querySelector("img.offline").classList.remove("hidden");
+        }
+    });
     addWorkoutDialog.addEventListener("click", (event) => {
         if (event.target.nodeName === "DIALOG") {
             let animation = addWorkoutDialog.animate(hideDialogAnimation, hideDialogTiming);
