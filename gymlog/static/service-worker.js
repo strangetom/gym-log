@@ -3,7 +3,7 @@
 /* A version number is useful when updating the worker logic,
    allowing you to remove outdated cache entries during the update.
 */
-const VERSION = 'v2::';
+const VERSION = 'v3::';
 
 /* The install event fires when the service worker is first installed.
    You can use this event to prepare the service worker to be able to serve
@@ -28,7 +28,7 @@ self.addEventListener("fetch", function(event) {
   If the network fetch takes longer than 4 seconds, fallback to serving the resource from the cache
   */
   event.respondWith(
-    fromNetwork(event.request, 4000).catch(function () {
+    fromNetwork(event.request, 1500).catch(function () {
       return fromCache(event.request);
     }));
  });
