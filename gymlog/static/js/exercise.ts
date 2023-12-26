@@ -239,6 +239,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Override back button behaviour to always return to workout page, even after
+  // adding new set.
+  let backBtn: HTMLAnchorElement = document.querySelector("#workout-shortcut");
+  window.addEventListener("popstate", () => {
+    location.replace(backBtn.href);
+  })
+  history.pushState({}, "");
+
   showOfflineSets();
 });
 /**

@@ -161,6 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
             timer.reset();
         });
     }
+    let backBtn = document.querySelector("#workout-shortcut");
+    window.addEventListener("popstate", () => {
+        location.replace(backBtn.href);
+    });
+    history.pushState({}, "");
     showOfflineSets();
 });
 function isoDateTime() {
