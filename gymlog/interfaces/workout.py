@@ -21,6 +21,12 @@ class ExerciseSet:
     time_s: Optional[int]
     repetitions: Optional[int]
 
+    def __post_init__(self):
+        if self.time_s is not None:
+            self.hours = math.floor(float(self.time_s) / 3600) or None
+            self.mins = math.floor((float(self.time_s) % 3600) / 60) or None
+            self.seconds = math.floor(float(self.time_s) % 60) or None
+
 
 class WorkoutInterface:
     def __init__(self):
@@ -163,24 +169,32 @@ class WorkoutInterface:
         for e in exercises:
 
             query = Exercise.get(Exercise.exercise_id == e.exercise)
-            last_update, last_set, is_today = self._get_exercise_last_set(e.exercise)
+            set_ = self.get_exercise_last_set(e.exercise)
+
+            if set_.repetitions is not None and set_.weight_kg is not None:
+                set_string = f"{set_.repetitions} x {set_.weight_kg} kg"
+            elif set_.distance_m is not None and set_.time_s is not None:
+                time_string = str(datetime.timedelta(seconds=int(set_.time_s)))[2:]
+                set_string = f"{int(set_.distance_m)} m - {time_string}"
+            elif set_.time_s is not None:
+                set_string = f"{set_.time_s} s"
+            else:
+                set_string = ""
 
             exercise_data.append(
                 {
                     "name": query.name,
                     "exerciseID": query.exercise_id,
-                    "last_update": last_update,
-                    "is_today": is_today,
-                    "last_set": last_set,
+                    "last_update": self._readable_datetime(set_.datetime),
+                    "is_today": self._timestamp_is_today(set_.datetime),
+                    "last_set": set_string,
                 }
             )
 
         # Sort alpabetically by name and return
         return sorted(exercise_data, key=lambda x: x["name"])
 
-    def list_exercise_sets(
-        self, exerciseID: int, number: int = 36
-    ) -> List[List[Dict[str, Any]]]:
+    def list_todays_exercise_sets(self, exerciseID: int) -> List[Dict[str, Any]]:
         """Get list of most recent sets limited by <number> for exercise.
         Sets are grouped by date.
 
@@ -188,22 +202,23 @@ class WorkoutInterface:
         ----------
         exerciseID : int
             Exercise ID
-        number : int, optional
-            Number of sets to return. Default is 12.
 
         Returns
         -------
-        List[List[Dict[str, Any]]]
-            List of dicts containing set timestamp and detail, grouped by date.
+        List[Dict[str, Any]]
+            List of dicts containing set timestamp and detail.
         """
         set_data = []
         sets = (
             Sets.select()
             .where(Sets.exercise == exerciseID)
             .order_by(Sets.uid.desc())
-            .limit(number)
+            .limit(15)  # Assume no more than 15 sets per day ever
         )
         for s in sets:
+            if not self._timestamp_is_today(s.datetime):
+                continue
+
             current_set = ExerciseSet(
                 s.uid, s.datetime, s.distance_m, s.weight_kg, s.time_s, s.repetitions
             )
@@ -241,18 +256,10 @@ class WorkoutInterface:
                 }
             )
 
-        # Group sets by date (i.e. the bit before 'T' in the timestamp)
-        grouped_sets = [
-            list(group)
-            for _, group in groupby(
-                set_data, key=lambda x: x["timestamp"].split("T")[0]
-            )
-        ]
-
-        return grouped_sets
+        return set_data
 
     def get_exercise_history(
-        self, exerciseID: int, num_sets: int = 12
+        self, exerciseID: int, num_sets: int = 25
     ) -> Dict[int, List[Tuple[str, str]]]:
         """Get historical sets for this exercise going back `period_days`.
 
@@ -585,9 +592,8 @@ class WorkoutInterface:
             set_.repetitions,
         )
 
-    def _get_exercise_last_set(self, exerciseID: int) -> Tuple[str, str]:
-        """Return human readable string for when timestamp of last set
-        for exercise.
+    def get_exercise_last_set(self, exerciseID: int) -> ExerciseSet:
+        """Return ExerciseSet object for most recent set for exercise
 
         Parameters
         ----------
@@ -596,13 +602,12 @@ class WorkoutInterface:
 
         Returns
         -------
-        Tuple[str, str]
-            Human readable relative timestamp
-            Last set string
-            True if last exercise is today
+        ExerciseSet
+            Object containing set information
         """
         query = Sets.select(
             fn.MAX(Sets.datetime),
+            Sets.uid,
             Sets.distance_m,
             Sets.weight_kg,
             Sets.time_s,
@@ -610,31 +615,21 @@ class WorkoutInterface:
         ).where(Sets.exercise == exerciseID)
         set_ = query[0]
 
-        if set_.repetitions is not None and set_.weight_kg is not None:
-            set_string = f"{set_.repetitions} x {set_.weight_kg} kg"
-        elif set_.distance_m is not None and set_.time_s is not None:
-            time_string = str(datetime.timedelta(seconds=int(set_.time_s)))[2:]
-            set_string = f"{int(set_.distance_m)} m - {time_string}"
-        elif set_.time_s is not None:
-            set_string = f"{set_.time_s} s"
-        else:
-            set_string = ""
+        return ExerciseSet(
+            set_.uid,
+            set_.datetime,
+            set_.distance_m,
+            set_.weight_kg,
+            set_.time_s,
+            set_.repetitions,
+        )
 
-        if set_.datetime is None:
-            return "Never", set_string, False
-        else:
-            return (
-                self._readable_datetime(set_.datetime),
-                set_string,
-                self._timestamp_is_today(set_.datetime),
-            )
-
-    def _readable_datetime(self, timestamp: str) -> str:
+    def _readable_datetime(self, timestamp: str | None) -> str:
         """Convert an ISO8601 timestamp into a human readable relative string
 
         Parameters
         ----------
-        timestamp : str
+        timestamp : str | None
             ISO8601 timestamp
 
         Returns
@@ -642,6 +637,9 @@ class WorkoutInterface:
         str
             Human readable relative string
         """
+        if timestamp is None:
+            return "Never"
+
         # Python <3.11 doesn't parse the Z in the timestamp, so the dt object is not
         # timezone aware. Replace Z with +00:00 to make it timezone aware
         dt = self._parse_timestamp(timestamp)

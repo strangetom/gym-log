@@ -131,7 +131,8 @@ def exercise_endpoint(exerciseID: int):
 
         return render_template(
             "exercise.html.jinja",
-            sets=W.list_exercise_sets(exerciseID),
+            sets=W.list_todays_exercise_sets(exerciseID),
+            last_set=W.get_exercise_last_set(exerciseID),
             name=W.get_exercise_name(exerciseID),
             type=W.get_exercise_type(exerciseID),
             graph=W.get_exercise_history(exerciseID),
