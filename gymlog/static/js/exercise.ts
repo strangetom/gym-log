@@ -130,7 +130,7 @@ class Timer {
 
 document.addEventListener("DOMContentLoaded", () => {
   let form: HTMLButtonElement = document.querySelector(
-    "#new-set > form",
+    "#todays-sets > form",
   ) as HTMLButtonElement;
   form.addEventListener("formdata", insertUUIDTimestamp);
 
@@ -142,26 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", saveLocally);
   }
 
-  let graphBtn: HTMLDivElement = document.querySelector(
-    "#graph-button",
-  ) as HTMLDivElement;
-  let graphSection: HTMLElement = document.querySelector(
-    "#graph",
-  ) as HTMLElement;
-  graphBtn.addEventListener("click", () => {
-    if (graphSection.classList.contains("hidden")) {
-      graphSection.classList.remove("hidden");
-    } else {
-      graphSection.style.transform = "";
-      graphSection.classList.add("hidden");
-    }
-  });
-  // Add event listener for swiping up to close graph drop down
-  graphSection.addEventListener("touchstart", swipeCloseGraph);
-
   // When selecting the new set input
   let newSetInputs: NodeListOf<HTMLInputElement> =
-    document.querySelectorAll("#new-set input");
+    document.querySelectorAll("#todays-sets input");
   newSetInputs.forEach((el) => {
     el.addEventListener("click", (e) => {
       (e.target as HTMLInputElement).select();
@@ -244,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let backBtn: HTMLAnchorElement = document.querySelector("#workout-shortcut");
   window.addEventListener("popstate", () => {
     location.replace(backBtn.href);
-  })
+  });
   history.pushState({}, "");
 
   showOfflineSets();
@@ -424,7 +407,7 @@ function insertUUIDTimestamp(e: FormDataEvent) {
 function saveLocally(e: Event) {
   e.preventDefault();
 
-  let form = document.querySelector("#new-set > form") as HTMLFormElement;
+  let form = document.querySelector("#todays-sets > form") as HTMLFormElement;
   let formdata = new FormData(form);
   let data = Object.fromEntries(formdata);
 
@@ -466,9 +449,7 @@ function showOfflineSets() {
     return;
   }
 
-  let offlineSetContainer = document.querySelector(
-    "#historical-sets > .offline",
-  );
+  let offlineSetContainer = document.querySelector("#todays-sets > .offline");
   offlineSetContainer.innerHTML = "";
 
   let relevantOfflineSets = offlineSets.filter((s) => {
@@ -482,7 +463,7 @@ function showOfflineSets() {
     let card = document.createElement("div");
     card.classList.add("offline-card");
     card.dataset.uuid = data.uuid;
-    let value = document.createElement("span");
+    let value = document.createElement("h3");
     value.innerText = formatSetValue(data);
     let date = document.createElement("span");
     date.innerText = formatSetTimestamp(data.timestamp);

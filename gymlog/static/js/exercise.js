@@ -79,26 +79,14 @@ class Timer {
     }
 }
 document.addEventListener("DOMContentLoaded", () => {
-    let form = document.querySelector("#new-set > form");
+    let form = document.querySelector("#todays-sets > form");
     form.addEventListener("formdata", insertUUIDTimestamp);
     let offline = JSON.parse(localStorage.getItem("offline"));
     if (offline) {
         document.querySelector("#offline").classList.remove("hidden");
         form.addEventListener("submit", saveLocally);
     }
-    let graphBtn = document.querySelector("#graph-button");
-    let graphSection = document.querySelector("#graph");
-    graphBtn.addEventListener("click", () => {
-        if (graphSection.classList.contains("hidden")) {
-            graphSection.classList.remove("hidden");
-        }
-        else {
-            graphSection.style.transform = "";
-            graphSection.classList.add("hidden");
-        }
-    });
-    graphSection.addEventListener("touchstart", swipeCloseGraph);
-    let newSetInputs = document.querySelectorAll("#new-set input");
+    let newSetInputs = document.querySelectorAll("#todays-sets input");
     newSetInputs.forEach((el) => {
         el.addEventListener("click", (e) => {
             e.target.select();
@@ -278,7 +266,7 @@ function insertUUIDTimestamp(e) {
 }
 function saveLocally(e) {
     e.preventDefault();
-    let form = document.querySelector("#new-set > form");
+    let form = document.querySelector("#todays-sets > form");
     let formdata = new FormData(form);
     let data = Object.fromEntries(formdata);
     let offlineData = JSON.parse(localStorage.getItem("offline-sets"));
@@ -306,7 +294,7 @@ function showOfflineSets() {
     if (offlineSets == null) {
         return;
     }
-    let offlineSetContainer = document.querySelector("#historical-sets > .offline");
+    let offlineSetContainer = document.querySelector("#todays-sets > .offline");
     offlineSetContainer.innerHTML = "";
     let relevantOfflineSets = offlineSets.filter((s) => {
         return s.exerciseID == exerciseID;
@@ -318,7 +306,7 @@ function showOfflineSets() {
         let card = document.createElement("div");
         card.classList.add("offline-card");
         card.dataset.uuid = data.uuid;
-        let value = document.createElement("span");
+        let value = document.createElement("h3");
         value.innerText = formatSetValue(data);
         let date = document.createElement("span");
         date.innerText = formatSetTimestamp(data.timestamp);
