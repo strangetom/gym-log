@@ -294,7 +294,7 @@ function showOfflineSets() {
     if (offlineSets == null) {
         return;
     }
-    let offlineSetContainer = document.querySelector("#todays-sets > .offline");
+    let offlineSetContainer = document.querySelector("#todays-sets .offline");
     offlineSetContainer.innerHTML = "";
     let relevantOfflineSets = offlineSets.filter((s) => {
         return s.exerciseID == exerciseID;
