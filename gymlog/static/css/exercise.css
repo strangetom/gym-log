@@ -175,7 +175,7 @@ h1 {
   border: 1px solid var(--bg-1);
 }
 #todays-sets .sets {
-  max-height: 12rem;
+  max-height: 11rem;
   overflow-y: auto;
 }
 #todays-sets h2 {
