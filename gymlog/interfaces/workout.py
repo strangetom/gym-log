@@ -29,7 +29,8 @@ class ExerciseSet:
 
 @dataclass
 class ExerciseStats:
-    one_rep_max: Optional[str]
+    specific_stat: str
+    specific_stat_heading: str
     last_workout: str
     last_set: str
     aggregate: str
@@ -182,7 +183,7 @@ class WorkoutInterface:
                 set_string = f"{set_.repetitions} x {set_.weight_kg} kg"
             elif set_.distance_m is not None and set_.time_s is not None:
                 time_string = str(datetime.timedelta(seconds=int(set_.time_s)))[2:]
-                set_string = f"{int(set_.distance_m)} m - {time_string}"
+                set_string = f"{set_.distance_m / 1000:.2f} km / {time_string}"
             elif set_.time_s is not None:
                 set_string = f"{set_.time_s} s"
             else:
@@ -433,15 +434,17 @@ class WorkoutInterface:
             )
             total = sum(s.weight_kg * s.repetitions for s in sets)
 
-            return ExerciseStats(f"{rep_max:.1f} kg", recent, latest, f"{total:,g} kg")
+            return ExerciseStats(
+                f"{rep_max:.1f} kg", "1 rep max", recent, latest, f"{total:,g} kg"
+            )
 
         elif exercise_type == "distance-time":
 
             total = sum(s.distance_m for s in sets) / 1000
-            rep_max = max(s.distance_m / s.time_s for s in sets)
+            speed = latest_set.distance_m / latest_set.time_s
 
             return ExerciseStats(
-                f"{rep_max:.1f} m/s", recent, latest, f"{total:,.2f} km"
+                f"{speed:.1f} m/s", "Speed", recent, latest, f"{total:,.2f} km"
             )
         elif exercise_type == "time":
             total_seconds = sum(s.time_s for s in sets)
@@ -449,7 +452,9 @@ class WorkoutInterface:
 
             rep_max = max(s.time_s for s in sets)
 
-            return ExerciseStats(f"{rep_max:.1f} s", recent, latest, total_seconds_str)
+            return ExerciseStats(
+                f"{rep_max:.1f} s", "Longest", recent, latest, total_seconds_str
+            )
 
     def save_set(self, post_data: Dict[str, str]) -> None:
         """Save new set to database
@@ -800,7 +805,7 @@ class WorkoutInterface:
 
         elif details.distance_m is not None and details.time_s is not None:
             time_string = str(datetime.timedelta(seconds=int(details.time_s)))[2:]
-            set_string = f"{int(details.distance_m / 1000):.2f} km - {time_string}"
+            set_string = f"{details.distance_m / 1000:.2f} km / {time_string}"
 
         elif details.time_s is not None:
             set_string = f"{details.time_s} s"

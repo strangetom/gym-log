@@ -116,6 +116,11 @@ h1 {
 #stats #aggregate {
   grid-area: d;
 }
+#stats #last-set.small-font .stat-value {
+  font-size: 1.75rem;
+  position: relative;
+  top: 0.25rem;
+}
 
 #graph {
   position: relative;
@@ -243,7 +248,7 @@ h1 {
   vertical-align: bottom;
 }
 #todays-sets .set-card span {
-  width: 12ch;
+  width: fit-content;
   text-align: right;
 }
 #todays-sets .set-card .delta {

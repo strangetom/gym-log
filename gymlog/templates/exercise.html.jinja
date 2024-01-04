@@ -23,7 +23,7 @@
         </section>
 
         <section id="stats">
-            <div id="last-set" class="stat" style="--bg-colour: var(--orange);">
+            <div id="last-set" class="stat {{ 'small-font' if type == 'distance-time' }}" style="--bg-colour: var(--orange);">
                 <span class="stat-heading">Latest set</span>
                 <span class="stat-value">{{ stats.last_set }}</span>
             </div>
@@ -32,8 +32,8 @@
                 <span class="stat-value">{{ stats.last_workout }}</span>
             </div>
             <div id="one-rep-max" class="stat" style="--bg-colour: var(--aqua);">
-                <span class="stat-heading">1 rep max</span>
-                <span class="stat-value">{{ stats.one_rep_max }}</span>
+                <span class="stat-heading">{{ stats.specific_stat_heading }}</span>
+                <span class="stat-value">{{ stats.specific_stat }}</span>
             </div>
             <div id="aggregate" class="stat" style="--bg-colour: var(--blue);">
                 <span class="stat-heading">Total</span>
