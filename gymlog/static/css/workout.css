@@ -1,31 +1,4 @@
-:root {
-  color-scheme: dark;
-  --bg: #1d2021;
-  --bg-s: #32302f;
-  --bg-1: #3c3836;
-  --bg-2: #504945;
-  --bg-3: #665c54;
-  --bg-4: #7c6f64;
-  --fg: #fbf1c7;
-  --fg-1: #ebdbb2;
-  --fg-2: #d5c4a1;
-  --gray: #a89984;
-  --red: #cc241d;
-  --red-alt: #fb4934;
-  --green: #98971a;
-  --green-alt: #b8bb26;
-  --yellow: #d79921;
-  --yellow-alt: #fabd2f;
-  --blue: #458588;
-  --blue-alt: #83a598;
-  --purple: #b16286;
-  --purple-alt: #d3869b;
-  --orange: #d65d0e;
-  --orange-alt: #fe8019;
-  --aqua: #689d6a;
-  --aqua-alt: #8ec07c;
-  --brown: #B17744;
-}
+@import 'colours.css';
 
 body {
   font-family: sans-serif;
@@ -118,7 +91,9 @@ h1 {
   background-color: var(--workout-colour);
 }
 .today {
-  filter: contrast(2);
+  background-color: var(--fg);
+  color: var(--workout-colour);
+  border: 1px solid var(--workout-colour);
 }
 .exercise-card .offline {
   position: absolute;
