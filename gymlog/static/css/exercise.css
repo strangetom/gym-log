@@ -218,7 +218,7 @@ h1 {
   font-size: 2rem;
   height: 3rem;
   width: 3rem;
-  border-radius: 3rem;
+  border-radius: var(--mid-radius);
   border: none;
   color: var(--bg);
   background-color: var(--fg);
@@ -297,43 +297,39 @@ h1 {
   text-align: center;
 }
 
-.timer {
+#todays-sets .timer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: .8rem;
-  margin: .9rem auto;
-  width: 80%;
+  border-radius: var(--big-radius);
+  margin: 1rem;
   background-color: var(--bg-s);
-  padding: .3rem;
 }
-.timer.running {
+#todays-sets .timer.running {
   background-color: var(--blue);
 }
-.timer.paused{
-  background-color: #224244;
+#todays-sets .timer.paused{
+  background-color: var(--blue-blend);
 }
-.timer-btn {
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: .8rem;
+#todays-sets .timer-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   transition: scale 250ms;
+  margin: 0;
 }
-.timer-btn:active {
+#todays-sets .timer-btn:active {
   scale: 1.1;
 }
-.timer-btn img {
+#todays-sets .timer-btn img {
   height: 2rem;
   width: auto;
 }
-.timer span {;
+#todays-sets .timer span {;
   font-size: 2rem;
   font-family: monospace;
 }
-.timer span.millis {
+#todays-sets .timer span.millis {
   font-size: 1rem;
 }
 

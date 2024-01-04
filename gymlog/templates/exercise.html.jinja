@@ -89,18 +89,6 @@
                         <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="mins" name="mins" autocomplete="off" value="{{ '{:02}'.format(last_set.mins) if last_set.mins is not none }}" placeholder="mm"/>&nbsp;:
                         <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="secs" name="secs" autocomplete="off" value="{{ '{:02}'.format(last_set.seconds) if last_set.seconds is not none }}" placeholder="ss"/>
                     </div>
-                    <div class="timer">
-                        <button type="button" class="fab timer-btn" id="timer-start-btn">
-                            <img src="/static/img/play.svg" alt="Start timer" height="1" width="1"/>
-                        </button>
-                        <div>
-                            <span id="timer-display">&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;</span>
-                            <span id="timer-display-millis" class="millis">&ndash;&ndash;&ndash;</span>
-                        </div>
-                        <button type="button" class="fab timer-btn" id="timer-stop-btn">
-                            <img src="/static/img/stop.svg" alt="Stop timer" height="1" width="1"/>
-                        </button>
-                    </div>
                     {%- endif -%}
                 </div>
                 <div>
@@ -109,6 +97,21 @@
                     </button>
                 </div>
             </form>
+
+            {%- if type == "time" -%}
+            <div class="timer">
+                <button type="button" class="fab timer-btn" id="timer-start-btn">
+                    <img src="/static/img/play.svg" alt="Start timer" height="1" width="1"/>
+                </button>
+                <div>
+                    <span id="timer-display">&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;</span>
+                    <span id="timer-display-millis" class="millis">&ndash;&ndash;&ndash;</span>
+                </div>
+                <button type="button" class="fab timer-btn" id="timer-stop-btn">
+                    <img src="/static/img/stop.svg" alt="Stop timer" height="1" width="1"/>
+                </button>
+            </div>
+            {%- endif -%}
 
             <div class="sets">
                 {%- for s in sets -%}
