@@ -12,15 +12,33 @@
         <link rel="icon" href="/static/favicon.svg" type="image/svg+xml"/>
         <meta name="theme-color" content="#32302f"/>
     </head>
-    <body>
-
+    <body style="--workout-color: {{ workoutColour }}">
         <section id="header">
-            <a id="workout-shortcut" href="/workout/{{ workoutID }}" style="--workoutColor: {{ workoutColour }}">
+            <a id="workout-shortcut" href="/workout/{{ workoutID }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
                 </svg>
             </a>
             <h1>{{ name }}</h1>
+        </section>
+
+        <section id="stats">
+            <div id="last-set" class="stat" style="--bg-colour: var(--orange);">
+                <span class="stat-heading">Latest set</span>
+                <span class="stat-value">{{ stats.last_set }}</span>
+            </div>
+            <div id="last-workout" class="stat" style="--bg-colour: var(--yellow);">
+                <span class="stat-heading">Last workout</span>
+                <span class="stat-value">{{ stats.last_workout }}</span>
+            </div>
+            <div id="one-rep-max" class="stat" style="--bg-colour: var(--aqua);">
+                <span class="stat-heading">1 rep max</span>
+                <span class="stat-value">{{ stats.one_rep_max }}</span>
+            </div>
+            <div id="aggregate" class="stat" style="--bg-colour: var(--blue);">
+                <span class="stat-heading">Total</span>
+                <span class="stat-value">{{ stats.aggregate }}</span>
+            </div>
         </section>
 
         <section id="graph">
@@ -29,15 +47,11 @@
                 {%- for age, values in graph.items() -%}
                 <div class="graph-group">
                     {%- for v in values -%}
-                    <div class="graph-bar {{ 'graph-bar-today' if age == -1 }}" style="--size:{{ v.scaled }};" data-value="{{ v.value }}"></div>
+                    <div class="graph-bar {{ 'graph-bar-today' if v.today }}" style="--size:{{ v.scaled }};" data-value="{{ v.value }}"></div>
                     {%- endfor -%}
                 </div>
                 {%- endfor -%}
             </div>
-        </section>
-
-        <section id="stats">
-            <h2>Statistics</h2>
         </section>
 
         <section id="todays-sets">
@@ -111,6 +125,9 @@
                     <span>{{ s.readable_time }}</span>
                 </div>
                 {%- endfor -%}
+                {%- if not sets -%}
+                <div class="no-sets">No sets today :(</div>
+                {%- endif -%}
                 <div class="offline"></div>
             </div>
         </section>

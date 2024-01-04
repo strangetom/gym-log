@@ -3,7 +3,8 @@
 body {
   font-family: sans-serif;
   color: var(--fg);
-  background-color: var(--bg); 
+  background-color: var(--bg-1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%231d2021' fill-opacity='0.3' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   margin: 0 auto;
   max-width: 80ch;
   -webkit-font-smoothing: antialiased;
@@ -41,7 +42,7 @@ h1 {
   justify-content: center;
 }
 #workout-shortcut {
-  color: var(--workoutColor);
+  color: var(--workout-color);
   position: absolute;
   top: .7rem;
   left: .7rem;
@@ -74,22 +75,64 @@ h1 {
   border-radius: 0 0 var(--mid-radius) var(--mid-radius);
 }
 
+#stats {
+  margin-top: 4.7rem;
+  height: 11rem;
+  border-radius: var(--mid-radius);
+  padding-top: .5rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-areas: 
+    "a a a b b"
+    "c c d d d";
+  grid-gap: .5rem;
+}
+#stats .stat {
+  padding: .25rem .75rem 1rem;
+  background-color: var(--bg-colour);
+  border-radius: var(--mid-radius);
+  height: 3.5rem;
+  box-shadow: var(--big-shadow);
+}
+#stats .stat .stat-heading {
+  display: block;
+  font-size: .9rem;
+  color: var(--bg-s);
+}
+#stats .stat .stat-value {
+  display: block;
+  font-size: 2.25rem;
+  color: var(--bg);
+}
+#stats #last-set {
+  grid-area: a;
+}
+#stats #last-workout {
+  grid-area: b;
+}
+#stats #one-rep-max {
+  grid-area: c;
+}
+#stats #aggregate {
+  grid-area: d;
+}
+
 #graph {
   position: relative;
-  margin-top: 4.7rem;
   height: 14.5rem;
   direction: rtl;
-  background-color: var(--bg-1);
+  background-color: var(--bg);
   border-radius: var(--mid-radius);
   box-shadow: var(--big-shadow);
-  border: 1px solid var(--bg-2);
+  border: 1px solid var(--bg-1);
 }
 #graph .graph-chart {
   height: 100%;
   display: flex;
   justify-content: flex-start;
   gap: 10px;
-  padding: 1rem;
+  padding: 1rem 1rem 1rem 0;
+  border-left: 1rem solid var(--bg);
   overflow-x: scroll;
   box-sizing: border-box;
 }
@@ -102,11 +145,11 @@ h1 {
   position: relative;
   width: 6px;
   height: calc(100% * var(--size));
-  background-color: var(--bg-4);
+  background-color: var(--workout-color);
   border-radius: var(--small-radius);
 }
 #graph .graph-bar-today {
-  background-color: var(--green-alt);
+  background-color: var(--fg);
 }
 #graph h2 {
   font-size: 1.5rem;
@@ -117,25 +160,14 @@ h1 {
   top: 0;
 }
 
-#stats {
-  height: 9rem;
-  border-radius: var(--mid-radius);
-  padding: .5rem;
-}
-#stats h2 {
-  font-size: 1.5rem;
-  font-weight: normal;
-  margin: 0 1rem;
-}
-
 #todays-sets {
-  height: 20rem;
-  background-color: var(--bg-1);
+  height: 18rem;
+  background-color: var(--bg);
   border-radius: var(--mid-radius);
   padding: .5rem;
   position: relative;
   box-shadow: var(--big-shadow);
-  border: 1px solid var(--bg-2);
+  border: 1px solid var(--bg-1);
 }
 #todays-sets .sets {
   max-height: 12rem;
@@ -215,11 +247,15 @@ h1 {
   text-align: right;
 }
 #todays-sets .set-card .delta {
+  display: inline-block;
+  width: fit-content;
   color: var(--fg);
-  border-radius: var(--big-radius);
+  border-radius: var(--mid-radius);
+  border: 1px solid var(--fg-3);
   padding: 0 0.5rem;
   font-size: 1rem;
   position: relative;
+  top: -1px;
   margin-left: 0.25rem;
 }
 #todays-sets .set-card .increase {
@@ -251,6 +287,9 @@ h1 {
   display: inline-block;
   margin: 0;
   font-weight: normal;
+}
+#todays-sets .no-sets {
+  text-align: center;
 }
 
 .timer {

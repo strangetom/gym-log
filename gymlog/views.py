@@ -133,6 +133,7 @@ def exercise_endpoint(exerciseID: int):
             "exercise.html.jinja",
             sets=W.list_todays_exercise_sets(exerciseID),
             last_set=W.get_exercise_last_set(exerciseID),
+            stats=W.get_exercise_stats(exerciseID),
             name=W.get_exercise_name(exerciseID),
             type=W.get_exercise_type(exerciseID),
             graph=W.get_exercise_history(exerciseID),

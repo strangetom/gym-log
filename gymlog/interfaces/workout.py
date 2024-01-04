@@ -4,7 +4,6 @@ import datetime
 import math
 import uuid
 from dataclasses import dataclass
-from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple
 
 from peewee import fn, IntegrityError
@@ -26,6 +25,14 @@ class ExerciseSet:
             self.hours = math.floor(float(self.time_s) / 3600) or None
             self.mins = math.floor((float(self.time_s) % 3600) / 60) or None
             self.seconds = math.floor(float(self.time_s) % 60) or None
+
+
+@dataclass
+class ExerciseStats:
+    one_rep_max: Optional[str]
+    last_workout: str
+    last_set: str
+    aggregate: str
 
 
 class WorkoutInterface:
@@ -298,9 +305,19 @@ class WorkoutInterface:
                 )
 
                 if time_delta.days in data.keys():
-                    data[time_delta.days].append(s.weight_kg * s.repetitions)
+                    data[time_delta.days].append(
+                        {
+                            "value": s.weight_kg * s.repetitions,
+                            "today": self._timestamp_is_today(s.datetime),
+                        }
+                    )
                 else:
-                    data[time_delta.days] = [s.weight_kg * s.repetitions]
+                    data[time_delta.days] = [
+                        {
+                            "value": s.weight_kg * s.repetitions,
+                            "today": self._timestamp_is_today(s.datetime),
+                        }
+                    ]
 
                 max_value = max(max_value, s.weight_kg * s.repetitions)
                 min_value = min(min_value, s.weight_kg * s.repetitions)
@@ -315,9 +332,19 @@ class WorkoutInterface:
                 )
 
                 if time_delta.days in data.keys():
-                    data[time_delta.days].append(s.distance_m / s.time_s)
+                    data[time_delta.days].append(
+                        {
+                            "value": s.distance_m / s.time_s,
+                            "today": self._timestamp_is_today(s.datetime),
+                        }
+                    )
                 else:
-                    data[time_delta.days] = [s.distance_m / s.time_s]
+                    data[time_delta.days] = [
+                        {
+                            "value": s.distance_m / s.time_s,
+                            "today": self._timestamp_is_today(s.datetime),
+                        }
+                    ]
 
                 max_value = max(max_value, s.distance_m / s.time_s)
                 min_value = min(min_value, s.distance_m / s.time_s)
@@ -332,9 +359,19 @@ class WorkoutInterface:
                 )
 
                 if time_delta.days in data.keys():
-                    data[time_delta.days].append(s.time_s)
+                    data[time_delta.days].append(
+                        {
+                            "value": s.time_s,
+                            "today": self._timestamp_is_today(s.datetime),
+                        }
+                    )
                 else:
-                    data[time_delta.days] = [s.time_s]
+                    data[time_delta.days] = [
+                        {
+                            "value": s.time_s,
+                            "today": self._timestamp_is_today(s.datetime),
+                        }
+                    ]
 
                 max_value = max(max_value, s.time_s)
                 min_value = min(min_value, s.time_s)
@@ -350,13 +387,69 @@ class WorkoutInterface:
         for k, values in data.items():
             data[k] = [
                 {
-                    "scaled": f"{(v - min_value) / (max_value - min_value):.2g}",
-                    "value": f"{v:.3g}",
+                    "scaled": f"{(v['value'] - min_value) / (max_value - min_value):.2g}",
+                    "value": f"{v['value']:.3g}",
+                    "today": v["today"],
                 }
                 for v in values
             ]
 
         return data
+
+    def get_exercise_stats(self, exerciseID: int) -> ExerciseStats:
+        """Summary
+
+        Parameters
+        ----------
+        exerciseID : int
+            Exercise ID
+
+        Returns
+        -------
+        ExerciseStats
+            ExerciseStats object for exercise
+        """
+        exercise_type = self.get_exercise_type(exerciseID)
+
+        sets = (
+            Sets.select()
+            .where(Sets.exercise == exerciseID)
+            .order_by(Sets.datetime.desc())
+        )
+        latest_set = ExerciseSet(
+            sets[0].uid,
+            sets[0].datetime,
+            sets[0].distance_m,
+            sets[0].weight_kg,
+            sets[0].time_s,
+            sets[0].repetitions,
+        )
+        latest = self._create_set_summary(latest_set)
+        recent = self._parse_timestamp(latest_set.datetime).strftime("%d %b")
+
+        if exercise_type == "weight-repetitions":
+            rep_max = self._calculate_one_rep_max(
+                latest_set.weight_kg, latest_set.repetitions
+            )
+            total = sum(s.weight_kg * s.repetitions for s in sets)
+
+            return ExerciseStats(f"{rep_max:.1f} kg", recent, latest, f"{total:,g} kg")
+
+        elif exercise_type == "distance-time":
+
+            total = sum(s.distance_m for s in sets) / 1000
+            rep_max = max(s.distance_m / s.time_s for s in sets)
+
+            return ExerciseStats(
+                f"{rep_max:.1f} m/s", recent, latest, f"{total:,.2f} km"
+            )
+        elif exercise_type == "time":
+            total_seconds = sum(s.time_s for s in sets)
+            total_seconds_str = str(datetime.timedelta(seconds=int(total_seconds)))
+
+            rep_max = max(s.time_s for s in sets)
+
+            return ExerciseStats(f"{rep_max:.1f} s", recent, latest, total_seconds_str)
 
     def save_set(self, post_data: Dict[str, str]) -> None:
         """Save new set to database
@@ -688,7 +781,7 @@ class WorkoutInterface:
     def _create_set_summary(self, details: ExerciseSet) -> str:
         """Generate string that summarises a set
         For example:
-        10 x 39.0 kg for weight-repetitions exercises
+        10× 39.0 kg for weight-repetitions exercises
         2000 m - 17:00 for distance-time exercises
         45 s for time exercises
 
@@ -707,7 +800,7 @@ class WorkoutInterface:
 
         elif details.distance_m is not None and details.time_s is not None:
             time_string = str(datetime.timedelta(seconds=int(details.time_s)))[2:]
-            set_string = f"{int(details.distance_m)} m - {time_string}"
+            set_string = f"{int(details.distance_m / 1000):.2f} km - {time_string}"
 
         elif details.time_s is not None:
             set_string = f"{details.time_s} s"
@@ -791,3 +884,20 @@ class WorkoutInterface:
             Timestamp convert to datetime.datetime object
         """
         return datetime.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+
+    def _calculate_one_rep_max(self, weight: float, reps: int) -> float:
+        """Calculate one rep max using Brzycki formula
+
+        Parameters
+        ----------
+        weight : float
+            Weight used for set
+        reps : int
+            Number of reps in set
+
+        Returns
+        -------
+        float
+            One rep max value
+        """
+        return weight / (1.0278 - 0.0278 * reps)
