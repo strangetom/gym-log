@@ -138,6 +138,7 @@ h1 {
   gap: 10px;
   padding: 1rem 1rem 1rem 0;
   border-left: 1rem solid var(--bg);
+  border-radius: var(--mid-radius);
   overflow-x: scroll;
   box-sizing: border-box;
 }
