@@ -25,6 +25,10 @@ class ExerciseSet:
             self.hours = math.floor(float(self.time_s) / 3600) or None
             self.mins = math.floor((float(self.time_s) % 3600) / 60) or None
             self.seconds = math.floor(float(self.time_s) % 60) or None
+        else:
+            self.hours = None
+            self.mins = None
+            self.seconds = None
 
 
 @dataclass
@@ -417,6 +421,10 @@ class WorkoutInterface:
             .where(Sets.exercise == exerciseID)
             .order_by(Sets.datetime.desc())
         )
+        # Exercise has not sets yet
+        if not sets:
+            return ExerciseStats("", "", "", "", "")
+
         latest_set = ExerciseSet(
             sets[0].uid,
             sets[0].datetime,
@@ -713,6 +721,10 @@ class WorkoutInterface:
         ).where(Sets.exercise == exerciseID)
         set_ = query[0]
 
+        # Exercise has no sets yet
+        if set_.uid is None:
+            return ExerciseSet(0, "", None, None, None, None)
+
         return ExerciseSet(
             set_.uid,
             set_.datetime,
@@ -735,7 +747,7 @@ class WorkoutInterface:
         str
             Human readable relative string
         """
-        if timestamp is None:
+        if timestamp is None or timestamp == "":
             return "Never"
 
         # Python <3.11 doesn't parse the Z in the timestamp, so the dt object is not
@@ -767,19 +779,22 @@ class WorkoutInterface:
             else:
                 return dt.strftime("%b %d %Y")
 
-    def _timestamp_is_today(self, timestamp: str) -> bool:
+    def _timestamp_is_today(self, timestamp: str | None) -> bool:
         """Return True is timestamp is same day as today
 
         Parameters
         ----------
-        timestamp : str
-            ISO8601 timestamp
+        timestamp : str | None
+            ISO8601 timestamp or None
 
         Returns
         -------
         bool
             True is timestamp day is today
         """
+        if timestamp is None or timestamp == "":
+            return False
+
         dt = self._parse_timestamp(timestamp)
         return dt.date() == datetime.date.today()
 
