@@ -269,10 +269,7 @@ function saveLocally(e) {
     let form = document.querySelector("#todays-sets > form");
     let formdata = new FormData(form);
     let data = Object.fromEntries(formdata);
-    let offlineData = JSON.parse(localStorage.getItem("offline-sets"));
-    if (offlineData === null) {
-        offlineData = [];
-    }
+    let offlineData = JSON.parse(localStorage.getItem("offline-sets")) || [];
     offlineData.push(data);
     localStorage.setItem("offline-sets", JSON.stringify(offlineData));
     showOfflineSets();
@@ -280,7 +277,7 @@ function saveLocally(e) {
 function removeLocalSet(e) {
     let set = e.target.closest("div");
     let uuid = set.dataset.uuid;
-    let offlineData = JSON.parse(localStorage.getItem("offline-sets"));
+    let offlineData = JSON.parse(localStorage.getItem("offline-sets")) || [];
     let setRemovedData = offlineData.filter((s) => {
         return s.uuid != uuid;
     });

@@ -411,10 +411,7 @@ function saveLocally(e: Event) {
   let formdata = new FormData(form);
   let data = Object.fromEntries(formdata);
 
-  let offlineData = JSON.parse(localStorage.getItem("offline-sets"));
-  if (offlineData === null) {
-    offlineData = [];
-  }
+  let offlineData = JSON.parse(localStorage.getItem("offline-sets"))  || [];
   offlineData.push(data);
   localStorage.setItem("offline-sets", JSON.stringify(offlineData));
   showOfflineSets();
@@ -428,7 +425,7 @@ function removeLocalSet(e: Event) {
   let set = (e.target as HTMLImageElement).closest("div");
   let uuid = set.dataset.uuid;
 
-  let offlineData = JSON.parse(localStorage.getItem("offline-sets"));
+  let offlineData = JSON.parse(localStorage.getItem("offline-sets"))  || [];
   let setRemovedData = offlineData.filter((s) => {
     return s.uuid != uuid;
   });
