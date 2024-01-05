@@ -29,8 +29,6 @@ h1 {
 }
 #header a {
   position: absolute;
-  top: .7rem;
-  left: .7rem;
   height: 2rem;
   width: 2rem;
   margin: 5px;
@@ -44,20 +42,13 @@ h1 {
   width: 75%;
   height: 75%;
 }
-
-#fab-edit {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 3.8rem;
-  height: 3.8rem;
-  border: none;
-  border-radius: 3rem;
-  background-color: var(--fg);
-  color: var(--bg-1);
-  font-size: 3rem;
-  font-weight: 100;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
+#home {
+  top: .7rem;
+  left: .7rem;
+}
+#edit {
+  top: .7rem;
+  right: .7rem;
 }
 #fab-edit img {
   scale: 0.6;
