@@ -93,6 +93,7 @@ h1 {
   border-radius: var(--mid-radius);
   height: 3.5rem;
   box-shadow: var(--big-shadow);
+  border: 1px solid var(--bg-2);
 }
 #stats .stat .stat-heading {
   display: block;
@@ -129,7 +130,7 @@ h1 {
   background-color: var(--bg);
   border-radius: var(--mid-radius);
   box-shadow: var(--big-shadow);
-  border: 1px solid var(--bg-1);
+  border: 1px solid var(--bg-2);
 }
 #graph .graph-chart {
   height: 100%;
@@ -173,7 +174,7 @@ h1 {
   padding: .5rem;
   position: relative;
   box-shadow: var(--big-shadow);
-  border: 1px solid var(--bg-1);
+  border: 1px solid var(--bg-2);
 }
 #todays-sets .sets {
   max-height: 11rem;
