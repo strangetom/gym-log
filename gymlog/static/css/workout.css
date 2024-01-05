@@ -84,6 +84,12 @@ h1 {
   border-radius: 10px;
   background-color: var(--workout-colour);
 }
+.exercise-icon {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  height: 5rem;
+}
 .today {
   background-color: var(--fg-1);
   color: var(--workout-colour);
