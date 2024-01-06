@@ -440,7 +440,11 @@ class WorkoutInterface:
             rep_max = self._calculate_one_rep_max(
                 latest_set.weight_kg, latest_set.repetitions
             )
-            total = sum(s.weight_kg * s.repetitions for s in sets)
+            total = sum(
+                s.weight_kg * s.repetitions
+                for s in sets
+                if self._timestamp_is_within_year(s.datetime)
+            )
 
             return ExerciseStats(
                 f"{rep_max:.1f} kg", "1 rep max", recent, latest, f"{total:,g} kg"
@@ -448,14 +452,23 @@ class WorkoutInterface:
 
         elif exercise_type == "distance-time":
 
-            total = sum(s.distance_m for s in sets) / 1000
+            total = (
+                sum(
+                    s.distance_m
+                    for s in sets
+                    if self._timestamp_is_within_year(s.datetime)
+                )
+                / 1000
+            )
             speed = latest_set.distance_m / latest_set.time_s
 
             return ExerciseStats(
                 f"{speed:.1f} m/s", "Speed", recent, latest, f"{total:,.2f} km"
             )
         elif exercise_type == "time":
-            total_seconds = sum(s.time_s for s in sets)
+            total_seconds = sum(
+                s.time_s for s in sets if self._timestamp_is_within_year(s.datetime)
+            )
             total_seconds_str = str(datetime.timedelta(seconds=int(total_seconds)))
 
             rep_max = max(s.time_s for s in sets)
@@ -797,6 +810,26 @@ class WorkoutInterface:
 
         dt = self._parse_timestamp(timestamp)
         return dt.date() == datetime.date.today()
+
+    def _timestamp_is_within_year(self, timestamp: str | None) -> bool:
+        """Return True is timestamp is within a year of the current date.
+
+        Parameters
+        ----------
+        timestamp : str | None
+            ISO8601 timestamp or None
+
+        Returns
+        -------
+        bool
+            True if time since timestamp is less than or equal to a year
+        """
+        if timestamp is None or timestamp == "":
+            return False
+
+        dt = self._parse_timestamp(timestamp)
+        delta = datetime.date.today() - dt.date()
+        return delta.days <= 365
 
     def _create_set_summary(self, details: ExerciseSet) -> str:
         """Generate string that summarises a set
