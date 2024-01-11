@@ -1,36 +1,10 @@
-:root {
-  color-scheme: dark;
-  --bg: #1d2021;
-  --bg-s: #32302f;
-  --bg-1: #3c3836;
-  --bg-2: #504945;
-  --bg-3: #665c54;
-  --bg-4: #7c6f64;
-  --fg: #fbf1c7;
-  --fg-1: #ebdbb2;
-  --fg-2: #d5c4a1;
-  --gray: #a89984;
-  --red: #cc241d;
-  --red-alt: #fb4934;
-  --green: #98971a;
-  --green-alt: #b8bb26;
-  --yellow: #d79921;
-  --yellow-alt: #fabd2f;
-  --blue: #458588;
-  --blue-alt: #83a598;
-  --purple: #b16286;
-  --purple-alt: #d3869b;
-  --orange: #d65d0e;
-  --orange-alt: #fe8019;
-  --aqua: #689d6a;
-  --aqua-alt: #8ec07c;
-  --brown: #B17744;
-}
+@import 'colours.css';
 
 body {
   font-family: sans-serif;
   color: var(--fg);
-  background-color: var(--bg); 
+  background-color: var(--bg-1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%231d2021' fill-opacity='0.3' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   margin: 0 auto;
   max-width: 80ch;
   -webkit-font-smoothing: antialiased;
@@ -55,8 +29,6 @@ h1 {
 }
 #header a {
   position: absolute;
-  top: .7rem;
-  left: .7rem;
   height: 2rem;
   width: 2rem;
   margin: 5px;
@@ -70,20 +42,13 @@ h1 {
   width: 75%;
   height: 75%;
 }
-
-#fab-edit {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 3.8rem;
-  height: 3.8rem;
-  border: none;
-  border-radius: 3rem;
-  background-color: var(--fg);
-  color: var(--bg-1);
-  font-size: 3rem;
-  font-weight: 100;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
+#home {
+  top: .7rem;
+  left: .7rem;
+}
+#edit {
+  top: .7rem;
+  right: .7rem;
 }
 #fab-edit img {
   scale: 0.6;
@@ -101,7 +66,9 @@ h1 {
   margin: 10px;
   text-decoration: none;
   border-radius: .5rem;
-  background-color: var(--bg-s);
+  border: 1px solid var(--bg-2);
+  background-color: var(--bg);
+  box-shadow: var(--small-shadow);
   color: var(--fg);
 }
 .exercise-card h2 {
@@ -117,8 +84,16 @@ h1 {
   border-radius: 10px;
   background-color: var(--workout-colour);
 }
+.exercise-icon {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  height: 5rem;
+}
 .today {
-  filter: contrast(2);
+  background-color: var(--fg-1);
+  color: var(--workout-colour);
+  border: 1px solid var(--workout-colour);
 }
 .exercise-card .offline {
   position: absolute;

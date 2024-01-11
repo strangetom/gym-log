@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     let exercises = document.querySelectorAll("a.exercise-card");
-    let offlineSets = JSON.parse(localStorage.getItem("offline-sets"));
+    let offlineSets = JSON.parse(localStorage.getItem("offline-sets")) || [];
     exercises.forEach((el) => {
         let exerciseID = el.dataset.exerciseid;
         let count = offlineSets.filter((s) => {

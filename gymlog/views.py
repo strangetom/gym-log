@@ -131,7 +131,9 @@ def exercise_endpoint(exerciseID: int):
 
         return render_template(
             "exercise.html.jinja",
-            sets=W.list_exercise_sets(exerciseID),
+            sets=W.list_todays_exercise_sets(exerciseID),
+            last_set=W.get_exercise_last_set(exerciseID),
+            stats=W.get_exercise_stats(exerciseID),
             name=W.get_exercise_name(exerciseID),
             type=W.get_exercise_type(exerciseID),
             graph=W.get_exercise_history(exerciseID),
@@ -171,13 +173,7 @@ def set_endpoint(setID: int):
     if request.method == "POST":
         post_data = request.form
         W.save_set(post_data)
-        return redirect(
-            url_for(
-                "exercise_endpoint",
-                exerciseID=post_data["exerciseID"],
-                workoutID=post_data["workoutID"],
-            )
-        )
+        return Response(status=200)
 
     elif request.method == "DELETE":
         W.delete_set(setID)

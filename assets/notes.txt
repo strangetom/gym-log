@@ -1,0 +1,7 @@
+1. Take body svg from Body black outline with white background.svg
+2. Make background var(--grey) with 50% transpacency (#92837480)
+3. Make outline var(--bg-1) (#3c3836)
+4. Add muscle group from Eachmusclegroupseparate_* folder
+5. Make muscle background var(--red-blend) with 50% transparency (#98282380)
+6. Make muscle outline var(--red) (#982823)
+7. Clip
