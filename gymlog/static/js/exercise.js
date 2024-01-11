@@ -86,6 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector("#offline").classList.remove("hidden");
         form.addEventListener("submit", saveLocally);
     }
+    else {
+        form.addEventListener("submit", saveToServer);
+    }
     let newSetInputs = document.querySelectorAll("#todays-sets input");
     newSetInputs.forEach((el) => {
         el.addEventListener("click", (e) => {
@@ -149,11 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
             timer.reset();
         });
     }
-    let backBtn = document.querySelector("#workout-shortcut");
-    window.addEventListener("popstate", () => {
-        location.replace(backBtn.href);
-    });
-    history.pushState({}, "");
     showOfflineSets();
 });
 function isoDateTime() {
@@ -216,35 +214,6 @@ function modifySet() {
         });
     }
 }
-function swipeCloseGraph(e) {
-    if (e.changedTouches[0].target.closest(".graph-wrapper") !=
-        null) {
-        return;
-    }
-    e.preventDefault();
-    let startY = e.changedTouches[0].pageY;
-    let currentY = startY;
-    let graph = e.changedTouches[0].target.closest("#graph");
-    graph.classList.remove("animate");
-    this.swipeMove = function (e) {
-        let endY = e.changedTouches[0].pageY;
-        let translate = Math.min(0, -(startY - endY));
-        let transform = "translateY(" + translate + "px)";
-        graph.style.transform = transform;
-    };
-    this.swipeEnd = function (e) {
-        let endY = e.changedTouches[0].pageY;
-        graph.style.transform = "";
-        graph.classList.add("animate");
-        if (startY - endY > 100) {
-            graph.classList.add("hidden");
-        }
-        graph.removeEventListener("touchmove", this.swipeMove);
-        graph.removeEventListener("touchend", this.swipeEnd);
-    };
-    graph.addEventListener("touchmove", this.swipeMove);
-    graph.addEventListener("touchend", this.swipeEnd);
-}
 async function toggleWakeLock(status) {
     if (status == WakelockStatus.Enable && wakelock == null) {
         try {
@@ -263,6 +232,26 @@ function insertUUIDTimestamp(e) {
     let timestamp = new Date().toISOString().split(".")[0] + "Z";
     e.formData.append("timestamp", timestamp);
     e.formData.append("uuid", uuid);
+}
+function saveToServer(e) {
+    e.preventDefault();
+    let form = document.querySelector("#todays-sets > form");
+    let formdata = new FormData(form);
+    fetch("/set/", {
+        method: "POST",
+        body: formdata,
+    }).then((res) => {
+        if (res.ok) {
+            window.location.reload();
+        }
+        else {
+            let btn = form.querySelector("button");
+            btn.classList.add("save-error");
+            setTimeout(() => {
+                btn.classList.remove("save-error");
+            }, 2500);
+        }
+    });
 }
 function saveLocally(e) {
     e.preventDefault();

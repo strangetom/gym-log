@@ -340,7 +340,6 @@ h1 {
 }
 .save-error {
   background-color: var(--red) !important;
-  rotate: 45deg;
 }
 
 /* Dialog specific styles */

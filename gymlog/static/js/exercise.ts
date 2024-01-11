@@ -140,6 +140,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#offline").classList.remove("hidden");
     // Redirect saved sets to localStorage
     form.addEventListener("submit", saveLocally);
+  } else {
+    form.addEventListener("submit", saveToServer);
   }
 
   // When selecting the new set input
@@ -221,14 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
       timer.reset();
     });
   }
-
-  // Override back button behaviour to always return to workout page, even after
-  // adding new set.
-  let backBtn: HTMLAnchorElement = document.querySelector("#workout-shortcut");
-  window.addEventListener("popstate", () => {
-    location.replace(backBtn.href);
-  });
-  history.pushState({}, "");
 
   showOfflineSets();
 });
@@ -314,66 +308,6 @@ function modifySet() {
 }
 
 /**
- * Event handler for touch events to swipe up to close graph
- * @param {TouchEvent} e Touchstart event
- */
-function swipeCloseGraph(e: TouchEvent) {
-  if (
-    (e.changedTouches[0].target as HTMLElement).closest(".graph-wrapper") !=
-    null
-  ) {
-    // If the closest table element is not null, then it means we've touched the graph.
-    // Therefore, abort this event listener so we can scroll the graph horizontally without
-    // this event listener capturing the touch events
-    return;
-  }
-
-  e.preventDefault();
-
-  // e.changedTouches should only have a single item
-  // Get the y position on the page from that item
-  let startY = e.changedTouches[0].pageY;
-  let currentY = startY;
-
-  // Add a touchmove and touchend events to the graph element
-  let graph: HTMLElement = (e.changedTouches[0].target as HTMLElement).closest(
-    "#graph",
-  );
-  // Remove animation on touchstart event so it doesn't make the touch iteraction laggy.
-  // We'll restore it when closing the graph
-  graph.classList.remove("animate");
-
-  this.swipeMove = function (e: TouchEvent) {
-    let endY = e.changedTouches[0].pageY;
-    // Don't allow translate to move graph section down
-    let translate = Math.min(0, -(startY - endY));
-    let transform = "translateY(" + translate + "px)";
-    graph.style.transform = transform;
-  };
-
-  this.swipeEnd = function (e: TouchEvent) {
-    let endY = e.changedTouches[0].pageY;
-    // Remove any element style transform so that if we don't move far enough to close
-    // the graph, it returns to fully open
-    graph.style.transform = "";
-    // Restore animation
-    graph.classList.add("animate");
-    // If the delta between startY and endY is large enough, add the "hidden" class
-    // to trigger the close animation
-    if (startY - endY > 100) {
-      graph.classList.add("hidden");
-    }
-    // Remove the touchend and touchmove event listeners to avoid adding a new one
-    // everytime a touchstart event is fired.
-    graph.removeEventListener("touchmove", this.swipeMove);
-    graph.removeEventListener("touchend", this.swipeEnd);
-  };
-
-  graph.addEventListener("touchmove", this.swipeMove);
-  graph.addEventListener("touchend", this.swipeEnd);
-}
-
-/**
  * Toggle wakelock when checkbox state changes
  */
 async function toggleWakeLock(status: WakelockStatus) {
@@ -401,6 +335,34 @@ function insertUUIDTimestamp(e: FormDataEvent) {
 }
 
 /**
+ * Save sets to server
+ * @param {Event} e Form submission event to intercept
+ */
+function saveToServer(e: Event) {
+  // Dont' use native form submission as this results in a redirection
+  e.preventDefault();
+
+  let form = document.querySelector("#todays-sets > form") as HTMLFormElement;
+  let formdata = new FormData(form);
+
+  fetch("/set/", {
+    method: "POST",
+    body: formdata,
+  }).then((res) => {
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      let btn: HTMLButtonElement = form.querySelector("button");
+      btn.classList.add("save-error");
+      // Restore default after 5 seconds
+      setTimeout(() => {
+        btn.classList.remove("save-error");
+      }, 2500);
+    }
+  });
+}
+
+/**
  * Save sets to localStorage when in offline mode
  * @param {Event} e Form submission event to intercept
  */
@@ -411,7 +373,7 @@ function saveLocally(e: Event) {
   let formdata = new FormData(form);
   let data = Object.fromEntries(formdata);
 
-  let offlineData = JSON.parse(localStorage.getItem("offline-sets"))  || [];
+  let offlineData = JSON.parse(localStorage.getItem("offline-sets")) || [];
   offlineData.push(data);
   localStorage.setItem("offline-sets", JSON.stringify(offlineData));
   showOfflineSets();
@@ -425,7 +387,7 @@ function removeLocalSet(e: Event) {
   let set = (e.target as HTMLImageElement).closest("div");
   let uuid = set.dataset.uuid;
 
-  let offlineData = JSON.parse(localStorage.getItem("offline-sets"))  || [];
+  let offlineData = JSON.parse(localStorage.getItem("offline-sets")) || [];
   let setRemovedData = offlineData.filter((s) => {
     return s.uuid != uuid;
   });

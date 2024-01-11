@@ -173,13 +173,7 @@ def set_endpoint(setID: int):
     if request.method == "POST":
         post_data = request.form
         W.save_set(post_data)
-        return redirect(
-            url_for(
-                "exercise_endpoint",
-                exerciseID=post_data["exerciseID"],
-                workoutID=post_data["workoutID"],
-            )
-        )
+        return Response(status=200)
 
     elif request.method == "DELETE":
         W.delete_set(setID)
