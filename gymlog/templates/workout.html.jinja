@@ -40,7 +40,7 @@
                     <span class="exercise-last-set">{{ e.last_set }}</span>
                 </div>
                 <img class="offline hidden" src="/static/img/offline.svg">
-                <img class="exercise-icon" src="/static/img/{{ e.name.replace(' ', '-')|lower }}.svg">
+                <img class="exercise-icon" src="/static/img/{{ e.name.replace(' ', '-')|lower + '-today' if e.is_today else e.name.replace(' ', '-')|lower }}.svg">
             </a>
             {%- endfor -%}
         </section>
