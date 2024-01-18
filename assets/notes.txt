@@ -7,4 +7,4 @@
 7. Clip
 
 
-For -today version, use var(--aqua-blend) for colour
+For -today version, use var(--aqua) for colour
