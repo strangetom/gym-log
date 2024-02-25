@@ -6,82 +6,100 @@
         <meta name="viewport" content="width=device-width"/>
         <title>{{ name }} | Gym Log</title>
         <link rel="stylesheet" type="text/css" href="/static/css/exercise.css"/>
-        <link rel="stylesheet" type="text/css" href="/static/css/graph.css"/>
         <script type="module" src="/static/js/exercise.js"></script>
         <!-- icons and manifest for PWA -->
         <link rel="manifest" href="/static/manifest.json"/>
         <link rel="icon" href="/static/favicon.svg" type="image/svg+xml"/>
         <meta name="theme-color" content="#32302f"/>
     </head>
-    <body>
-
+    <body style="--workout-color: {{ workoutColour }}">
         <section id="header">
-            <a id="workout-shortcut" href="/workout/{{ workoutID }}" style="--workoutColor: {{ workoutColour }}">
+            <a id="workout-shortcut" href="/workout/{{ workoutID }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
                 </svg>
             </a>
             <h1>{{ name }}</h1>
-            <div id="graph-button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0Zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5Z"/>
-                </svg>
+        </section>
+
+        <section id="stats">
+            <div id="last-set" class="stat {{ 'small-font' if type == 'distance-time' }}" style="--bg-colour: var(--orange);">
+                <span class="stat-heading">Latest set</span>
+                <span class="stat-value">{{ stats.last_set }}</span>
+            </div>
+            <div id="last-workout" class="stat" style="--bg-colour: var(--yellow);">
+                <span class="stat-heading">Last workout</span>
+                <span class="stat-value">{{ stats.last_workout }}</span>
+            </div>
+            <div id="one-rep-max" class="stat" style="--bg-colour: var(--aqua);">
+                <span class="stat-heading">{{ stats.specific_stat_heading }}</span>
+                <span class="stat-value">{{ stats.specific_stat }}</span>
+            </div>
+            <div id="aggregate" class="stat" style="--bg-colour: var(--blue);">
+                <span class="stat-heading">Total in last year</span>
+                <span class="stat-value">{{ stats.aggregate }}</span>
             </div>
         </section>
 
-        <section id="historical-sets">
-            {%- for group in sets -%}
-            <div class="set-group">
-                {%- for s in group -%}
-                <div class="set-card" data-uid="{{ s.uid }}" data-type="{{ type }}" data-distance="{{ s.distance if s.distance is not none }}" data-repetitions="{{ s.repetitions if s.repetitions is not none }}" data-weight="{{ s.weight if s.weight if not none }}" data-hours="{{ s.hours if s.hours if not none }}" data-mins="{{ s.mins if s.mins is not none }}" data-seconds="{{ s.seconds if s.seconds is not none }}">
-                    <div class="set-top-row">
-                        <h3>{{ s.set_detail }}</h3>
-                        {% if s.delta is not none %}
-                            {%- if s.delta > 0 %}
-                            <span class="increase">{{ "+%.1f"|format(s.delta) }}%</span>
-                            {%- else -%}
-                            <span class="decrease">{{ "%.1f"|format(s.delta) }}%</span>
-                            {%- endif -%}
-                        {% else %}
-                        <span class="equal">=</span>
-                        {% endif %}
-                    </div>
-                    <small>{{ s.readable_time }}</small>
+        <section id="graph">
+            <h2>History</h2>
+            <div class="graph-chart">
+                {%- for age, values in graph.items() -%}
+                <div class="graph-group">
+                    {%- for v in values -%}
+                    <div class="graph-bar {{ 'graph-bar-today' if v.today }}" style="--size:{{ v.scaled }};" data-value="{{ v.value }}"></div>
+                    {%- endfor -%}
                 </div>
                 {%- endfor -%}
             </div>
-            {%- endfor -%}
         </section>
 
-        <section id="new-set">
-            <form action="/set/" method="post">
-                <input type="hidden" name="exerciseID" id="exerciseID" value="{{ exerciseID }}"/>
-                <input type="hidden" name="workoutID" id="workoutID" value="{{ workoutID }}"/>
-                {%- if type == "weight-repetitions" -%}
-                <div class="new-input">
-                    <input type="text" inputmode="numeric" pattern="[0-9]+" id="reps" name="reps" autocomplete="off" value="{{ sets[0][0].repetitions if sets and sets[0][0].repetitions is not none }}"/>
-                    Reps
+        <section id="todays-sets">
+            <h2>Today</h2>
+           <div id="offline" class="hidden">
+                Offline
+            </div>
+            <form>
+                <div>
+                    <input type="hidden" name="exerciseID" id="exerciseID" value="{{ exerciseID }}"/>
+                    <!-- Need to send workoutID so we know where the back button goes after redirected after submitting new set -->
+                    <input type="hidden" name="workoutID" id="workoutID" value="{{ workoutID }}"/>
+                    {%- if type == "weight-repetitions" -%}
+                    <div class="new-input">
+                        <input type="text" inputmode="numeric" pattern="[0-9]+" id="reps" name="reps" autocomplete="off" value="{{ last_set.repetitions if last_set.repetitions is not none }}"/>
+                        reps
+                    </div>
+                    <div class="new-input">
+                        <input type="text" inputmode="numeric" pattern="[0-9]+([\.][0-9]+)?" id="weight" name="weight" autocomplete="off" value="{{ last_set.weight_kg if last_set.weight_kg is not none }}"/>
+                        kg
+                    </div>
+                    {%- elif type == "distance-time" -%}
+                    <div class="new-input">
+                        <input type="text" inputmode="numeric" pattern="[0-9]+([\.][0-9]+)?" id="distance" name="distance" autocomplete="off" value="{{ last_set.distance_m if last_set.distance_m is not none }}"/>
+                        m
+                    </div>
+                    <div class="new-input">
+                        <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="hours" name="hours" autocomplete="off" value="{{ last_set.hours if last_set.hours is not none }}" placeholder="hh"/>&nbsp;:
+                        <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="mins" name="mins" autocomplete="off" value="{{ '{:02}'.format(last_set.mins) if last_set.mins is not none }}" placeholder="mm"/>&nbsp;:
+                        <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="secs" name="secs" autocomplete="off" value="{{ '{:02}'.format(last_set.seconds) if last_set.seconds is not none }}" placeholder="ss"/>
+                    </div>
+                    {%- elif type == "time" -%}
+                    <div class="new-input">
+                        <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="hours" name="hours" autocomplete="off" value="{{ last_set.hours if last_set.hours is not none }}" placeholder="hh"/>&nbsp;:
+                        <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="mins" name="mins" autocomplete="off" value="{{ '{:02}'.format(last_set.mins) if last_set.mins is not none }}" placeholder="mm"/>&nbsp;:
+                        <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="secs" name="secs" autocomplete="off" value="{{ '{:02}'.format(last_set.seconds) if last_set.seconds is not none }}" placeholder="ss"/>
+                    </div>
+                    {%- endif -%}
                 </div>
-                <div class="new-input">
-                    <input type="text" inputmode="numeric" pattern="[0-9]+([\.][0-9]+)?" id="weight" name="weight" autocomplete="off" value="{{ sets[0][0].weight if sets and sets[0][0].weight is not none }}"/>
-                    kg
+                <div>
+                    <button type="submit" class="fab" id="fab">
+                        +
+                    </button>
                 </div>
-                {%- elif type == "distance-time" -%}
-                <div class="new-input">
-                    <input type="text" inputmode="numeric" pattern="[0-9]+([\.][0-9]+)?" id="distance" name="distance" autocomplete="off" value="{{ sets[0][0].distance if sets and sets[0][0].distance is not none }}"/>
-                    m
-                </div>
-                <div class="new-input">
-                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="hours" name="hours" autocomplete="off" value="{{ sets[0][0].hours if sets and sets[0][0].hours is not none }}" placeholder="hh"/>&nbsp;:
-                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="mins" name="mins" autocomplete="off" value="{{ '{:02}'.format(sets[0][0].mins) if sets and sets[0][0].mins is not none }}" placeholder="mm"/>&nbsp;:
-                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="secs" name="secs" autocomplete="off" value="{{ '{:02}'.format(sets[0][0].seconds) if sets and sets[0][0].seconds is not none }}" placeholder="ss"/>
-                </div>
-                {%- elif type == "time" -%}
-                <div class="new-input">
-                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="hours" name="hours" autocomplete="off" value="{{ sets[0][0].hours if sets and sets[0][0].hours is not none }}" placeholder="hh"/>&nbsp;:
-                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="mins" name="mins" autocomplete="off" value="{{ '{:02}'.format(sets[0][0].mins) if sets and sets[0][0].mins is not none }}" placeholder="mm"/>&nbsp;:
-                    <input class="time-input" type="text" inputmode="numeric" pattern="[0-9]+" id="secs" name="secs" autocomplete="off" value="{{ '{:02}'.format(sets[0][0].seconds) if sets and sets[0][0].seconds is not none }}" placeholder="ss"/>
-                </div>
+            </form>
+
+            <div class="sets">
+                {%- if type == "time" -%}
                 <div class="timer">
                     <button type="button" class="fab timer-btn" id="timer-start-btn">
                         <img src="/static/img/play.svg" alt="Start timer" height="1" width="1"/>
@@ -95,33 +113,25 @@
                     </button>
                 </div>
                 {%- endif -%}
-                <button type="submit" class="fab" id="fab">
-                    +
-                </button>
-            </form>
-        </section>
-
-        <section id="graph" class="hidden animate">
-            <h4>Historical progress</h4>
-            <div class="graph-wrapper">
-                <div class="graph-chart">
-                    {%- for age, values in graph.items() -%}
-                    <div class="graph-group">
-                        {%- for v in values -%}
-                        <div class="graph-bar" style="--size:{{ v.scaled }};" data-value="{{ v.value }}"></div>
-                        {%- endfor -%}
-                    </div>
-                    {%- endfor -%}
-                    <div class="graph-group">
-                        <div class="graph-bar" style="--size: 1; background-color: transparent;"></div>
-                    </div>
+                {%- for s in sets -%}
+                <div class="set-card" data-uid="{{ s.uid }}" data-type="{{ type }}" data-distance="{{ s.distance if s.distance is not none }}" data-repetitions="{{ s.repetitions if s.repetitions is not none }}" data-weight="{{ s.weight if s.weight if not none }}" data-hours="{{ s.hours if s.hours if not none }}" data-mins="{{ s.mins if s.mins is not none }}" data-seconds="{{ s.seconds if s.seconds is not none }}">
+                    <h3>{{ s.set_detail }}
+                    {% if s.delta is not none %}
+                        {%- if s.delta > 0 %}
+                        <span class="delta increase">{{ "+%.1f"|format(s.delta) }}%</span>
+                        {%- else -%}
+                        <span class="delta decrease">{{ "%.1f"|format(s.delta) }}%</span>
+                        {%- endif -%}
+                    {% endif %}
+                    </h3>
+                    <span>{{ s.readable_time }}</span>
                 </div>
+                {%- endfor -%}
+                {%- if not sets -%}
+                <div class="no-sets">No sets today :(</div>
+                {%- endif -%}
+                <div class="offline"></div>
             </div>
-            <p>Most recent ⟶</p>
-            <svg xmlns="http://www.w3.org/2000/svg" class="swipe-arrow" preserveAspectRatio="none" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-            </svg>
-
         </section>
     </body>
 

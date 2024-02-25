@@ -8,15 +8,15 @@ const hideDialogTiming = {
 
 document.addEventListener("DOMContentLoaded", () => {
   let fab_save: HTMLButtonElement = document.querySelector(
-    "#fab-save"
+    "#fab-save",
   ) as HTMLButtonElement;
   fab_save.addEventListener("click", saveWorkout);
 
   let fab_new_exercise: HTMLButtonElement = document.querySelector(
-    "#fab-new-exercise"
+    "#fab-new-exercise",
   ) as HTMLButtonElement;
   let new_exercise_dialog: HTMLDialogElement = document.querySelector(
-    "#new-exercise-dialog"
+    "#new-exercise-dialog",
   ) as HTMLDialogElement;
   // Open new exercise when clicking new exercise FAB
   fab_new_exercise.addEventListener("click", () => {
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if ((event.target as HTMLElement).nodeName === "DIALOG") {
       let animation = new_exercise_dialog.animate(
         hideDialogAnimation,
-        hideDialogTiming
+        hideDialogTiming,
       );
       animation.addEventListener("finish", () => {
         new_exercise_dialog.close("cancel");
@@ -39,13 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Close new exercise dialog when clicking cancel
   let cancel_new_exercise: HTMLButtonElement =
     new_exercise_dialog.querySelector(
-      "button[value='cancel']"
+      "button[value='cancel']",
     ) as HTMLButtonElement;
   cancel_new_exercise.addEventListener("click", (e) => {
     e.preventDefault();
     let animation = new_exercise_dialog.animate(
       hideDialogAnimation,
-      hideDialogTiming
+      hideDialogTiming,
     );
     animation.addEventListener("finish", () => {
       new_exercise_dialog.close("cancel");
@@ -54,13 +54,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Submit new exercise when clicking add
   let add_new_exercise: HTMLButtonElement = new_exercise_dialog.querySelector(
-    "button[value='submit']"
+    "button[value='submit']",
   ) as HTMLButtonElement;
   add_new_exercise.addEventListener("click", (e) => {
     e.preventDefault();
     let animation = new_exercise_dialog.animate(
       hideDialogAnimation,
-      hideDialogTiming
+      hideDialogTiming,
     );
     animation.addEventListener("finish", () => {
       new_exercise_dialog.close("submit");
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   let fab_delete_workout: HTMLButtonElement = document.querySelector(
-    "#fab-delete"
+    "#fab-delete",
   ) as HTMLButtonElement;
   fab_delete_workout.addEventListener("click", deleteWorkout);
 
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function saveWorkout(e: Event) {
   let workoutID: number;
   let workoutIDEl: HTMLInputElement = document.querySelector(
-    "#workoutID"
+    "#workoutID",
   ) as HTMLInputElement;
   if (workoutIDEl == null) {
     //error
@@ -97,7 +97,7 @@ function saveWorkout(e: Event) {
 
   let selectedExerciseIDs: number[] = [];
   let exerciseOptions: NodeListOf<HTMLInputElement> = document.querySelectorAll(
-    "input[type='checkbox']"
+    "input[type='checkbox']",
   );
   exerciseOptions.forEach((opt) => {
     if (opt.checked) {
@@ -143,7 +143,7 @@ function deleteWorkout() {
 
 function saveExercise() {
   let new_exercise_dialog: HTMLDialogElement = document.querySelector(
-    "#new-exercise-dialog"
+    "#new-exercise-dialog",
   ) as HTMLDialogElement;
   if (new_exercise_dialog.returnValue == "submit") {
     let formEl: HTMLFormElement = new_exercise_dialog.querySelector("form");

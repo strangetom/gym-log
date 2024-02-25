@@ -131,7 +131,9 @@ def exercise_endpoint(exerciseID: int):
 
         return render_template(
             "exercise.html.jinja",
-            sets=W.list_exercise_sets(exerciseID),
+            sets=W.list_todays_exercise_sets(exerciseID),
+            last_set=W.get_exercise_last_set(exerciseID),
+            stats=W.get_exercise_stats(exerciseID),
             name=W.get_exercise_name(exerciseID),
             type=W.get_exercise_type(exerciseID),
             graph=W.get_exercise_history(exerciseID),
@@ -171,13 +173,7 @@ def set_endpoint(setID: int):
     if request.method == "POST":
         post_data = request.form
         W.save_set(post_data)
-        return redirect(
-            url_for(
-                "exercise_endpoint",
-                exerciseID=post_data["exerciseID"],
-                workoutID=post_data["workoutID"],
-            )
-        )
+        return Response(status=200)
 
     elif request.method == "DELETE":
         W.delete_set(setID)
@@ -186,4 +182,23 @@ def set_endpoint(setID: int):
     elif request.method == "PUT":
         post_data = request.form
         W.update_set(setID, post_data)
+        return Response(status=200)
+
+
+@app.route("/sync", methods=["POST"])
+def sync_sets():
+    """Sync sets cached when offline to database.
+
+    Sets are only added to database there is no other set with the same UUID
+    in the database.
+
+    Returns
+    -------
+    Response
+        Response object
+    """
+    if request.method == "POST":
+        post_data = request.form
+        offline_sets = json.loads(post_data["offline_sets"])
+        W.sync_sets(offline_sets)
         return Response(status=200)

@@ -41,10 +41,10 @@ class Timer {
     this.timerEl = timerEl;
     this.displayEl = timerEl.querySelector("#timer-display") as HTMLSpanElement;
     this.millisEl = timerEl.querySelector(
-      "#timer-display-millis"
+      "#timer-display-millis",
     ) as HTMLSpanElement;
     this.playPauseEl = timerEl.querySelector(
-      "#timer-start-btn"
+      "#timer-start-btn",
     ) as HTMLButtonElement;
   }
 
@@ -129,30 +129,24 @@ class Timer {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  let fab: HTMLButtonElement = document.querySelector(
-    "#fab"
+  let form: HTMLButtonElement = document.querySelector(
+    "#todays-sets > form",
   ) as HTMLButtonElement;
+  form.addEventListener("formdata", insertUUIDTimestamp);
 
-  let graphBtn: HTMLDivElement = document.querySelector(
-    "#graph-button"
-  ) as HTMLDivElement;
-  let graphSection: HTMLElement = document.querySelector(
-    "#graph"
-  ) as HTMLElement;
-  graphBtn.addEventListener("click", () => {
-    if (graphSection.classList.contains("hidden")) {
-      graphSection.classList.remove("hidden");
-    } else {
-      graphSection.style.transform = "";
-      graphSection.classList.add("hidden");
-    }
-  });
-  // Add event listener for swiping up to close graph drop down
-  graphSection.addEventListener("touchstart", swipeCloseGraph);
+  // Set offline mode
+  let offline = JSON.parse(localStorage.getItem("offline"));
+  if (offline) {
+    document.querySelector("#offline").classList.remove("hidden");
+    // Redirect saved sets to localStorage
+    form.addEventListener("submit", saveLocally);
+  } else {
+    form.addEventListener("submit", saveToServer);
+  }
 
   // When selecting the new set input
   let newSetInputs: NodeListOf<HTMLInputElement> =
-    document.querySelectorAll("#new-set input");
+    document.querySelectorAll("#todays-sets input");
   newSetInputs.forEach((el) => {
     el.addEventListener("click", (e) => {
       (e.target as HTMLInputElement).select();
@@ -160,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   let editSetInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll(
-    "#edit-set-dialog input"
+    "#edit-set-dialog input",
   );
   editSetInputs.forEach((el) => {
     el.addEventListener("click", (e) => {
@@ -229,6 +223,8 @@ document.addEventListener("DOMContentLoaded", () => {
       timer.reset();
     });
   }
+
+  showOfflineSets();
 });
 /**
  * Return current ISO8601 datetime without milliseconds.
@@ -312,66 +308,6 @@ function modifySet() {
 }
 
 /**
- * Event handler for touch events to swipe up to close graph
- * @param {TouchEvent} e Touchstart event
- */
-function swipeCloseGraph(e: TouchEvent) {
-  if (
-    (e.changedTouches[0].target as HTMLElement).closest(".graph-wrapper") !=
-    null
-  ) {
-    // If the closest table element is not null, then it means we've touched the graph.
-    // Therefore, abort this event listener so we can scroll the graph horizontally without
-    // this event listener capturing the touch events
-    return;
-  }
-
-  e.preventDefault();
-
-  // e.changedTouches should only have a single item
-  // Get the y position on the page from that item
-  let startY = e.changedTouches[0].pageY;
-  let currentY = startY;
-
-  // Add a touchmove and touchend events to the graph element
-  let graph: HTMLElement = (e.changedTouches[0].target as HTMLElement).closest(
-    "#graph"
-  );
-  // Remove animation on touchstart event so it doesn't make the touch iteraction laggy.
-  // We'll restore it when closing the graph
-  graph.classList.remove("animate");
-
-  this.swipeMove = function (e: TouchEvent) {
-    let endY = e.changedTouches[0].pageY;
-    // Don't allow translate to move graph section down
-    let translate = Math.min(0, -(startY - endY));
-    let transform = "translateY(" + translate + "px)";
-    graph.style.transform = transform;
-  };
-
-  this.swipeEnd = function (e: TouchEvent) {
-    let endY = e.changedTouches[0].pageY;
-    // Remove any element style transform so that if we don't move far enough to close
-    // the graph, it returns to fully open
-    graph.style.transform = "";
-    // Restore animation
-    graph.classList.add("animate");
-    // If the delta between startY and endY is large enough, add the "hidden" class
-    // to trigger the close animation
-    if (startY - endY > 100) {
-      graph.classList.add("hidden");
-    }
-    // Remove the touchend and touchmove event listeners to avoid adding a new one
-    // everytime a touchstart event is fired.
-    graph.removeEventListener("touchmove", this.swipeMove);
-    graph.removeEventListener("touchend", this.swipeEnd);
-  };
-
-  graph.addEventListener("touchmove", this.swipeMove);
-  graph.addEventListener("touchend", this.swipeEnd);
-}
-
-/**
  * Toggle wakelock when checkbox state changes
  */
 async function toggleWakeLock(status: WakelockStatus) {
@@ -385,4 +321,150 @@ async function toggleWakeLock(status: WakelockStatus) {
     // Release wakelock and set variable back to null
     wakelock.release().then(() => (wakelock = null));
   }
+}
+
+/**
+ * Insert UUID into POSTed data
+ * @param {FormDataEvent} e FormDataEvent triggered when submitting new set form
+ */
+function insertUUIDTimestamp(e: FormDataEvent) {
+  let uuid = crypto.randomUUID();
+  let timestamp = new Date().toISOString().split(".")[0] + "Z";
+  e.formData.append("timestamp", timestamp);
+  e.formData.append("uuid", uuid);
+}
+
+/**
+ * Save sets to server
+ * @param {Event} e Form submission event to intercept
+ */
+function saveToServer(e: Event) {
+  // Dont' use native form submission as this results in a redirection
+  e.preventDefault();
+
+  let form = document.querySelector("#todays-sets > form") as HTMLFormElement;
+  let formdata = new FormData(form);
+
+  fetch("/set/", {
+    method: "POST",
+    body: formdata,
+  }).then((res) => {
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      let btn: HTMLButtonElement = form.querySelector("button");
+      btn.classList.add("save-error");
+      // Restore default after 5 seconds
+      setTimeout(() => {
+        btn.classList.remove("save-error");
+      }, 2500);
+    }
+  });
+}
+
+/**
+ * Save sets to localStorage when in offline mode
+ * @param {Event} e Form submission event to intercept
+ */
+function saveLocally(e: Event) {
+  e.preventDefault();
+
+  let form = document.querySelector("#todays-sets > form") as HTMLFormElement;
+  let formdata = new FormData(form);
+  let data = Object.fromEntries(formdata);
+
+  let offlineData = JSON.parse(localStorage.getItem("offline-sets")) || [];
+  offlineData.push(data);
+  localStorage.setItem("offline-sets", JSON.stringify(offlineData));
+  showOfflineSets();
+}
+
+/**
+ * Remove selected set from offline data
+ * @param {Event} e Click event from clicking icon
+ */
+function removeLocalSet(e: Event) {
+  let set = (e.target as HTMLImageElement).closest("div");
+  let uuid = set.dataset.uuid;
+
+  let offlineData = JSON.parse(localStorage.getItem("offline-sets")) || [];
+  let setRemovedData = offlineData.filter((s) => {
+    return s.uuid != uuid;
+  });
+
+  localStorage.setItem("offline-sets", JSON.stringify(setRemovedData));
+  showOfflineSets();
+}
+
+/**
+ * Load any local sets and show in set history
+ */
+function showOfflineSets() {
+  let exerciseID = (document.querySelector("#exerciseID") as HTMLInputElement)
+    .value;
+
+  let offlineSets = JSON.parse(localStorage.getItem("offline-sets"));
+  if (offlineSets == null) {
+    return;
+  }
+
+  let offlineSetContainer = document.querySelector("#todays-sets .offline");
+  offlineSetContainer.innerHTML = "";
+
+  let relevantOfflineSets = offlineSets.filter((s) => {
+    return s.exerciseID == exerciseID;
+  });
+  if (relevantOfflineSets.length == 0) {
+    return;
+  }
+
+  relevantOfflineSets.forEach((data) => {
+    let card = document.createElement("div");
+    card.classList.add("offline-card");
+    card.dataset.uuid = data.uuid;
+    let value = document.createElement("h3");
+    value.innerText = formatSetValue(data);
+    let date = document.createElement("span");
+    date.innerText = formatSetTimestamp(data.timestamp);
+    let icon = document.createElement("img");
+    icon.src = "/static/img/delete.svg";
+    icon.addEventListener("click", removeLocalSet);
+
+    date.appendChild(icon);
+    card.appendChild(value);
+    card.appendChild(date);
+    offlineSetContainer.appendChild(card);
+  });
+  // Scroll to top of parent
+  offlineSetContainer.parentElement.scrollTop = 0;
+}
+
+/**
+ * Format locally stored set information into readable string
+ * @param {[type]} data Stored set data object
+ */
+function formatSetValue(data) {
+  let keys = Object.keys(data);
+  if (keys.includes("weight") && keys.includes("reps")) {
+    return `${data.reps} x ${data.weight}`;
+  }
+
+  if (keys.includes("secs") && keys.includes("distance")) {
+    return `${Math.floor(data.distance)} m - ${data.mins}:${data.secs}`;
+  }
+
+  if (keys.includes("secs")) {
+    return `${data.secs} s`;
+  }
+
+  return "";
+}
+
+/**
+ * Format timestamp into MMM DD YYYY format
+ * @param {[string]} timestamp ISO8601 timestamp
+ */
+function formatSetTimestamp(timestamp: string) {
+  let date = new Date(timestamp);
+  return date.toDateString().slice(4);
 }

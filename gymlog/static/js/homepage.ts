@@ -6,23 +6,52 @@ const hideDialogTiming = {
   easing: "ease-out",
 };
 
+enum OfflineStatus {
+  ONLINE,
+  OFFLINE,
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   installServiceWorker();
+
+  let offlineBtn: HTMLButtonElement = document.querySelector(
+    "#offline",
+  ) as HTMLButtonElement;
+  offlineBtn.addEventListener("click", toggleOfflineStatus);
+  // Check is already in offline mode and set icon
+  let offline = JSON.parse(localStorage.getItem("offline"));
+  if (offline) {
+    setOfflineStatus(OfflineStatus.OFFLINE);
+  }
+
   let fab: HTMLButtonElement = document.querySelector(
-    "#fab"
+    "#fab",
   ) as HTMLButtonElement;
   let addWorkoutDialog: HTMLDialogElement = document.querySelector(
-    "#new-workout-dialog"
+    "#new-workout-dialog",
   );
   fab.addEventListener("click", () => {
     addWorkoutDialog.showModal();
+  });
+
+  let workouts: NodeListOf<HTMLAnchorElement> =
+    document.querySelectorAll("a.workout-card");
+  let offlineSets = JSON.parse(localStorage.getItem("offline-sets")) || [];
+  workouts.forEach((el) => {
+    let workoutID = el.dataset.workoutid;
+    let count = offlineSets.filter((s) => {
+      return s.workoutID == workoutID;
+    }).length;
+    if (count > 0) {
+      el.querySelector("img.offline").classList.remove("hidden");
+    }
   });
 
   addWorkoutDialog.addEventListener("click", (event) => {
     if ((event.target as HTMLElement).nodeName === "DIALOG") {
       let animation = addWorkoutDialog.animate(
         hideDialogAnimation,
-        hideDialogTiming
+        hideDialogTiming,
       );
       animation.addEventListener("finish", () => {
         addWorkoutDialog.close("cancel");
@@ -35,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     let animation = addWorkoutDialog.animate(
       hideDialogAnimation,
-      hideDialogTiming
+      hideDialogTiming,
     );
     animation.addEventListener("finish", () => {
       addWorkoutDialog.close("cancel");
@@ -47,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     let animation = addWorkoutDialog.animate(
       hideDialogAnimation,
-      hideDialogTiming
+      hideDialogTiming,
     );
     animation.addEventListener("finish", () => {
       addWorkoutDialog.close("submit");
@@ -58,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function addWorkout() {
   let addWorkoutDialog: HTMLDialogElement = document.querySelector(
-    "#new-workout-dialog"
+    "#new-workout-dialog",
   );
   let formEl: HTMLFormElement = addWorkoutDialog.querySelector("form");
   let post_data = new FormData(formEl);
@@ -76,6 +105,55 @@ function addWorkout() {
 }
 
 /**
+ * Toggle offline status to opposite of current value
+ */
+function toggleOfflineStatus() {
+  let offline = JSON.parse(localStorage.getItem("offline"));
+  if (offline) {
+    setOfflineStatus(OfflineStatus.ONLINE);
+    syncOfflineSets();
+  } else {
+    setOfflineStatus(OfflineStatus.OFFLINE);
+  }
+}
+
+/**
+ * Set offline status in localStorage to specifiy value
+ * Update icon on homepage to match
+ * @param {OfflineStatus} mode Selected mode
+ */
+function setOfflineStatus(mode: OfflineStatus) {
+  let btn = document.querySelector("#offline");
+  let img = btn.querySelector("img");
+
+  if (mode == OfflineStatus.ONLINE) {
+    localStorage.setItem("offline", "false");
+    img.src = "/static/img/online.svg";
+  } else {
+    localStorage.setItem("offline", "true");
+    img.src = "/static/img/offline.svg";
+  }
+}
+
+function syncOfflineSets() {
+  let offlineSets = JSON.parse(localStorage.getItem("offline-sets"));
+  if (offlineSets === null || offlineSets.length == 0) {
+    return;
+  }
+
+  let form = new FormData();
+  form.append("offline_sets", JSON.stringify(offlineSets));
+  fetch("/sync", {
+    method: "POST",
+    body: form,
+  }).then((res) => {
+    if (res.ok) {
+      localStorage.setItem("offline-sets", "[]");
+    }
+  });
+}
+
+/**
  * Convenience function to install service worker
  */
 function installServiceWorker() {
@@ -87,7 +165,7 @@ function installServiceWorker() {
       },
       function () {
         console.log("CLIENT: service worker registration failure.");
-      }
+      },
     );
   } else {
     console.log("CLIENT: service worker is not supported.");

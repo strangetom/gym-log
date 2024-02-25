@@ -1,0 +1,10 @@
+1. Take body svg from Body black outline with white background.svg
+2. Make background var(--bg-4) (#7c6f64)
+3. Make outline var(--bg-2) (#504945)
+4. Add muscle group from Eachmusclegroupseparate_* folder
+5. Make muscle background var(--red-blend) (#982823)
+6. Make muscle outline var(--red-blend) (#982823)
+7. Clip
+
+
+For -today version, use var(--aqua) for colour

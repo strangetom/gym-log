@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width"/>
         <title>Gym Log</title>
         <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
-        <script type="module" src="./static/js/homepage.js"></script>
+        <script type="module" src="/static/js/homepage.js"></script>
         <!-- icons and manifest for PWA -->
         <link rel="manifest" href="/static/manifest.json"/>
         <link rel="icon" href="/static/favicon.svg" type="image/svg+xml"/>
@@ -17,11 +17,14 @@
 
         <section id="header">
             <h1>Gym Log</h1>
+            <button id="offline">
+                <img src="/static/img/online.svg" alt="Offline status" />
+            </button>
         </section>
 
         <section id="workouts">
             {%- for w in workouts -%}
-            <a href="/workout/{{ w.workoutID }}" class="workout-card" style="background-color:{{ w.colour }};">
+            <a href="/workout/{{ w.workoutID }}" data-workoutID="{{ w.workoutID }}" class="workout-card" style="background-color:{{ w.colour }};">
                 <div>
                     <h2>{{ w.name }}</h2>
                     <p>{{ w.exercise_count }} exercises</p>
@@ -30,6 +33,7 @@
                     <h3>{{ w.last_update }}</h3>
                     <p>> {{ w.last_exercise }}</p>
                 </div>
+                <img class="offline hidden" src="/static/img/offline.svg">
             </a>
             {%- endfor -%}
         </section>
