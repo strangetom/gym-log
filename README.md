@@ -4,9 +4,9 @@
 
 | Home                                                         | Workout                                                      | Exercise                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | --------------------------------------------------------- |
-| ![Screenshot of homepage](.screenshots/Home.jpg)             | ![Screenshot of workout page](.screenshots/Workout.jpg)      | ![Screenshot of exercise page](.screenshots/Exercise.jpg) |
+| ![Screenshot of homepage](.screenshots/Home.png)             | ![Screenshot of workout page](.screenshots/Workout.png)      | ![Screenshot of exercise page](.screenshots/Exercise.png) |
 | Edit workout                                                 | Edit set                                                     |                                                           |
-| ![Screenshot of edit workout page](.screenshots/EditWorkout.jpg) | ![Screen shot of edit set dialog on exercise page](.screenshots/EditSet.jpg) |                                                           |
+| ![Screenshot of edit workout page](.screenshots/EditWorkout.png) | ![Screen shot of edit set dialog on exercise page](.screenshots/EditSet.png) |                                                           |
 
 
 
