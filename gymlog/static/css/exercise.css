@@ -137,11 +137,23 @@ h1 {
   display: flex;
   justify-content: flex-start;
   gap: 10px;
-  padding: 1rem 1rem 1rem 0;
+  padding: 1rem 0 1rem 0;
   border-left: 1rem solid var(--bg);
+  border-right: 3rem solid var(--bg);
   border-radius: var(--mid-radius);
   overflow-x: scroll;
   box-sizing: border-box;
+}
+#graph #label {
+  position: absolute;
+  color: var(--fg-4);
+  right: 0.5rem;
+  left: 1rem;
+  /* The graph container has pading at the top and bottom of 2rem, so the
+  location of the bottom of the label needs to be scaled to (100% - 2rem)
+  so it aligns with the bars. Then add 1 rem to account for bottom padding. */
+  bottom: calc(calc(calc(100% - 2rem) * var(--size)) + 1rem);
+  border-bottom: 1px dashed var(--fg-4);
 }
 #graph .graph-group {
   display: flex;

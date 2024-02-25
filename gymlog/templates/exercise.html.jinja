@@ -44,6 +44,7 @@
         <section id="graph">
             <h2>History</h2>
             <div class="graph-chart">
+                <div id="label" style="--size:{{ graph_label.scaled }}">{{ graph_label.value }}</div>
                 {%- for age, values in graph.items() -%}
                 <div class="graph-group">
                     {%- for v in values -%}

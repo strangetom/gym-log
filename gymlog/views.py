@@ -2,7 +2,7 @@
 
 import json
 
-from flask import Response, render_template, request, redirect, url_for
+from flask import Response, render_template, request
 
 from gymlog import app
 from gymlog.interfaces import WorkoutInterface
@@ -129,6 +129,10 @@ def exercise_endpoint(exerciseID: int):
         # /exercise/1?workoutID=1
         workoutID = request.args.get("workoutID")
 
+        graph_data = W.get_exercise_history(exerciseID)
+        # Extract the lastest entry to display on y axis
+        graph_label = list(graph_data.values())[0][0]
+
         return render_template(
             "exercise.html.jinja",
             sets=W.list_todays_exercise_sets(exerciseID),
@@ -136,7 +140,8 @@ def exercise_endpoint(exerciseID: int):
             stats=W.get_exercise_stats(exerciseID),
             name=W.get_exercise_name(exerciseID),
             type=W.get_exercise_type(exerciseID),
-            graph=W.get_exercise_history(exerciseID),
+            graph=graph_data,
+            graph_label=graph_label,
             exerciseID=exerciseID,
             workoutID=workoutID,
             workoutColour=W.get_workout_colour(workoutID),
