@@ -265,6 +265,7 @@ class WorkoutInterface:
                     "seconds": seconds,
                     "repetitions": s.repetitions,
                     "delta": delta,
+                    "difficult": s.difficult,
                 }
             )
 
@@ -314,6 +315,7 @@ class WorkoutInterface:
                         {
                             "value": s.weight_kg * s.repetitions,
                             "today": self._timestamp_is_today(s.datetime),
+                            "difficult": s.difficult,
                         }
                     )
                 else:
@@ -321,6 +323,7 @@ class WorkoutInterface:
                         {
                             "value": s.weight_kg * s.repetitions,
                             "today": self._timestamp_is_today(s.datetime),
+                            "difficult": s.difficult,
                         }
                     ]
 
@@ -341,6 +344,7 @@ class WorkoutInterface:
                         {
                             "value": s.distance_m / s.time_s,
                             "today": self._timestamp_is_today(s.datetime),
+                            "difficult": s.difficult,
                         }
                     )
                 else:
@@ -348,6 +352,7 @@ class WorkoutInterface:
                         {
                             "value": s.distance_m / s.time_s,
                             "today": self._timestamp_is_today(s.datetime),
+                            "difficult": s.difficult,
                         }
                     ]
 
@@ -368,6 +373,7 @@ class WorkoutInterface:
                         {
                             "value": s.time_s,
                             "today": self._timestamp_is_today(s.datetime),
+                            "difficult": s.difficult,
                         }
                     )
                 else:
@@ -375,6 +381,7 @@ class WorkoutInterface:
                         {
                             "value": s.time_s,
                             "today": self._timestamp_is_today(s.datetime),
+                            "difficult": s.difficult,
                         }
                     ]
 
@@ -395,6 +402,7 @@ class WorkoutInterface:
                     "scaled": f"{(v['value'] - min_value) / (max_value - min_value):.2g}",
                     "value": f"{v['value']:.3g}",
                     "today": v["today"],
+                    "difficult": v["difficult"],
                 }
                 for v in values
             ]
@@ -536,6 +544,7 @@ class WorkoutInterface:
         set_.distance_m = data.get("distance_m", None)
         set_.weight_kg = data.get("weight_kg", None)
         set_.repetitions = data.get("repetitions", None)
+        set_.difficult = True if data.get("difficult", False) else False
 
         if (
             "hours" in data.keys()

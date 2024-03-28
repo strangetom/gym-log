@@ -33,6 +33,7 @@ class Sets(BaseModel):
     uid = pw.AutoField()
     weight_kg = pw.FloatField(null=True)
     uuid = pw.TextField(null=False, unique=True)
+    difficult = pw.BooleanField(null=False, default=False)
 
     class Meta:
         table_name = "sets"

@@ -170,6 +170,16 @@ h1 {
 #graph .graph-bar-today {
   background-color: var(--fg);
 }
+#graph .graph-bar-difficult:after {
+  content: "";
+  height: 7px;
+  width: 5px;
+  background-color: var(--red-alt);
+  border-radius: 50%;
+  display: block;
+  position: absolute;
+  bottom: -10px;
+}
 #graph h2 {
   font-size: 1.5rem;
   font-weight: normal;
@@ -422,4 +432,61 @@ h2 {
   padding: .5rem .8rem;
   margin: 0 .2rem;
   background-color: var(--purple);
+}
+/* Checkbox specific styles */
+.checkbox {    
+  display: block;
+  margin: 1rem 0 0 0;
+  left: 0; 
+  right: 0;
+  position: relative;
+}
+.checkbox input[type="checkbox"] {
+  width: auto;
+  opacity: 0.00000001;
+  position: absolute;
+  left: 0;
+}
+.checkbox label {
+  font-family: sans-serif;
+  font-size: 1rem;
+  position: relative;
+  display: block;
+  padding-left: 30px;
+  cursor: pointer;
+}
+.checkbox label:before {
+  /* Checkbox outline */
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -3px;
+  margin: 4px;
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.28s ease;
+  border-radius: 3px;
+  border: 2px solid var(--bg-1);
+}
+.checkbox label:after {
+  /* Check icon */
+  content: '';
+  border-bottom: 2px solid var(--fg);
+  border-left: 2px solid var(--fg);
+  transform: rotate(-45deg) scale(0);
+  transition: transform ease 0.25s;
+  position: absolute;
+  width: 8px;
+  height: 4px;
+  top: 7px;
+  left: 9px;
+}
+.checkbox input[type="checkbox"]:checked ~ label::after,
+.checkbox input[type="radio"]:checked ~ label::after {
+  /* Check icon animtation */
+  transform: rotate(-45deg) scale(1);
+}
+.checkbox input[type="checkbox"]:checked ~ label::before,
+.checkbox input[type="radio"]:checked ~ label::before {
+  background-color: var(--bg-1);
 }

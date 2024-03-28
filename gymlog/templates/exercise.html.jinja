@@ -48,7 +48,7 @@
                 {%- for age, values in graph.items() -%}
                 <div class="graph-group">
                     {%- for v in values -%}
-                    <div class="graph-bar {{ 'graph-bar-today' if v.today }}" style="--size:{{ v.scaled }};" data-value="{{ v.value }}"></div>
+                    <div class="graph-bar {{ 'graph-bar-today' if v.today }} {{ 'graph-bar-difficult' if v.difficult }}" style="--size:{{ v.scaled }};" data-value="{{ v.value }}"></div>
                     {%- endfor -%}
                 </div>
                 {%- endfor -%}
@@ -115,7 +115,7 @@
                 </div>
                 {%- endif -%}
                 {%- for s in sets -%}
-                <div class="set-card" data-uid="{{ s.uid }}" data-type="{{ type }}" data-distance="{{ s.distance if s.distance is not none }}" data-repetitions="{{ s.repetitions if s.repetitions is not none }}" data-weight="{{ s.weight if s.weight if not none }}" data-hours="{{ s.hours if s.hours if not none }}" data-mins="{{ s.mins if s.mins is not none }}" data-seconds="{{ s.seconds if s.seconds is not none }}">
+                <div class="set-card" data-uid="{{ s.uid }}" data-type="{{ type }}" data-distance="{{ s.distance if s.distance is not none }}" data-repetitions="{{ s.repetitions if s.repetitions is not none }}" data-weight="{{ s.weight if s.weight if not none }}" data-hours="{{ s.hours if s.hours if not none }}" data-mins="{{ s.mins if s.mins is not none }}" data-seconds="{{ s.seconds if s.seconds is not none }}" data-difficult="{{ s.difficult }}">
                     <h3>{{ s.set_detail }}
                     {% if s.delta is not none %}
                         {%- if s.delta > 0 %}
@@ -168,6 +168,10 @@
                 <input class="time-input" type="text" inputmode="numeric" id="seconds" name="seconds" autocomplete="off" value="" placeholder="ss"/>
             </div>
             {%- endif -%}
+            <div class="checkbox">
+                <input type="checkbox" id="difficult" name="difficult" autocomplete="off"/>
+                <label for="difficult">Difficult</label>
+            </div>
             <div class="buttons">
                 <button type="submit" value="edit">Edit</button>
                 <button type="submit" value="delete">Delete</button>

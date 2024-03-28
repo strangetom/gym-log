@@ -186,6 +186,10 @@ function showEditSetDialog(e) {
         let secondsDialogInput = editDialog.querySelector("#seconds");
         secondsDialogInput.value = set.dataset.seconds || "";
     }
+    let difficultInput = editDialog.querySelector("#difficult");
+    if (set.dataset.difficult == "True") {
+        difficultInput.checked = true;
+    }
     editDialog.showModal();
 }
 function modifySet() {

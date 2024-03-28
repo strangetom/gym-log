@@ -273,6 +273,11 @@ function showEditSetDialog(e: Event) {
     secondsDialogInput.value = set.dataset.seconds || "";
   }
 
+  let difficultInput: HTMLInputElement = editDialog.querySelector("#difficult");
+  if (set.dataset.difficult == "True") {
+    difficultInput.checked = true;
+  }
+
   editDialog.showModal();
 }
 /**
