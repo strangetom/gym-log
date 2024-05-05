@@ -179,7 +179,6 @@ class WorkoutInterface:
         exercise_data = []
         exercises = WorkoutExercise.select().where(WorkoutExercise.workout == workoutID)
         for e in exercises:
-
             query = Exercise.get(Exercise.exercise_id == e.exercise)
             set_ = self.get_exercise_last_set(e.exercise)
 
@@ -459,7 +458,6 @@ class WorkoutInterface:
             )
 
         elif exercise_type == "distance-time":
-
             total = (
                 sum(
                     s.distance_m
@@ -876,7 +874,7 @@ class WorkoutInterface:
     ) -> Optional[float]:
         """Calculate the percentage change from previous set.
         If the exercise type is weight-repetitions, the delta is calculated
-        from the weight (repetitions ignored)
+        from the weight*repetitions
         If the exercise type is distance-time, the delta is calculated from
         the change in rate (i.e. distance/time)
         If the exercise type is time, the delta is calculated from the change
@@ -896,14 +894,16 @@ class WorkoutInterface:
         """
         change_from_previous = 0
 
-        if current_set.weight_kg is not None and previous_set.weight_kg is not None:
-            if previous_set.weight_kg != 0:
-                change_from_previous = (
-                    (current_set.weight_kg - previous_set.weight_kg)
-                    / previous_set.weight_kg
-                    * 100
-                )
-
+        if (
+            current_set.weight_kg is not None
+            and previous_set.weight_kg is not None
+            and current_set.repetitions is not None
+            and previous_set.repetitions is not None
+        ):
+            previous = previous_set.weight_kg * previous_set.repetitions
+            current = current_set.weight_kg * current_set.repetitions
+            if previous_set != 0:
+                change_from_previous = (current - previous) / previous * 100
         elif (
             current_set.distance_m is not None
             and current_set.time_s is not None
