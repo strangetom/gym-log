@@ -108,11 +108,13 @@ def workout_endpoint(workoutID: int):
 
 @app.route("/exercise/", methods=["POST"], defaults={"exerciseID": None})
 @app.route("/exercise/<int:exerciseID>", methods=["GET", "DELETE"])
+@app.route("/exercise/<int:exerciseID>", methods=["PATCH"])
 def exercise_endpoint(exerciseID: int):
     """Exercise endpoint.
     If the method is GET, return exercise page.
     If the method is POST, create new exercise.
     If the method is DELETE, delete indicated exercise.
+    If the method is PATCH, update the exercise notes
 
     Returns
     -------
@@ -140,6 +142,7 @@ def exercise_endpoint(exerciseID: int):
             stats=W.get_exercise_stats(exerciseID),
             name=W.get_exercise_name(exerciseID),
             type=W.get_exercise_type(exerciseID),
+            notes=W.get_exercise_notes(exerciseID),
             graph=graph_data,
             graph_label=graph_label,
             exerciseID=exerciseID,
@@ -154,6 +157,11 @@ def exercise_endpoint(exerciseID: int):
 
     elif request.method == "DELETE":
         W.delete_exercise(exerciseID)
+        return Response(status=200)
+
+    elif request.method == "PATCH":
+        patch_data = request.form
+        W.update_exercise_notes(exerciseID, patch_data["notes"])
         return Response(status=200)
 
 

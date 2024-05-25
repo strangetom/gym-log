@@ -108,6 +108,22 @@ class WorkoutInterface:
         query = Exercise.get(Exercise.exercise_id == exerciseID)
         return query.type_
 
+    def get_exercise_notes(self, exerciseID: int) -> str:
+        """Return exercise notes from exercise ID
+
+        Parameters
+        ----------
+        exerciseID : int
+            Exercise ID
+
+        Returns
+        -------
+        str
+            Exercise notes
+        """
+        query = Exercise.get(Exercise.exercise_id == exerciseID)
+        return query.notes or ""
+
     def list_workouts(self) -> List[Dict[str, Any]]:
         """List all workouts in log
 
@@ -634,6 +650,20 @@ class WorkoutInterface:
         """
         exercise = Exercise.get(Exercise.exercise_id == exerciseID)
         exercise.delete_instance(recursive=True)
+
+    def update_exercise_notes(self, exerciseID: int, notes: str) -> None:
+        """Update exercise notes.
+
+        Parameters
+        ----------
+        exerciseID : int
+            Exercise ID
+        notes : str
+            Notes
+        """
+        exercise = Exercise.get(Exercise.exercise_id == exerciseID)
+        exercise.notes = notes
+        exercise.save()
 
     def new_workout(self, name: str, colour: str) -> None:
         """Add new workout to database

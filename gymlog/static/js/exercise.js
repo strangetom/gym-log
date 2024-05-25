@@ -152,10 +152,28 @@ document.addEventListener("DOMContentLoaded", () => {
             timer.reset();
         });
     }
+    var inputTimer;
+    let notes = document.querySelector("#notes textarea");
+    notes.addEventListener("input", (e) => {
+        clearTimeout(inputTimer);
+        inputTimer = setTimeout(patchNotes, 500);
+    });
     showOfflineSets();
 });
 function isoDateTime() {
     return new Date().toISOString().split(".")[0] + "Z";
+}
+function patchNotes(e) {
+    let exerciseID = document.querySelector("#exerciseID")
+        .value;
+    let notes = document.querySelector("#notes textarea");
+    let patch_data = new FormData();
+    patch_data.append("notes", notes.value);
+    let url = `/exercise/${exerciseID}`;
+    fetch(url, {
+        method: "PATCH",
+        body: patch_data,
+    });
 }
 function showEditSetDialog(e) {
     let set = e.target.closest(".set-card");

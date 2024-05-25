@@ -224,6 +224,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Update notes when typing
+  var inputTimer;
+  let notes: HTMLTextAreaElement = document.querySelector("#notes textarea");
+  notes.addEventListener("input", (e) => {
+    clearTimeout(inputTimer);
+    inputTimer = setTimeout(patchNotes, 500);
+  });
+
   showOfflineSets();
 });
 /**
@@ -231,6 +239,20 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 function isoDateTime() {
   return new Date().toISOString().split(".")[0] + "Z";
+}
+
+function patchNotes(e: Event) {
+  let exerciseID = (document.querySelector("#exerciseID") as HTMLInputElement)
+    .value;
+  let notes = document.querySelector("#notes textarea") as HTMLTextAreaElement;
+  let patch_data = new FormData();
+  patch_data.append("notes", notes.value);
+
+  let url = `/exercise/${exerciseID}`;
+  fetch(url, {
+    method: "PATCH",
+    body: patch_data,
+  });
 }
 
 /**

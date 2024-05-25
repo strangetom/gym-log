@@ -17,6 +17,7 @@ class Exercise(BaseModel):
     exercise_id = pw.AutoField(column_name="exerciseID")
     name = pw.TextField()
     type_ = pw.TextField(column_name="type")
+    notes = pw.TextField()
 
     class Meta:
         table_name = "exercise"
