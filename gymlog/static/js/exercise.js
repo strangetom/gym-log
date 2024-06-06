@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let notes = document.querySelector("#notes textarea");
     notes.addEventListener("input", (e) => {
         clearTimeout(inputTimer);
-        inputTimer = setTimeout(patchNotes, 500);
+        inputTimer = setTimeout(patchNotes, 750);
     });
     showOfflineSets();
 });
@@ -173,6 +173,20 @@ function patchNotes(e) {
     fetch(url, {
         method: "PATCH",
         body: patch_data,
+    }).then((res) => {
+        let textarea = document.querySelector("#notes > textarea");
+        if (res.ok) {
+            textarea.classList.add("save-success-notes");
+            setTimeout(() => {
+                textarea.classList.remove("save-success-notes");
+            }, 500);
+        }
+        else {
+            textarea.classList.add("save-error-notes");
+            setTimeout(() => {
+                textarea.classList.remove("save-error-notes");
+            }, 500);
+        }
     });
 }
 function showEditSetDialog(e) {

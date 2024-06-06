@@ -384,6 +384,12 @@ h1 {
 .save-error {
   background-color: var(--red) !important;
 }
+.save-success-notes {
+  background-color: var(--green-blend) !important;
+}
+.save-error-notes {
+  background-color: var(--red-blend) !important;
+}
 
 /* Dialog specific styles */
 dialog::backdrop {
