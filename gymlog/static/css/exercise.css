@@ -376,6 +376,9 @@ h1 {
   box-sizing: border-box;
   width: calc(100% - 2rem);
   height: 5rem;
+  background-color: var(--bg-1);
+  border: 2px solid var(--bg-4);
+  border-radius: .25rem;
 }
 
 .save-success {
@@ -385,10 +388,12 @@ h1 {
   background-color: var(--red) !important;
 }
 .save-success-notes {
-  background-color: var(--green-blend) !important;
+  outline: none !important;
+  border: 2px solid var(--green-alt) !important;
 }
 .save-error-notes {
-  background-color: var(--red-blend) !important;
+  outline: none !important;
+  border: 2px solid var(--red-alt) !important;
 }
 
 /* Dialog specific styles */
