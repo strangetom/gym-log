@@ -132,8 +132,11 @@ def exercise_endpoint(exerciseID: int):
         workoutID = request.args.get("workoutID")
 
         graph_data = W.get_exercise_history(exerciseID)
-        # Extract the lastest entry to display on y axis
-        graph_label = list(graph_data.values())[0][0]
+        # Extract the lastest entry to display on y axis, if there is graph data
+        if len(graph_data) == 0:
+            graph_label = ""
+        else:
+            graph_label = list(graph_data.values())[0][0]
 
         return render_template(
             "exercise.html.jinja",
