@@ -932,7 +932,7 @@ class WorkoutInterface:
         ):
             previous = previous_set.weight_kg * previous_set.repetitions
             current = current_set.weight_kg * current_set.repetitions
-            if previous_set != 0:
+            if previous > 0:
                 change_from_previous = (current - previous) / previous * 100
         elif (
             current_set.distance_m is not None
