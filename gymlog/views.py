@@ -4,7 +4,7 @@ import json
 
 from flask import Response, render_template, request
 
-from gymlog import app
+from gymlog import app, oidc
 from gymlog.interfaces import WorkoutInterface
 
 W = WorkoutInterface()
@@ -24,6 +24,7 @@ def serviceworker():
 
 
 @app.route("/")
+@oidc.require_login
 def home():
     """Return homepage
 
@@ -37,6 +38,7 @@ def home():
 
 
 @app.route("/edit-workout/<int:workoutID>")
+@oidc.require_login
 def edit_workout(workoutID: int):
     """Page for editing workout name and exercise list.
 
@@ -64,6 +66,7 @@ def edit_workout(workoutID: int):
 
 @app.route("/workout/", methods=["POST"], defaults={"workoutID": None})
 @app.route("/workout/<int:workoutID>", methods=["GET", "DELETE", "PUT"])
+@oidc.require_login
 def workout_endpoint(workoutID: int):
     """Workout endpoint
     If the method is GET, return workout page.
@@ -109,6 +112,7 @@ def workout_endpoint(workoutID: int):
 @app.route("/exercise/", methods=["POST"], defaults={"exerciseID": None})
 @app.route("/exercise/<int:exerciseID>", methods=["GET", "DELETE"])
 @app.route("/exercise/<int:exerciseID>", methods=["PATCH"])
+@oidc.require_login
 def exercise_endpoint(exerciseID: int):
     """Exercise endpoint.
     If the method is GET, return exercise page.
@@ -170,6 +174,7 @@ def exercise_endpoint(exerciseID: int):
 
 @app.route("/set/", methods=["POST"], defaults={"setID": None})
 @app.route("/set/<int:setID>", methods=["DELETE", "PUT"])
+@oidc.require_login
 def set_endpoint(setID: int):
     """Exercise set endpoint.
     If the method is POST, create new set.
@@ -202,6 +207,7 @@ def set_endpoint(setID: int):
 
 
 @app.route("/sync", methods=["POST"])
+@oidc.require_login
 def sync_sets():
     """Sync sets cached when offline to database.
 

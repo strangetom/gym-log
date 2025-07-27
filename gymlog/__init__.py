@@ -1,8 +1,25 @@
 #!/usr/bin/env python3
 
+import os
+
 from flask import Flask, Response
+from flask_oidc import OpenIDConnect
 
 app = Flask(__name__)
+app.secret_key = "BapYtZ55gdyUb7gyVwLkaMd7qzzaTCswTFDLFJrCU0I="
+app.config["OIDC_CLIENT_SECRETS"] = {
+    "web": {
+        "client_id": os.getenv("OIDC_CLIENT_ID"),
+        "client_secret": os.getenv("OIDC_CLIENT_SECRET"),
+        "auth_uri": os.getenv("OIDC_AUTH_URI"),
+        "userinfo_uri": f"{os.getenv('OIDC_AUTH_URI')}/api/oidc/userinfo",
+        "issuer": os.getenv("OIDC_ISSUER"),
+        "redirect_uris": [os.getenv("OIDC_REDIRECT_URI")],
+    }
+}
+app.config["OIDC_OVERWRITE_REDIRECT_URI"] = os.getenv("OIDC_OVERWRITE_REDIRECT_URI")
+app.config["OIDC_SCOPES"] = "openid email profile"
+oidc = OpenIDConnect(app)
 
 import gymlog.views  # noqa: E402, F401
 from gymlog.models import (  # noqa: E402
