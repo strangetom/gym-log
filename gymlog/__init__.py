@@ -34,15 +34,16 @@ from gymlog.models import (  # noqa: E402
 database.create_tables([Exercise, Workout, Sets, WorkoutExercise], safe=True)
 database.close()
 
+
 @app.template_filter("slugify")
 def slugify(text: str) -> str:
     """Simple slugification of text e.g. "Upper Body" -> "upper-body"
-    
+
     Parameters
     ----------
     text : str
         Text to slugify
-    
+
     Returns
     -------
     str
