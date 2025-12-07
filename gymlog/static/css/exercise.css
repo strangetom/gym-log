@@ -1,5 +1,10 @@
 @import 'colours.css';
 
+@view-transition {
+  navigation: auto;
+}
+
+
 body {
   font-family: sans-serif;
   color: var(--fg);
