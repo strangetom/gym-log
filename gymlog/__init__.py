@@ -49,7 +49,7 @@ def slugify(text: str) -> str:
     str
         Slugified text
     """
-    return "-".join([word.lower() for word in text.split()])
+    return "-".join([word.lower() for word in text.split()]).replace("-", "")
 
 
 @app.before_request
