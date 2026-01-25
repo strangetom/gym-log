@@ -62,13 +62,12 @@ h1 {
 }
 
 #history {
-  margin-top: 5.5rem;
+  margin: 5.5rem 1rem 0;
 }
 .history-entry {
   display: grid;
-  grid-template-columns: 20% auto;
+  grid-template-columns: 4rem 1fr;
   grid-gap: 1rem;
-  justify-items: center;
   align-items: center;
   margin: 1rem 0;
 }
