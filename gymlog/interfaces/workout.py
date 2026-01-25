@@ -3,6 +3,7 @@
 import datetime
 import math
 import uuid
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -38,6 +39,16 @@ class ExerciseStats:
     last_workout: str
     last_set: str
     aggregate: str
+
+
+@dataclass
+class WorkoutHistory:
+    date: datetime.date
+    month: str
+    day: str
+    exercises: set[str]
+    category: str
+    colour: str
 
 
 class WorkoutInterface:
@@ -993,3 +1004,47 @@ class WorkoutInterface:
             One rep max value
         """
         return weight / (1.0278 - 0.0278 * reps)
+
+    def get_workout_history(self, max_workouts: int = 15) -> list[WorkoutHistory]:
+        # Create a dict listing the unique exercises on each day a workout was done.
+        exercise_dates = defaultdict(set)
+        sets = Sets.select().order_by(Sets.uid.desc())
+        for set_ in sets:
+            date = self._parse_timestamp(set_.datetime)
+            exercise_dates[date.date()].add(set_.exerciseID)
+
+        # Iterate over workout_history_exercises and determine predominant workout from
+        # exerciseIDs, and map exerciseIDs to exercise names.
+        history = []
+        for date, exercise_ids in exercise_dates.items():
+            workout_ids = []
+            exercise_names = set()
+            for exercise_id in exercise_ids:
+                workout_id = (
+                    Workout.select(Workout.workout_id)
+                    .join(WorkoutExercise)
+                    .where(WorkoutExercise.exercise == exercise_id)
+                    .scalar()
+                )
+                workout_ids.append(workout_id)
+
+                exercise_names.add(self.get_exercise_name(exercise_id))
+
+            # Determine most common workout from the workouts each exercise belongs to.
+            workout_id_count = Counter(workout_ids)
+            most_common_workout_id, _ = workout_id_count.most_common(1)[0]
+
+            history.append(
+                WorkoutHistory(
+                    date=date,
+                    month=date.strftime("%b"),
+                    day=date.strftime("%d"),
+                    exercises=exercise_names,
+                    category=self.get_workout_name(most_common_workout_id),
+                    colour=self.get_workout_colour(most_common_workout_id),
+                )
+            )
+            if len(history) == max_workouts:
+                break
+
+        return history

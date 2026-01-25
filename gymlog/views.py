@@ -206,6 +206,14 @@ def set_endpoint(setID: int):
         return Response(status=200)
 
 
+@app.route("/history", methods=["GET"])
+@oidc.require_login
+def workout_history():
+    """Workout history page."""
+    history = W.get_workout_history(max_workouts=25)
+    return render_template("history.html.jinja", history=history)
+
+
 @app.route("/sync", methods=["POST"])
 @oidc.require_login
 def sync_sets():

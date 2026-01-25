@@ -26,6 +26,10 @@ body {
   font-size: 1.3rem;
   max-width: calc(80ch / 1.3);
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 15% auto 15%;
+  align-items: center;
+  justify-items: center;
 }
 h1 {
   margin: .7rem;
@@ -33,9 +37,6 @@ h1 {
   text-align: center;
 }
 #offline {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
   height: calc(2.5rem);
   width: calc(2.5rem);
   padding: 0;
@@ -43,6 +44,17 @@ h1 {
   border: none;
 }
 #offline img{
+  width: 100%;
+  height: 100%;
+}
+#history {
+  height: calc(2.5rem);
+  width: calc(2.5rem);
+  padding: 0;
+  background: none;
+  border: none;
+}
+#history img{
   width: 100%;
   height: 100%;
 }
