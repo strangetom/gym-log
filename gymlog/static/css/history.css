@@ -72,14 +72,14 @@ h1 {
   margin: 1rem 0;
 }
 .history-date-bg {
-  border-radius: 3rem;
+  border-radius: .5rem;
   width: 4rem;
   height: 4rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-color: var(--bg);
-  border: 1px solid var(--bg-2);
+  background-color: color-mix(in srgb, var(--workout-colour) 20%, var(--bg));
+  border: 2px solid var(--workout-colour);
   box-shadow: var(--small-shadow);
 }
 .history-date-bg p {
