@@ -14,4 +14,4 @@ RUN mkdir -p /app/data
 
 CMD ["gunicorn",  "--chdir", "/app", "--bind", "0.0.0.0:5000", "gymlog:app"]
 
-HEALTHCHECK --start-period=10s CMD python3 /app/gymlog/healthcheck.py || exit 1
+HEALTHCHECK --start-period=10s --interval=5m --timeout=5s CMD python3 /app/gymlog/healthcheck.py || exit 1
