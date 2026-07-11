@@ -5,8 +5,8 @@ const hideDialogTiming = {
   duration: 100,
   easing: "ease-out",
 };
-let timer;
-var wakelock = null;
+let timer: Timer | null;
+var wakelock: WakeLockSentinel | null = null;
 
 enum WakelockStatus {
   Enable = 1,
@@ -22,7 +22,7 @@ class Timer {
   // Store pause time, to continue from if paused, milliseconds
   pauseElapsed: number = 0;
   // Store interval id
-  interval: number = null;
+  interval: number | undefined = undefined;
   // Timer element
   timerEl: HTMLDivElement;
   // Display element, where we'll show the output
@@ -52,7 +52,7 @@ class Timer {
    * Toggle timer start / pause
    */
   toggle() {
-    if (this.interval == null) {
+    if (this.interval == undefined) {
       this.startTime = Date.now();
       this.interval = setInterval(this.display.bind(this), 100);
       this.togglePlayPause();
@@ -61,7 +61,7 @@ class Timer {
     } else {
       this.pauseElapsed = Date.now() - this.startTime + this.pauseElapsed;
       clearInterval(this.interval);
-      this.interval = null;
+      this.interval = undefined;
       this.togglePlayPause();
       toggleWakeLock(WakelockStatus.Disable);
     }
@@ -72,11 +72,11 @@ class Timer {
    */
   reset() {
     clearInterval(this.interval);
-    this.interval = null;
+    this.interval = undefined;
     this.pauseElapsed = 0;
 
     // Force start icon to play
-    let img = this.playPauseEl.querySelector("img");
+    let img = this.playPauseEl.querySelector("img") as HTMLImageElement;
     img.src = "/static/img/play.svg";
     this.displayEl.innerHTML = "&ndash;&ndash;:&ndash;&ndash;:&ndash;&ndash;";
     this.millisEl.innerHTML = "&ndash;&ndash;&ndash;";
@@ -88,7 +88,7 @@ class Timer {
   }
 
   /**
-   * Convert counter in seconds to readble time and display in displayEl
+   * Convert counter in seconds to readable time and display in displayEl
    */
   display() {
     let elapsedMillis = Date.now() - this.startTime + this.pauseElapsed;
@@ -98,7 +98,7 @@ class Timer {
     let minutes = Math.floor((Math.floor(elapsedSecs) % 3600) / 60);
     let seconds = Math.floor(Math.floor(elapsedSecs) % 60);
 
-    // Get milli seconds, but only to 10 ms accuracy, so last digit is always 0
+    // Get milliseconds, but only to 10 ms accuracy, so last digit is always 0
     let millis = (elapsedSecs % 1) * 1000;
     let roundedMillis = Math.ceil(millis / 10) * 10;
 
@@ -115,7 +115,7 @@ class Timer {
    * Toggle img on play / pause button
    */
   togglePlayPause() {
-    let img = this.playPauseEl.querySelector("img");
+    let img = this.playPauseEl.querySelector("img") as HTMLImageElement;
     if (img.src.endsWith("play.svg")) {
       img.src = "/static/img/pause.svg";
       this.timerEl.classList.remove("paused");
@@ -135,9 +135,11 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("formdata", insertUUIDTimestamp);
 
   // Set offline mode
-  let offline = JSON.parse(localStorage.getItem("offline"));
+  let offline = JSON.parse(localStorage.getItem("offline") as string);
   if (offline) {
-    document.querySelector("#offline").classList.remove("hidden");
+    (document.querySelector("#offline") as HTMLElement).classList.remove(
+      "hidden",
+    );
     // Redirect saved sets to localStorage
     form.addEventListener("submit", saveLocally);
   } else {
@@ -167,8 +169,9 @@ document.addEventListener("DOMContentLoaded", () => {
     el.addEventListener("click", showEditSetDialog);
   });
 
-  let editDialog: HTMLDialogElement =
-    document.querySelector("#edit-set-dialog");
+  let editDialog: HTMLDialogElement = document.querySelector(
+    "#edit-set-dialog",
+  ) as HTMLDialogElement;
   editDialog.addEventListener("click", (event) => {
     if ((event.target as HTMLElement).nodeName === "DIALOG") {
       let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
@@ -178,7 +181,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  let editBtn = editDialog.querySelector("button[value='edit']");
+  let editBtn = editDialog.querySelector(
+    "button[value='edit']",
+  ) as HTMLButtonElement;
   editBtn.addEventListener("click", (e) => {
     e.preventDefault();
     let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
@@ -188,7 +193,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  let deleteBtn = editDialog.querySelector("button[value='delete']");
+  let deleteBtn = editDialog.querySelector(
+    "button[value='delete']",
+  ) as HTMLButtonElement;
   deleteBtn.addEventListener("click", (e) => {
     e.preventDefault();
     let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
@@ -198,7 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  let cancelBtn = editDialog.querySelector("button[value='cancel']");
+  let cancelBtn = editDialog.querySelector(
+    "button[value='cancel']",
+  ) as HTMLButtonElement;
   cancelBtn.addEventListener("click", (e) => {
     e.preventDefault();
     let animation = editDialog.animate(hideDialogAnimation, hideDialogTiming);
@@ -209,24 +218,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Timer element for time-based exercises
   // Only initialise and add event listeners if it's on the exercise page
-  let timerEl: HTMLDivElement = document.querySelector(".timer");
+  let timerEl: HTMLDivElement = document.querySelector(
+    ".timer",
+  ) as HTMLDivElement;
   if (timerEl != null) {
     timer = new Timer(timerEl);
-    let timerStartBtn: HTMLButtonElement =
-      document.querySelector("#timer-start-btn");
+    let timerStartBtn: HTMLButtonElement = document.querySelector(
+      "#timer-start-btn",
+    ) as HTMLButtonElement;
     timerStartBtn.addEventListener("click", () => {
-      timer.toggle();
+      if (timer != null) {
+        timer.toggle();
+      }
     });
-    let timerStopBtn: HTMLButtonElement =
-      document.querySelector("#timer-stop-btn");
+    let timerStopBtn: HTMLButtonElement = document.querySelector(
+      "#timer-stop-btn",
+    ) as HTMLButtonElement;
     timerStopBtn.addEventListener("click", () => {
-      timer.reset();
+      if (timer != null) {
+        timer.reset();
+      }
     });
   }
 
   // Update notes when typing
-  var inputTimer;
-  let notes: HTMLTextAreaElement = document.querySelector("#notes textarea");
+  var inputTimer: number | undefined;
+  let notes: HTMLTextAreaElement = document.querySelector(
+    "#notes textarea",
+  ) as HTMLTextAreaElement;
   notes.addEventListener("input", (e) => {
     clearTimeout(inputTimer);
     inputTimer = setTimeout(patchNotes, 750);
@@ -236,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let exerciseID = (document.querySelector("#exerciseID") as HTMLInputElement)
     .value;
-  let graphCanvas = document.getElementById("history");
+  let graphCanvas = document.getElementById("history") as HTMLCanvasElement;
   if (graphCanvas != null) {
     fetch(`/exercise-history/${exerciseID}`)
       .then((r) => r.json())
@@ -245,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ds.backgroundColor = (context) => {
             let workoutColor = getCSSVar(
               "--workout-color",
-              document.querySelector("body"),
+              document.querySelector("body") as HTMLBodyElement,
             );
             let foregroundColor = getCSSVar("--fg");
             if (context.dataIndex == undefined) return workoutColor;
@@ -259,7 +278,8 @@ document.addEventListener("DOMContentLoaded", () => {
           };
         });
 
-        graphCanvas.parentElement.style.width = data.labels.length * 50 + "px";
+        (graphCanvas.parentElement as HTMLDivElement).style.width =
+          data.labels.length * 50 + "px";
         new Chart(graphCanvas, {
           type: "bar",
           data: data,
@@ -314,7 +334,9 @@ function patchNotes(e: Event) {
     method: "PATCH",
     body: patch_data,
   }).then((res) => {
-    let textarea = document.querySelector("#notes > textarea");
+    let textarea = document.querySelector(
+      "#notes > textarea",
+    ) as HTMLTextAreaElement;
     if (res.ok) {
       textarea.classList.add("save-success-notes");
       // Restore default after 5 seconds
@@ -336,42 +358,60 @@ function patchNotes(e: Event) {
  * @param {Event} e Click event for set to be edited.
  */
 function showEditSetDialog(e: Event) {
-  let set: HTMLDivElement = (e.target as HTMLDivElement).closest(".set-card");
-  let editDialog: HTMLDialogElement =
-    document.querySelector("#edit-set-dialog");
+  let set: HTMLDivElement = (e.target as HTMLDivElement).closest(
+    ".set-card",
+  ) as HTMLDivElement;
+  let editDialog: HTMLDialogElement = document.querySelector(
+    "#edit-set-dialog",
+  ) as HTMLDialogElement;
 
-  (editDialog.querySelector("#setID") as HTMLInputElement).value =
-    set.dataset.uid;
+  (editDialog.querySelector("#setID") as HTMLInputElement).value = set.dataset
+    .uid as string;
 
   if (set.dataset.type == "weight-repetitions") {
-    let repDialogInput: HTMLInputElement =
-      editDialog.querySelector("#repetitions");
+    let repDialogInput: HTMLInputElement = editDialog.querySelector(
+      "#repetitions",
+    ) as HTMLInputElement;
     repDialogInput.value = set.dataset.repetitions || "";
-    let weightDialogInput: HTMLInputElement =
-      editDialog.querySelector("#weight_kg");
+    let weightDialogInput: HTMLInputElement = editDialog.querySelector(
+      "#weight_kg",
+    ) as HTMLInputElement;
     weightDialogInput.value = set.dataset.weight || "";
   } else if (set.dataset.type == "distance-time") {
-    let distanceDialogInput: HTMLInputElement =
-      editDialog.querySelector("#distance_m");
+    let distanceDialogInput: HTMLInputElement = editDialog.querySelector(
+      "#distance_m",
+    ) as HTMLInputElement;
     distanceDialogInput.value = set.dataset.distance || "";
-    let hoursDialogInput: HTMLInputElement = editDialog.querySelector("#hours");
+    let hoursDialogInput: HTMLInputElement = editDialog.querySelector(
+      "#hours",
+    ) as HTMLInputElement;
     hoursDialogInput.value = set.dataset.hours || "";
-    let minsDialogInput: HTMLInputElement = editDialog.querySelector("#mins");
+    let minsDialogInput: HTMLInputElement = editDialog.querySelector(
+      "#mins",
+    ) as HTMLInputElement;
     minsDialogInput.value = set.dataset.mins || "";
-    let secondsDialogInput: HTMLInputElement =
-      editDialog.querySelector("#seconds");
+    let secondsDialogInput: HTMLInputElement = editDialog.querySelector(
+      "#seconds",
+    ) as HTMLInputElement;
     secondsDialogInput.value = set.dataset.seconds || "";
   } else if (set.dataset.type == "time") {
-    let hoursDialogInput: HTMLInputElement = editDialog.querySelector("#hours");
+    let hoursDialogInput: HTMLInputElement = editDialog.querySelector(
+      "#hours",
+    ) as HTMLInputElement;
     hoursDialogInput.value = set.dataset.hours || "";
-    let minsDialogInput: HTMLInputElement = editDialog.querySelector("#mins");
+    let minsDialogInput: HTMLInputElement = editDialog.querySelector(
+      "#mins",
+    ) as HTMLInputElement;
     minsDialogInput.value = set.dataset.mins || "";
-    let secondsDialogInput: HTMLInputElement =
-      editDialog.querySelector("#seconds");
+    let secondsDialogInput: HTMLInputElement = editDialog.querySelector(
+      "#seconds",
+    ) as HTMLInputElement;
     secondsDialogInput.value = set.dataset.seconds || "";
   }
 
-  let difficultInput: HTMLInputElement = editDialog.querySelector("#difficult");
+  let difficultInput: HTMLInputElement = editDialog.querySelector(
+    "#difficult",
+  ) as HTMLInputElement;
   if (set.dataset.difficult == "True") {
     difficultInput.checked = true;
   }
@@ -383,9 +423,12 @@ function showEditSetDialog(e: Event) {
  * Modification includes changing values or deleting the set.
  */
 function modifySet() {
-  let editDialog: HTMLDialogElement =
-    document.querySelector("#edit-set-dialog");
-  let formEl: HTMLFormElement = editDialog.querySelector("form");
+  let editDialog: HTMLDialogElement = document.querySelector(
+    "#edit-set-dialog",
+  ) as HTMLDialogElement;
+  let formEl: HTMLFormElement = editDialog.querySelector(
+    "form",
+  ) as HTMLFormElement;
   let post_data = new FormData(formEl);
   let setID = post_data.get("setID");
   let url = `/set/${setID}`;
@@ -442,7 +485,7 @@ function insertUUIDTimestamp(e: FormDataEvent) {
  * @param {Event} e Form submission event to intercept
  */
 function saveToServer(e: Event) {
-  // Dont' use native form submission as this results in a redirection
+  // Don't use native form submission as this results in a redirection
   e.preventDefault();
 
   let form = document.querySelector("#todays-sets > form") as HTMLFormElement;
@@ -455,7 +498,9 @@ function saveToServer(e: Event) {
     if (res.ok) {
       window.location.reload();
     } else {
-      let btn: HTMLButtonElement = form.querySelector("button");
+      let btn: HTMLButtonElement = form.querySelector(
+        "button",
+      ) as HTMLButtonElement;
       btn.classList.add("save-error");
       // Restore default after 5 seconds
       setTimeout(() => {
@@ -476,7 +521,8 @@ function saveLocally(e: Event) {
   let formdata = new FormData(form);
   let data = Object.fromEntries(formdata);
 
-  let offlineData = JSON.parse(localStorage.getItem("offline-sets")) || [];
+  let offlineData =
+    JSON.parse(localStorage.getItem("offline-sets") as string) || [];
   offlineData.push(data);
   localStorage.setItem("offline-sets", JSON.stringify(offlineData));
   showOfflineSets();
@@ -487,10 +533,11 @@ function saveLocally(e: Event) {
  * @param {Event} e Click event from clicking icon
  */
 function removeLocalSet(e: Event) {
-  let set = (e.target as HTMLImageElement).closest("div");
+  let set = (e.target as HTMLImageElement).closest("div") as HTMLDivElement;
   let uuid = set.dataset.uuid;
 
-  let offlineData = JSON.parse(localStorage.getItem("offline-sets")) || [];
+  let offlineData =
+    JSON.parse(localStorage.getItem("offline-sets") as string) || [];
   let setRemovedData = offlineData.filter((s) => {
     return s.uuid != uuid;
   });
@@ -506,12 +553,15 @@ function showOfflineSets() {
   let exerciseID = (document.querySelector("#exerciseID") as HTMLInputElement)
     .value;
 
-  let offlineSets = JSON.parse(localStorage.getItem("offline-sets"));
+  let offlineSets = JSON.parse(localStorage.getItem("offline-sets") as string);
   if (offlineSets == null) {
     return;
   }
 
   let offlineSetContainer = document.querySelector("#todays-sets .offline");
+  if (offlineSetContainer == null) {
+    return;
+  }
   offlineSetContainer.innerHTML = "";
 
   let relevantOfflineSets = offlineSets.filter((s) => {

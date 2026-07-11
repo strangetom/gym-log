@@ -14,7 +14,7 @@ class Timer {
     constructor(timerEl) {
         this.startTime = 0;
         this.pauseElapsed = 0;
-        this.interval = null;
+        this.interval = undefined;
         this.wakelock = null;
         this.timerEl = timerEl;
         this.displayEl = timerEl.querySelector("#timer-display");
@@ -22,7 +22,7 @@ class Timer {
         this.playPauseEl = timerEl.querySelector("#timer-start-btn");
     }
     toggle() {
-        if (this.interval == null) {
+        if (this.interval == undefined) {
             this.startTime = Date.now();
             this.interval = setInterval(this.display.bind(this), 100);
             this.togglePlayPause();
@@ -32,14 +32,14 @@ class Timer {
         else {
             this.pauseElapsed = Date.now() - this.startTime + this.pauseElapsed;
             clearInterval(this.interval);
-            this.interval = null;
+            this.interval = undefined;
             this.togglePlayPause();
             toggleWakeLock(WakelockStatus.Disable);
         }
     }
     reset() {
         clearInterval(this.interval);
-        this.interval = null;
+        this.interval = undefined;
         this.pauseElapsed = 0;
         let img = this.playPauseEl.querySelector("img");
         img.src = "/static/img/play.svg";
@@ -145,11 +145,15 @@ document.addEventListener("DOMContentLoaded", () => {
         timer = new Timer(timerEl);
         let timerStartBtn = document.querySelector("#timer-start-btn");
         timerStartBtn.addEventListener("click", () => {
-            timer.toggle();
+            if (timer != null) {
+                timer.toggle();
+            }
         });
         let timerStopBtn = document.querySelector("#timer-stop-btn");
         timerStopBtn.addEventListener("click", () => {
-            timer.reset();
+            if (timer != null) {
+                timer.reset();
+            }
         });
     }
     var inputTimer;
@@ -177,7 +181,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     return labelDate === today ? foregroundColor : workoutColor;
                 };
             });
-            graphCanvas.parentElement.style.width = data.labels.length * 50 + "px";
+            graphCanvas.parentElement.style.width =
+                data.labels.length * 50 + "px";
             new Chart(graphCanvas, {
                 type: "bar",
                 data: data,
@@ -240,8 +245,8 @@ function patchNotes(e) {
 function showEditSetDialog(e) {
     let set = e.target.closest(".set-card");
     let editDialog = document.querySelector("#edit-set-dialog");
-    editDialog.querySelector("#setID").value =
-        set.dataset.uid;
+    editDialog.querySelector("#setID").value = set.dataset
+        .uid;
     if (set.dataset.type == "weight-repetitions") {
         let repDialogInput = editDialog.querySelector("#repetitions");
         repDialogInput.value = set.dataset.repetitions || "";
@@ -365,6 +370,9 @@ function showOfflineSets() {
         return;
     }
     let offlineSetContainer = document.querySelector("#todays-sets .offline");
+    if (offlineSetContainer == null) {
+        return;
+    }
     offlineSetContainer.innerHTML = "";
     let relevantOfflineSets = offlineSets.filter((s) => {
         return s.exerciseID == exerciseID;
