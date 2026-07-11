@@ -266,7 +266,8 @@ document.addEventListener("DOMContentLoaded", () => {
           options: {
             maintainAspectRatio: false,
             borderRadius: 4,
-            barPercentage: 0.6,
+            barPercentage: 0.7,
+            categoryPercentage: 0.85,
             scales: {
               y: {
                 display: false,
