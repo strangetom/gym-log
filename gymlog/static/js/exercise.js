@@ -159,7 +159,52 @@ document.addEventListener("DOMContentLoaded", () => {
         inputTimer = setTimeout(patchNotes, 750);
     });
     showOfflineSets();
+    let exerciseID = document.querySelector("#exerciseID")
+        .value;
+    let graphCanvas = document.getElementById("history");
+    if (graphCanvas != null) {
+        fetch(`/exercise-history/${exerciseID}`)
+            .then((r) => r.json())
+            .then((data) => {
+            data.datasets.forEach((ds) => {
+                ds.backgroundColor = (context) => {
+                    let workoutColor = getCSSVar("--workout-color", document.querySelector("body"));
+                    let foregroundColor = getCSSVar("--fg");
+                    if (context.dataIndex == undefined)
+                        return workoutColor;
+                    return context.dataIndex === 0 ? foregroundColor : workoutColor;
+                };
+            });
+            graphCanvas.parentElement.style.width = data.labels.length * 50 + "px";
+            new Chart(graphCanvas, {
+                type: "bar",
+                data: data,
+                options: {
+                    maintainAspectRatio: false,
+                    borderRadius: 4,
+                    barPercentage: 0.6,
+                    scales: {
+                        y: {
+                            display: false,
+                        },
+                        x: {
+                            display: false,
+                            reverse: true,
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                    },
+                },
+            });
+        });
+    }
 });
+function getCSSVar(name, element = document.documentElement) {
+    return getComputedStyle(element).getPropertyValue(name).trim();
+}
 function isoDateTime() {
     return new Date().toISOString().split(".")[0] + "Z";
 }
@@ -359,4 +404,3 @@ function formatSetTimestamp(timestamp) {
     let date = new Date(timestamp);
     return date.toDateString().slice(4);
 }
-export {};

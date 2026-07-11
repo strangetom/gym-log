@@ -1,4 +1,4 @@
-import { saveError, saveSuccess } from "./saveFunctions.js";
+declare const Chart: any;
 
 const hideDialogAnimation = [{ transform: "translateY(-100%" }];
 const hideDialogTiming = {
@@ -233,7 +233,61 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   showOfflineSets();
+
+  let exerciseID = (document.querySelector("#exerciseID") as HTMLInputElement)
+    .value;
+  let graphCanvas = document.getElementById("history");
+  if (graphCanvas != null) {
+    fetch(`/exercise-history/${exerciseID}`)
+      .then((r) => r.json())
+      .then((data) => {
+        data.datasets.forEach((ds) => {
+          ds.backgroundColor = (context) => {
+            let workoutColor = getCSSVar(
+              "--workout-color",
+              document.querySelector("body"),
+            );
+            let foregroundColor = getCSSVar("--fg");
+            if (context.dataIndex == undefined) return workoutColor;
+            return context.dataIndex === 0 ? foregroundColor : workoutColor;
+          };
+        });
+
+        graphCanvas.parentElement.style.width = data.labels.length * 50 + "px";
+        new Chart(graphCanvas, {
+          type: "bar",
+          data: data,
+          options: {
+            maintainAspectRatio: false,
+            borderRadius: 4,
+            barPercentage: 0.6,
+            scales: {
+              y: {
+                display: false,
+              },
+              x: {
+                display: false,
+                reverse: true,
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          },
+        });
+      });
+  }
 });
+
+/*
+ * Get the value of a CSS property on given element.
+ */
+function getCSSVar(name: string, element = document.documentElement) {
+  return getComputedStyle(element).getPropertyValue(name).trim();
+}
+
 /**
  * Return current ISO8601 datetime without milliseconds.
  */

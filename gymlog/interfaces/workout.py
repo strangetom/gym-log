@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import datetime
+from itertools import groupby, zip_longest
 import math
 import uuid
 from collections import Counter, defaultdict
@@ -297,9 +298,7 @@ class WorkoutInterface:
 
         return set_data
 
-    def get_exercise_history(
-        self, exerciseID: int, num_sets: int = 25
-    ) -> Dict[int, List[Tuple[str, str]]]:
+    def get_exercise_history(self, exerciseID: int, num_sets: int = 25) -> dict:
         """Get historical sets for this exercise going back `period_days`.
 
         Parameters
@@ -321,119 +320,38 @@ class WorkoutInterface:
         """
         exercise_type = self.get_exercise_type(exerciseID)
 
-        data = {}
-        max_value = 0
-        min_value = 1e6
-
         sets = (
             Sets.select()
             .where(Sets.exercise == exerciseID)
             .order_by(Sets.datetime.desc())
         )
-        if exercise_type == "weight-repetitions":
-            for s in sets:
-                time_delta = self._parse_timestamp(s.datetime) - datetime.datetime.now(
-                    datetime.timezone.utc
-                )
+        # Group sets by date.
+        set_groups = []
+        dates = []
+        for date, set_group in groupby(
+            sets, key=lambda s: datetime.datetime.fromisoformat(s.datetime).date()
+        ):
+            if len(set_groups) == num_sets:
+                break
 
-                if time_delta.days in data.keys():
-                    data[time_delta.days].append(
-                        {
-                            "value": s.weight_kg * s.repetitions,
-                            "today": self._timestamp_is_today(s.datetime),
-                            "difficult": s.difficult,
-                        }
-                    )
-                else:
-                    data[time_delta.days] = [
-                        {
-                            "value": s.weight_kg * s.repetitions,
-                            "today": self._timestamp_is_today(s.datetime),
-                            "difficult": s.difficult,
-                        }
-                    ]
+            dates.append(date)
+            if exercise_type == "weight-repetitions":
+                set_groups.append([s.weight_kg * s.repetitions for s in set_group])
+            elif exercise_type == "distance-time":
+                set_groups.append([s.distance_m / s.time_s for s in set_group])
+            elif exercise_type == "time":
+                set_groups.append([s.time_s for s in set_group])
 
-                max_value = max(max_value, s.weight_kg * s.repetitions)
-                min_value = min(min_value, s.weight_kg * s.repetitions)
+        # Unzip lists from sets grouped by date to date grouped by set index e.g. all
+        # of set 1, all of set 2.
+        unzipped_lists = list(zip_longest(*set_groups, fillvalue=None))
 
-                if len(data.keys()) == num_sets:
-                    break
+        datasets = []
+        max_set_count = len(max(set_groups, key=len))
+        for i in range(max_set_count):
+            datasets.append({"label": f"set{i + 1}", "data": list(unzipped_lists[i])})
 
-        elif exercise_type == "distance-time":
-            for s in sets:
-                time_delta = self._parse_timestamp(s.datetime) - datetime.datetime.now(
-                    datetime.timezone.utc
-                )
-
-                if time_delta.days in data.keys():
-                    data[time_delta.days].append(
-                        {
-                            "value": s.distance_m / s.time_s,
-                            "today": self._timestamp_is_today(s.datetime),
-                            "difficult": s.difficult,
-                        }
-                    )
-                else:
-                    data[time_delta.days] = [
-                        {
-                            "value": s.distance_m / s.time_s,
-                            "today": self._timestamp_is_today(s.datetime),
-                            "difficult": s.difficult,
-                        }
-                    ]
-
-                max_value = max(max_value, s.distance_m / s.time_s)
-                min_value = min(min_value, s.distance_m / s.time_s)
-
-                if len(data.keys()) == num_sets:
-                    break
-
-        elif exercise_type == "time":
-            for s in sets:
-                time_delta = self._parse_timestamp(s.datetime) - datetime.datetime.now(
-                    datetime.timezone.utc
-                )
-
-                if time_delta.days in data.keys():
-                    data[time_delta.days].append(
-                        {
-                            "value": s.time_s,
-                            "today": self._timestamp_is_today(s.datetime),
-                            "difficult": s.difficult,
-                        }
-                    )
-                else:
-                    data[time_delta.days] = [
-                        {
-                            "value": s.time_s,
-                            "today": self._timestamp_is_today(s.datetime),
-                            "difficult": s.difficult,
-                        }
-                    ]
-
-                max_value = max(max_value, s.time_s)
-                min_value = min(min_value, s.time_s)
-
-                if len(data.keys()) == num_sets:
-                    break
-
-        # Calculate a scaled value, offset so zero is at the 0.9*min_value,
-        # then normalise. This is to better show the delta between sets
-        # Format the value to 3 significant figures for diplay purposes tooltips
-        max_value = max_value * 1.06
-        min_value = min_value * 0.9
-        for k, values in data.items():
-            data[k] = [
-                {
-                    "scaled": f"{(v['value'] - min_value) / (max_value - min_value):.2g}",
-                    "value": f"{v['value']:.3g}",
-                    "today": v["today"],
-                    "difficult": v["difficult"],
-                }
-                for v in values
-            ]
-
-        return data
+        return {"labels": dates, "datasets": datasets}
 
     def get_exercise_stats(self, exerciseID: int) -> ExerciseStats:
         """Summary

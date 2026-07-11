@@ -131,59 +131,22 @@ h1 {
 #graph {
   position: relative;
   height: 14.5rem;
-  direction: rtl;
   background-color: var(--bg);
   border-radius: var(--mid-radius);
   box-shadow: var(--big-shadow);
   border: 1px solid var(--bg-2);
 }
-#graph .graph-chart {
-  height: 100%;
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px;
-  padding: 1rem 0 1rem 0;
-  border-left: 1rem solid var(--bg);
-  border-right: 3rem solid var(--bg);
-  border-radius: var(--mid-radius);
+#graph #graph-scroll-container {
   overflow-x: scroll;
+  height: 100%;
+  direction: rtl;
+}
+#graph #graph-width-container {
+  padding: 2.5rem 0 0 0;
+  border-left: 1rem solid var(--bg);
+  border-right: 1rem solid var(--bg);
   box-sizing: border-box;
-}
-#graph #label {
-  position: absolute;
-  color: var(--fg-4);
-  right: 0.5rem;
-  left: 1rem;
-  /* The graph container has pading at the top and bottom of 2rem, so the
-  location of the bottom of the label needs to be scaled to (100% - 2rem)
-  so it aligns with the bars. Then add 1 rem to account for bottom padding. */
-  bottom: calc(calc(calc(100% - 2rem) * var(--size)) + 1rem);
-  border-bottom: 1px dashed var(--fg-4);
-}
-#graph .graph-group {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-}
-#graph .graph-bar {
-  position: relative;
-  width: 6px;
-  height: calc(100% * var(--size));
-  background-color: var(--workout-color);
-  border-radius: var(--small-radius);
-}
-#graph .graph-bar-today {
-  background-color: var(--fg);
-}
-#graph .graph-bar-difficult:after {
-  content: "";
-  height: 7px;
-  width: 5px;
-  background-color: var(--red-alt);
-  border-radius: 50%;
-  display: block;
-  position: absolute;
-  bottom: -10px;
+  height: 100%;
 }
 #graph h2 {
   font-size: 1.5rem;

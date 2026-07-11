@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width"/>
         <title>{{ name }} | Gym Log</title>
         <link rel="stylesheet" type="text/css" href="/static/css/exercise.css"/>
+        <script type="module" src="/static/js/chart.umd.min.js"></script>
         <script type="module" src="/static/js/exercise.js"></script>
         <!-- icons and manifest for PWA -->
         <link rel="manifest" href="/static/manifest.json"/>
@@ -43,15 +44,10 @@
 
         <section id="graph">
             <h2>History</h2>
-            <div class="graph-chart">
-                <div id="label" style="--size:{{ graph_label.scaled }}">{{ graph_label.value }}</div>
-                {%- for age, values in graph.items() -%}
-                <div class="graph-group">
-                    {%- for v in values -%}
-                    <div class="graph-bar {{ 'graph-bar-today' if v.today }} {{ 'graph-bar-difficult' if v.difficult }}" style="--size:{{ v.scaled }};" data-value="{{ v.value }}"></div>
-                    {%- endfor -%}
+            <div id="graph-scroll-container">
+                <div id="graph-width-container">
+                    <canvas id="history"></canvas>
                 </div>
-                {%- endfor -%}
             </div>
         </section>
 
