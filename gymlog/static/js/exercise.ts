@@ -249,7 +249,13 @@ document.addEventListener("DOMContentLoaded", () => {
             );
             let foregroundColor = getCSSVar("--fg");
             if (context.dataIndex == undefined) return workoutColor;
-            return context.dataIndex === 0 ? foregroundColor : workoutColor;
+            // If the label of the current group is today's date, use foreground colour
+            // otherwise use workout colour.
+            let labelDate = new Date(
+              context.chart.data.labels[context.dataIndex],
+            ).toDateString();
+            let today = new Date().toDateString();
+            return labelDate === today ? foregroundColor : workoutColor;
           };
         });
 

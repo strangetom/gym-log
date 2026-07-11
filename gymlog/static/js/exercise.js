@@ -172,7 +172,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     let foregroundColor = getCSSVar("--fg");
                     if (context.dataIndex == undefined)
                         return workoutColor;
-                    return context.dataIndex === 0 ? foregroundColor : workoutColor;
+                    let labelDate = new Date(context.chart.data.labels[context.dataIndex]).toDateString();
+                    let today = new Date().toDateString();
+                    return labelDate === today ? foregroundColor : workoutColor;
                 };
             });
             graphCanvas.parentElement.style.width = data.labels.length * 50 + "px";
