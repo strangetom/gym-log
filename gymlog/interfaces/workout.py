@@ -334,6 +334,9 @@ class WorkoutInterface:
             if len(set_groups) == num_sets:
                 break
 
+            # Reverse the set group so the latest set is last.
+            set_group = reversed(list(set_group))
+
             dates.append(date)
             if exercise_type == "weight-repetitions":
                 set_groups.append([s.weight_kg * s.repetitions for s in set_group])
